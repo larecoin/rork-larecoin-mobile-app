@@ -4,7 +4,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { 
   X, QrCode, CreditCard, Users, Compass, User, MessageSquare, FileText, Calendar,
-  Contact, UserPlus, Heart, FolderOpen, Wand2, Gamepad2, Layout, Bug, Gift, Settings,
+  Contact, UserPlus, Heart, FolderOpen, Wand2, Gamepad2, Layout, Bug, Gift, Settings, LayoutDashboard,
   Image, Code, Globe, HardDrive, Package, Webhook, Store, ClipboardList,
   Megaphone, PlusCircle, List, Award, ChevronRight, Coins, Banknote, Clover, HandCoins,
   ShoppingCart, ClipboardCheck, Shield, HelpCircle, FileSpreadsheet, Gem, TrendingUp, Boxes,
@@ -47,6 +47,7 @@ const menuSections: MenuSection[] = [
   {
     title: 'Social',
     items: [
+      { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
       { id: 'social-spaces', label: 'Social Spaces', icon: Users },
       { id: 'explore', label: 'Explore & Discover', icon: Compass },
       { id: 'profile', label: 'My Profile', icon: User },
@@ -163,6 +164,7 @@ export default function NavMenuModal({ visible, onClose }: NavMenuModalProps) {
       'invite-friends': '/menu/invite-friends',
       'scan-qr': '/menu/scan-qr',
       'buy-crypto': '/menu/buy-crypto',
+      'dashboard': '/(tabs)/(wallet)',
       'social-spaces': '/menu/social-spaces',
       'explore': '/menu/explore',
       'profile': '/(tabs)/profile',
