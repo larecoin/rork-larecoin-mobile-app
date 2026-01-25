@@ -56,6 +56,15 @@ const menuSections: MenuSection[] = [
     ],
   },
   {
+    title: 'Assets',
+    items: [
+      { id: 'tax-reports', label: 'Tax & Reports', icon: FileSpreadsheet },
+      { id: 'tokenize-assets', label: 'Tokenize Assets', icon: Gem },
+      { id: 'assets-market', label: 'Assets Market', icon: TrendingUp },
+      { id: 'my-tokenized-assets', label: 'My Tokenized Assets', icon: Boxes },
+    ],
+  },
+  {
     title: 'Shopping',
     items: [
       { id: 'shopping', label: 'Shopping', icon: ShoppingCart },
@@ -100,15 +109,6 @@ const menuSections: MenuSection[] = [
       { id: 'advanced-trading', label: 'Advanced Trading', icon: TrendingUp },
       { id: 'security-center', label: 'Security Center', icon: Shield },
       { id: 'helpdesk', label: 'Helpdesk', icon: HelpCircle },
-    ],
-  },
-  {
-    title: 'Assets',
-    items: [
-      { id: 'tax-reports', label: 'Tax & Reports', icon: FileSpreadsheet },
-      { id: 'tokenize-assets', label: 'Tokenize Assets', icon: Gem },
-      { id: 'assets-market', label: 'Assets Market', icon: TrendingUp },
-      { id: 'my-tokenized-assets', label: 'My Tokenized Assets', icon: Boxes },
     ],
   },
   {
