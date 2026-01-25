@@ -49,6 +49,7 @@ const menuSections: MenuSection[] = [
     items: [
       { id: 'wallet-nfts', label: 'My Wallet & NFTs', icon: Image },
       { id: 'staking-rewards', label: 'Staking & Rewards', icon: Coins },
+      { id: 'lusd-debit-card', label: 'LUSD Debit Card', icon: CreditCard },
       { id: 'payment-methods', label: 'Payment Methods', icon: CreditCard },
       { id: 'forex', label: 'Foreign Exchange', icon: Banknote },
       { id: 'lucky-draw', label: 'My Lucky Draws', icon: Clover },
@@ -181,6 +182,7 @@ export default function NavMenuModal({ visible, onClose }: NavMenuModalProps) {
       'referrals': '/menu/referrals',
       'wallet-nfts': '/menu/wallet-nfts',
       'staking-rewards': '/menu/staking-rewards',
+      'lusd-debit-card': '/menu/lusd-debit-card',
       'payment-methods': '/menu/payment-methods',
       'forex': '/menu/forex',
       'lucky-draw': '/menu/lucky-draw',
