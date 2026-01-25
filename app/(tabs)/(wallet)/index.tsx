@@ -14,7 +14,7 @@ interface LinkedCard {
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, RefreshControl, TextInput } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { ArrowUpRight, ArrowDownLeft, RefreshCw, Eye, EyeOff, ChevronRight, Plus, ChevronDown, Image, Coins, Droplets, Wallet, Check, Trash2, Edit3, Menu, Search, ArrowLeftRight, Clover, Receipt, GitBranch, Users, ShoppingCart, DollarSign, ShieldCheck, HandCoins, Send, FileText, CreditCard, Lock, Smartphone, Bell, AlertCircle, Shield } from 'lucide-react-native';
+import { ArrowUpRight, ArrowDownLeft, RefreshCw, Eye, EyeOff, ChevronRight, Plus, ChevronDown, Image, Coins, Droplets, Wallet, Check, Trash2, Edit3, Menu, Search, ArrowLeftRight, Clover, Receipt, GitBranch, Users, ShoppingCart, DollarSign, ShieldCheck, HandCoins, Send, FileText, CreditCard, Lock, Smartphone, Bell, AlertCircle, Shield, Settings } from 'lucide-react-native';
 import { useApp } from '@/contexts/AppContext';
 import ModeToggle from '@/components/ModeToggle';
 import TokenCard from '@/components/TokenCard';
@@ -278,12 +278,8 @@ export default function WalletDashboard() {
         <View style={[styles.balanceCard, { backgroundColor: balanceCardBg }]}>
           <View style={styles.balanceHeader}>
             <Text style={[styles.balanceLabel, { color: balanceCardTextSecondary }]}>Total Balance</Text>
-            <TouchableOpacity onPress={() => setBalanceVisible(!balanceVisible)}>
-              {balanceVisible ? (
-                <Eye size={20} color={balanceCardTextSecondary} />
-              ) : (
-                <EyeOff size={20} color={balanceCardTextSecondary} />
-              )}
+            <TouchableOpacity onPress={() => router.push('/menu/account-settings')}>
+              <Settings size={20} color={balanceCardTextSecondary} />
             </TouchableOpacity>
           </View>
           <Text style={[styles.balanceAmount, { color: balanceCardTextPrimary }]}>
