@@ -3,7 +3,9 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Refres
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { 
   Store, QrCode, Package, Edit2, Eye, Share2, Settings, 
-  Heart, ChevronRight, Plus, Check, X, Globe, MapPin, Copy, Link
+  Heart, ChevronRight, Plus, Check, X, Globe, MapPin, Copy, Link,
+  CreditCard, Wallet, Clock, Building2, Users, Bitcoin, Fingerprint,
+  ChevronDown, ChevronUp, DollarSign, Smartphone, Receipt
 } from 'lucide-react-native';
 import { Platform } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
@@ -17,12 +19,154 @@ interface Charity {
   description: string;
 }
 
+interface PaymentMethod {
+  id: string;
+  name: string;
+  fee: string;
+}
+
+interface PaymentCategory {
+  id: string;
+  name: string;
+  icon: React.ReactNode;
+  color: string;
+  description: string;
+  methods: PaymentMethod[];
+}
+
 const charities: Charity[] = [
   { id: '1', name: 'Red Cross', category: 'Humanitarian', description: 'Disaster relief and emergency assistance' },
   { id: '2', name: 'UNICEF', category: 'Children', description: 'Supporting children worldwide' },
   { id: '3', name: 'WWF', category: 'Environment', description: 'Wildlife conservation and environmental protection' },
   { id: '4', name: 'Doctors Without Borders', category: 'Health', description: 'Medical humanitarian aid' },
   { id: '5', name: 'Local Food Bank', category: 'Community', description: 'Fighting hunger in local communities' },
+];
+
+const paymentCategories: PaymentCategory[] = [
+  {
+    id: 'cards',
+    name: 'Card-Based Payments',
+    icon: <CreditCard size={20} color="#3498DB" />,
+    color: '#3498DB',
+    description: 'Credit, debit & prepaid cards',
+    methods: [
+      { id: 'visa', name: 'Visa', fee: '2.9%' },
+      { id: 'mastercard', name: 'Mastercard', fee: '2.9%' },
+      { id: 'amex', name: 'American Express', fee: '3.5%' },
+      { id: 'discover', name: 'Discover', fee: '2.9%' },
+      { id: 'diners', name: 'Diners Club', fee: '3.0%' },
+      { id: 'jcb', name: 'JCB', fee: '3.0%' },
+      { id: 'unionpay', name: 'UnionPay', fee: '2.8%' },
+      { id: 'visa-debit', name: 'Visa Debit', fee: '1.9%' },
+      { id: 'mc-debit', name: 'Mastercard Debit', fee: '1.9%' },
+      { id: 'prepaid', name: 'Prepaid Cards', fee: '2.5%' },
+      { id: 'gift-cards', name: 'Gift Cards', fee: '2.0%' },
+    ],
+  },
+  {
+    id: 'digital-wallets',
+    name: 'Digital Wallets & Mobile',
+    icon: <Smartphone size={20} color="#9B59B6" />,
+    color: '#9B59B6',
+    description: 'Apple Pay, Google Pay & more',
+    methods: [
+      { id: 'apple-pay', name: 'Apple Pay', fee: '2.5%' },
+      { id: 'google-pay', name: 'Google Pay', fee: '2.5%' },
+      { id: 'samsung-pay', name: 'Samsung Pay', fee: '2.5%' },
+      { id: 'paypal', name: 'PayPal', fee: '3.49%' },
+      { id: 'venmo', name: 'Venmo', fee: '3.0%' },
+      { id: 'cash-app', name: 'Cash App', fee: '2.75%' },
+      { id: 'alipay', name: 'Alipay', fee: '2.2%' },
+      { id: 'wechat-pay', name: 'WeChat Pay', fee: '2.2%' },
+      { id: 'amazon-pay', name: 'Amazon Pay', fee: '2.9%' },
+      { id: 'grabpay', name: 'GrabPay', fee: '2.3%' },
+      { id: 'phonepe', name: 'PhonePe', fee: '1.5%' },
+      { id: 'paytm', name: 'Paytm', fee: '1.5%' },
+      { id: 'mercado-pago', name: 'Mercado Pago', fee: '2.5%' },
+    ],
+  },
+  {
+    id: 'bnpl',
+    name: 'Buy Now, Pay Later',
+    icon: <Clock size={20} color="#E67E22" />,
+    color: '#E67E22',
+    description: 'Affirm, Klarna, Afterpay',
+    methods: [
+      { id: 'affirm', name: 'Affirm', fee: '5.99%' },
+      { id: 'afterpay', name: 'Afterpay / Clearpay', fee: '6.0%' },
+      { id: 'klarna', name: 'Klarna', fee: '5.99%' },
+      { id: 'paypal-pay4', name: 'PayPal Pay in 4', fee: '4.5%' },
+      { id: 'sezzle', name: 'Sezzle', fee: '6.0%' },
+      { id: 'zip', name: 'Zip (Quadpay)', fee: '6.0%' },
+    ],
+  },
+  {
+    id: 'bank-transfers',
+    name: 'Bank Transfers & Real-Time',
+    icon: <Building2 size={20} color="#27AE60" />,
+    color: '#27AE60',
+    description: 'ACH, Wire, SEPA & instant payments',
+    methods: [
+      { id: 'ach', name: 'ACH Transfer (U.S.)', fee: '0.8%' },
+      { id: 'wire', name: 'Wire Transfer', fee: '$25 flat' },
+      { id: 'sepa', name: 'SEPA Transfer (EU)', fee: '0.5%' },
+      { id: 'faster-uk', name: 'Faster Payments (UK)', fee: '0.5%' },
+      { id: 'fednow', name: 'FedNow (U.S.)', fee: '0.5%' },
+      { id: 'rtp', name: 'RTP Network', fee: '0.5%' },
+      { id: 'pix', name: 'Pix (Brazil)', fee: '0.5%' },
+      { id: 'upi', name: 'UPI (India)', fee: '0.3%' },
+      { id: 'promptpay', name: 'PromptPay (Thailand)', fee: '0.4%' },
+      { id: 'open-banking', name: 'Open Banking (A2A)', fee: '0.6%' },
+    ],
+  },
+  {
+    id: 'p2p',
+    name: 'P2P & Mobile Money',
+    icon: <Users size={20} color="#1ABC9C" />,
+    color: '#1ABC9C',
+    description: 'Zelle, M-Pesa & regional services',
+    methods: [
+      { id: 'zelle', name: 'Zelle', fee: '0.5%' },
+      { id: 'mpesa', name: 'M-Pesa (Africa)', fee: '1.5%' },
+      { id: 'gcash', name: 'GCash (Philippines)', fee: '1.5%' },
+      { id: 'dana', name: 'Dana (Indonesia)', fee: '1.5%' },
+      { id: 'ovo', name: 'OVO (Indonesia)', fee: '1.5%' },
+    ],
+  },
+  {
+    id: 'crypto',
+    name: 'Cryptocurrency & Blockchain',
+    icon: <Bitcoin size={20} color="#F39C12" />,
+    color: '#F39C12',
+    description: 'BTC, ETH, Stablecoins & more',
+    methods: [
+      { id: 'btc', name: 'Bitcoin (BTC)', fee: '1.0%' },
+      { id: 'eth', name: 'Ethereum (ETH)', fee: '1.0%' },
+      { id: 'usdt', name: 'USDT (Tether)', fee: '0.5%' },
+      { id: 'usdc', name: 'USDC', fee: '0.5%' },
+      { id: 'dai', name: 'DAI', fee: '0.5%' },
+      { id: 'sol', name: 'Solana (SOL)', fee: '1.0%' },
+      { id: 'bnb', name: 'BNB', fee: '1.0%' },
+      { id: 'bitpay', name: 'BitPay Gateway', fee: '1.0%' },
+      { id: 'coinbase-commerce', name: 'Coinbase Commerce', fee: '1.0%' },
+      { id: 'nowpayments', name: 'NOWPayments', fee: '0.5%' },
+    ],
+  },
+  {
+    id: 'specialized',
+    name: 'Other & Emerging Methods',
+    icon: <Fingerprint size={20} color="#8E44AD" />,
+    color: '#8E44AD',
+    description: 'QR, biometric, CBDCs & loyalty',
+    methods: [
+      { id: 'qr-payments', name: 'QR Code Payments', fee: '1.5%' },
+      { id: 'biometric', name: 'Biometric Payments', fee: '2.0%' },
+      { id: 'invoice', name: 'Invoice / Link Payments', fee: '2.9%' },
+      { id: 'autopay', name: 'Autopay / Recurring', fee: '2.5%' },
+      { id: 'loyalty-points', name: 'Loyalty / Rewards Points', fee: '1.0%' },
+      { id: 'cbdc', name: 'CBDC (Digital Yuan, etc.)', fee: '0.2%' },
+    ],
+  },
 ];
 
 export default function MyShopScreen() {
@@ -33,9 +177,34 @@ export default function MyShopScreen() {
   const [selectedCharity, setSelectedCharity] = useState<Charity | null>(charities[0]);
   const [donationPercent, setDonationPercent] = useState('2');
   const [copiedUrl, setCopiedUrl] = useState(false);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [expandedCategories, setExpandedCategories] = useState<string[]>([]);
+  const [enabledPaymentMethods, setEnabledPaymentMethods] = useState<string[]>([
+    'visa', 'mastercard', 'apple-pay', 'google-pay', 'paypal', 'btc', 'eth', 'usdt', 'usdc'
+  ]);
 
   const shopSlug = merchantProfile.name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
   const shopUrl = `larecoin.com/shop/${shopSlug}`;
+
+  const toggleCategory = (categoryId: string) => {
+    setExpandedCategories(prev => 
+      prev.includes(categoryId) 
+        ? prev.filter(id => id !== categoryId)
+        : [...prev, categoryId]
+    );
+  };
+
+  const togglePaymentMethod = (methodId: string) => {
+    setEnabledPaymentMethods(prev =>
+      prev.includes(methodId)
+        ? prev.filter(id => id !== methodId)
+        : [...prev, methodId]
+    );
+  };
+
+  const getEnabledCountForCategory = (category: PaymentCategory) => {
+    return category.methods.filter(m => enabledPaymentMethods.includes(m.id)).length;
+  };
 
   const copyShopUrl = async () => {
     if (Platform.OS === 'web') {
@@ -142,6 +311,25 @@ export default function MyShopScreen() {
             </TouchableOpacity>
           </View>
         </View>
+
+        <TouchableOpacity 
+          style={styles.paymentRequestCard}
+          onPress={() => setShowPaymentModal(true)}
+        >
+          <View style={styles.paymentRequestIconWrapper}>
+            <Receipt size={22} color="#3498DB" />
+          </View>
+          <View style={styles.paymentRequestInfo}>
+            <Text style={styles.paymentRequestTitle}>Request Payments</Text>
+            <Text style={styles.paymentRequestDesc}>
+              {enabledPaymentMethods.length} payment methods enabled
+            </Text>
+            <Text style={styles.paymentRequestNote}>
+              Net amounts moved on-chain to Larecoin liquidity pools
+            </Text>
+          </View>
+          <ChevronRight size={20} color={Colors.textSecondary} />
+        </TouchableOpacity>
 
         <TouchableOpacity 
           style={styles.charityCard}
@@ -278,6 +466,98 @@ export default function MyShopScreen() {
               onPress={() => setShowCharityModal(false)}
             >
               <Text style={styles.saveBtnText}>Save Selection</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+      <Modal
+        visible={showPaymentModal}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setShowPaymentModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={[styles.paymentModalContent, { paddingBottom: insets.bottom + 20 }]}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Payment Sources</Text>
+              <TouchableOpacity onPress={() => setShowPaymentModal(false)}>
+                <X size={24} color={Colors.text} />
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.paymentNotice}>
+              <DollarSign size={16} color={Colors.accent} />
+              <Text style={styles.paymentNoticeText}>
+                All payments incur processing fees. Net amounts are moved on-chain into Larecoin's liquidity pools.
+              </Text>
+            </View>
+
+            <ScrollView style={styles.paymentCategoryList} showsVerticalScrollIndicator={false}>
+              {paymentCategories.map(category => (
+                <View key={category.id} style={styles.paymentCategoryContainer}>
+                  <TouchableOpacity 
+                    style={styles.paymentCategoryHeader}
+                    onPress={() => toggleCategory(category.id)}
+                  >
+                    <View style={[styles.paymentCategoryIcon, { backgroundColor: category.color + '15' }]}>
+                      {category.icon}
+                    </View>
+                    <View style={styles.paymentCategoryInfo}>
+                      <Text style={styles.paymentCategoryName}>{category.name}</Text>
+                      <Text style={styles.paymentCategoryDesc}>{category.description}</Text>
+                    </View>
+                    <View style={styles.paymentCategoryRight}>
+                      <View style={[styles.enabledBadge, { backgroundColor: category.color + '20' }]}>
+                        <Text style={[styles.enabledBadgeText, { color: category.color }]}>
+                          {getEnabledCountForCategory(category)}/{category.methods.length}
+                        </Text>
+                      </View>
+                      {expandedCategories.includes(category.id) ? (
+                        <ChevronUp size={18} color={Colors.textSecondary} />
+                      ) : (
+                        <ChevronDown size={18} color={Colors.textSecondary} />
+                      )}
+                    </View>
+                  </TouchableOpacity>
+
+                  {expandedCategories.includes(category.id) && (
+                    <View style={styles.paymentMethodsList}>
+                      {category.methods.map(method => (
+                        <TouchableOpacity
+                          key={method.id}
+                          style={[
+                            styles.paymentMethodItem,
+                            enabledPaymentMethods.includes(method.id) && styles.paymentMethodItemEnabled
+                          ]}
+                          onPress={() => togglePaymentMethod(method.id)}
+                        >
+                          <View style={styles.paymentMethodInfo}>
+                            <Text style={styles.paymentMethodName}>{method.name}</Text>
+                            <Text style={styles.paymentMethodFee}>Fee: {method.fee}</Text>
+                          </View>
+                          <View style={[
+                            styles.paymentMethodToggle,
+                            enabledPaymentMethods.includes(method.id) && styles.paymentMethodToggleEnabled
+                          ]}>
+                            {enabledPaymentMethods.includes(method.id) && (
+                              <Check size={14} color="#fff" />
+                            )}
+                          </View>
+                        </TouchableOpacity>
+                      ))}
+                    </View>
+                  )}
+                </View>
+              ))}
+              <View style={{ height: 20 }} />
+            </ScrollView>
+
+            <TouchableOpacity 
+              style={styles.saveBtn}
+              onPress={() => setShowPaymentModal(false)}
+            >
+              <Text style={styles.saveBtnText}>Save Payment Settings</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -691,5 +971,162 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     color: Colors.background,
+  },
+  paymentRequestCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginHorizontal: 20,
+    backgroundColor: Colors.surface,
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: '#3498DB' + '30',
+  },
+  paymentRequestIconWrapper: {
+    width: 44,
+    height: 44,
+    borderRadius: 12,
+    backgroundColor: '#3498DB' + '15',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 14,
+  },
+  paymentRequestInfo: {
+    flex: 1,
+  },
+  paymentRequestTitle: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: Colors.text,
+    marginBottom: 2,
+  },
+  paymentRequestDesc: {
+    fontSize: 13,
+    color: Colors.textSecondary,
+    marginBottom: 2,
+  },
+  paymentRequestNote: {
+    fontSize: 11,
+    color: '#3498DB',
+    fontWeight: '500',
+  },
+  paymentModalContent: {
+    backgroundColor: Colors.background,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    padding: 20,
+    maxHeight: '90%',
+  },
+  paymentNotice: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: Colors.accent + '10',
+    borderRadius: 12,
+    padding: 12,
+    marginBottom: 16,
+    gap: 10,
+  },
+  paymentNoticeText: {
+    flex: 1,
+    fontSize: 12,
+    color: Colors.text,
+    lineHeight: 18,
+  },
+  paymentCategoryList: {
+    flex: 1,
+  },
+  paymentCategoryContainer: {
+    marginBottom: 12,
+    backgroundColor: Colors.surface,
+    borderRadius: 14,
+    overflow: 'hidden',
+  },
+  paymentCategoryHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 14,
+  },
+  paymentCategoryIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+  },
+  paymentCategoryInfo: {
+    flex: 1,
+  },
+  paymentCategoryName: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: Colors.text,
+    marginBottom: 2,
+  },
+  paymentCategoryDesc: {
+    fontSize: 12,
+    color: Colors.textSecondary,
+  },
+  paymentCategoryRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  enabledBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 8,
+  },
+  enabledBadgeText: {
+    fontSize: 11,
+    fontWeight: '600',
+  },
+  paymentMethodsList: {
+    paddingHorizontal: 14,
+    paddingBottom: 14,
+    borderTopWidth: 1,
+    borderTopColor: Colors.border,
+    paddingTop: 10,
+  },
+  paymentMethodItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: Colors.background,
+    borderRadius: 10,
+    padding: 12,
+    marginBottom: 6,
+  },
+  paymentMethodItemEnabled: {
+    backgroundColor: Colors.accent + '10',
+    borderWidth: 1,
+    borderColor: Colors.accent + '30',
+  },
+  paymentMethodInfo: {
+    flex: 1,
+  },
+  paymentMethodName: {
+    fontSize: 13,
+    fontWeight: '500',
+    color: Colors.text,
+    marginBottom: 2,
+  },
+  paymentMethodFee: {
+    fontSize: 11,
+    color: Colors.textSecondary,
+  },
+  paymentMethodToggle: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: Colors.border,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  paymentMethodToggleEnabled: {
+    backgroundColor: Colors.accent,
+    borderColor: Colors.accent,
   },
 });
