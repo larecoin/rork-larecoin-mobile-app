@@ -33,6 +33,9 @@ export default function WalletDashboard() {
     wallets, 
     activeWallet, 
     createWallet, 
+    createSubWallet,
+    getSubWallets,
+    getMainWallets,
     switchActiveWallet,
     deleteWallet,
     updateWalletLabel,
@@ -47,6 +50,10 @@ export default function WalletDashboard() {
   const [editingWalletId, setEditingWalletId] = React.useState<string | null>(null);
   const [editWalletName, setEditWalletName] = React.useState('');
   const [showNavMenu, setShowNavMenu] = React.useState(false);
+  const [showSubWalletModal, setShowSubWalletModal] = React.useState(false);
+  const [subWalletParentId, setSubWalletParentId] = React.useState<string | null>(null);
+  const [newSubWalletName, setNewSubWalletName] = React.useState('');
+  const [expandedWallets, setExpandedWallets] = React.useState<Record<string, boolean>>({});
   const [searchQuery, setSearchQuery] = React.useState('');
   const [assetTab, setAssetTab] = React.useState<'assets' | 'nfts' | 'receipts'>('assets');
   const [linkedCards, setLinkedCards] = React.useState<LinkedCard[]>([
@@ -117,6 +124,22 @@ export default function WalletDashboard() {
       setShowNewWalletModal(false);
     }
   };
+
+  const handleCreateSubWallet = async () => {
+    if (newSubWalletName.trim() && subWalletParentId) {
+      await createSubWallet(newSubWalletName.trim(), subWalletParentId);
+      setNewSubWalletName('');
+      setSubWalletParentId(null);
+      setShowSubWalletModal(false);
+      setExpandedWallets(prev => ({ ...prev, [subWalletParentId]: true }));
+    }
+  };
+
+  const toggleWalletExpansion = (walletId: string) => {
+    setExpandedWallets(prev => ({ ...prev, [walletId]: !prev[walletId] }));
+  };
+
+  const mainWallets = getMainWallets();
 
   const handleEditWallet = async () => {
     if (editingWalletId && editWalletName.trim()) {
@@ -281,47 +304,120 @@ export default function WalletDashboard() {
 
         {showWalletPicker && (
           <View style={[styles.walletPickerDropdown, { backgroundColor: colors.surface }]}>
-            {wallets.map(wallet => (
-              <View key={wallet.id} style={styles.walletPickerItem}>
-                <TouchableOpacity 
-                  style={styles.walletPickerItemMain}
-                  onPress={() => {
-                    switchActiveWallet(wallet.id);
-                    setShowWalletPicker(false);
-                  }}
-                >
-                  <View style={[styles.walletPickerIcon, { backgroundColor: colors.background }, wallet.id === activeWallet?.id && { backgroundColor: colors.primary }]}>
-                    <Wallet size={14} color={wallet.id === activeWallet?.id ? colors.background : colors.textSecondary} />
-                  </View>
-                  <View style={styles.walletPickerInfo}>
-                    <Text style={[styles.walletPickerName, { color: colors.text }]}>{wallet.label}</Text>
-                    <Text style={[styles.walletPickerAddress, { color: colors.textSecondary }]}>{wallet.address.slice(0, 8)}...{wallet.address.slice(-6)}</Text>
-                  </View>
-                  {wallet.id === activeWallet?.id && (
-                    <Check size={16} color={colors.accent} />
-                  )}
-                </TouchableOpacity>
-                <View style={styles.walletPickerActions}>
-                  <TouchableOpacity 
-                    style={styles.walletActionBtn}
-                    onPress={() => {
-                      setEditingWalletId(wallet.id);
-                      setEditWalletName(wallet.label);
-                    }}
-                  >
-                    <Edit3 size={14} color={colors.textSecondary} />
-                  </TouchableOpacity>
-                  {wallets.length > 1 && (
+            {mainWallets.map(wallet => {
+              const subWallets = getSubWallets(wallet.id);
+              const isExpanded = expandedWallets[wallet.id];
+              return (
+                <View key={wallet.id}>
+                  <View style={styles.walletPickerItem}>
                     <TouchableOpacity 
-                      style={styles.walletActionBtn}
-                      onPress={() => deleteWallet(wallet.id)}
+                      style={styles.walletPickerItemMain}
+                      onPress={() => {
+                        switchActiveWallet(wallet.id);
+                        setShowWalletPicker(false);
+                      }}
                     >
-                      <Trash2 size={14} color={colors.error} />
+                      <View style={[styles.walletPickerIcon, { backgroundColor: colors.background }, wallet.id === activeWallet?.id && { backgroundColor: colors.primary }]}>
+                        <Wallet size={14} color={wallet.id === activeWallet?.id ? colors.background : colors.textSecondary} />
+                      </View>
+                      <View style={styles.walletPickerInfo}>
+                        <View style={styles.walletNameRow}>
+                          <Text style={[styles.walletPickerName, { color: colors.text }]}>{wallet.label}</Text>
+                          {subWallets.length > 0 && (
+                            <View style={[styles.subWalletCountBadge, { backgroundColor: colors.primary + '20' }]}>
+                              <Text style={[styles.subWalletCountText, { color: colors.primary }]}>{subWallets.length}</Text>
+                            </View>
+                          )}
+                        </View>
+                        <Text style={[styles.walletPickerAddress, { color: colors.textSecondary }]}>{wallet.address.slice(0, 8)}...{wallet.address.slice(-6)}</Text>
+                      </View>
+                      {wallet.id === activeWallet?.id && (
+                        <Check size={16} color={colors.accent} />
+                      )}
                     </TouchableOpacity>
+                    <View style={styles.walletPickerActions}>
+                      {subWallets.length > 0 && (
+                        <TouchableOpacity 
+                          style={styles.walletActionBtn}
+                          onPress={() => toggleWalletExpansion(wallet.id)}
+                        >
+                          <ChevronDown size={14} color={colors.textSecondary} style={{ transform: [{ rotate: isExpanded ? '180deg' : '0deg' }] }} />
+                        </TouchableOpacity>
+                      )}
+                      <TouchableOpacity 
+                        style={styles.walletActionBtn}
+                        onPress={() => {
+                          setSubWalletParentId(wallet.id);
+                          setShowSubWalletModal(true);
+                        }}
+                      >
+                        <Plus size={14} color={colors.primary} />
+                      </TouchableOpacity>
+                      <TouchableOpacity 
+                        style={styles.walletActionBtn}
+                        onPress={() => {
+                          setEditingWalletId(wallet.id);
+                          setEditWalletName(wallet.label);
+                        }}
+                      >
+                        <Edit3 size={14} color={colors.textSecondary} />
+                      </TouchableOpacity>
+                      {mainWallets.length > 1 && (
+                        <TouchableOpacity 
+                          style={styles.walletActionBtn}
+                          onPress={() => deleteWallet(wallet.id)}
+                        >
+                          <Trash2 size={14} color={colors.error} />
+                        </TouchableOpacity>
+                      )}
+                    </View>
+                  </View>
+                  {isExpanded && subWallets.length > 0 && (
+                    <View style={[styles.subWalletsContainer, { borderLeftColor: colors.primary + '30' }]}>
+                      {subWallets.map(subWallet => (
+                        <View key={subWallet.id} style={styles.subWalletItem}>
+                          <TouchableOpacity 
+                            style={styles.subWalletItemMain}
+                            onPress={() => {
+                              switchActiveWallet(subWallet.id);
+                              setShowWalletPicker(false);
+                            }}
+                          >
+                            <View style={[styles.subWalletIcon, { backgroundColor: colors.primary + '15' }]}>
+                              <Layers size={12} color={colors.primary} />
+                            </View>
+                            <View style={styles.subWalletInfo}>
+                              <Text style={[styles.subWalletName, { color: colors.text }]}>{subWallet.label}</Text>
+                              <Text style={[styles.subWalletAddress, { color: colors.textSecondary }]}>{subWallet.address.slice(0, 6)}...{subWallet.address.slice(-4)}</Text>
+                            </View>
+                            {subWallet.id === activeWallet?.id && (
+                              <Check size={14} color={colors.accent} />
+                            )}
+                          </TouchableOpacity>
+                          <View style={styles.subWalletActions}>
+                            <TouchableOpacity 
+                              style={styles.walletActionBtn}
+                              onPress={() => {
+                                setEditingWalletId(subWallet.id);
+                                setEditWalletName(subWallet.label);
+                              }}
+                            >
+                              <Edit3 size={12} color={colors.textSecondary} />
+                            </TouchableOpacity>
+                            <TouchableOpacity 
+                              style={styles.walletActionBtn}
+                              onPress={() => deleteWallet(subWallet.id)}
+                            >
+                              <Trash2 size={12} color={colors.error} />
+                            </TouchableOpacity>
+                          </View>
+                        </View>
+                      ))}
+                    </View>
                   )}
                 </View>
-              </View>
-            ))}
+              );
+            })}
             <TouchableOpacity 
               style={[styles.addWalletBtn, { borderTopColor: colors.border }]}
               onPress={() => {
@@ -330,7 +426,7 @@ export default function WalletDashboard() {
               }}
             >
               <Plus size={18} color={colors.primary} />
-              <Text style={[styles.addWalletText, { color: colors.primary }]}>Create New Wallet</Text>
+              <Text style={[styles.addWalletText, { color: colors.primary }]}>Create New Main Wallet</Text>
             </TouchableOpacity>
           </View>
         )}
@@ -981,6 +1077,55 @@ export default function WalletDashboard() {
 
       <NavMenuModal visible={showNavMenu} onClose={() => setShowNavMenu(false)} />
 
+      {showSubWalletModal && (
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalContent, { backgroundColor: colors.surface }]}>
+            <View style={styles.subWalletModalHeader}>
+              <View style={[styles.subWalletModalIcon, { backgroundColor: colors.primary + '15' }]}>
+                <Layers size={24} color={colors.primary} />
+              </View>
+              <Text style={[styles.modalTitle, { color: colors.text }]}>Create Sub-Wallet</Text>
+              <Text style={[styles.subWalletModalSubtitle, { color: colors.textSecondary }]}>
+                Under: {wallets.find(w => w.id === subWalletParentId)?.label || 'Main Wallet'}
+              </Text>
+            </View>
+            <TextInput
+              style={[styles.modalInput, { backgroundColor: colors.background, color: colors.text }]}
+              placeholder="Sub-wallet name (e.g., Savings, Trading)"
+              placeholderTextColor={colors.textSecondary}
+              value={newSubWalletName}
+              onChangeText={setNewSubWalletName}
+              autoFocus
+            />
+            <View style={[styles.subWalletInfoBox, { backgroundColor: colors.background }]}>
+              <AlertCircle size={16} color={colors.primary} />
+              <Text style={[styles.subWalletInfoText, { color: colors.textSecondary }]}>
+                Sub-wallets share the same recovery phrase as the parent wallet but have separate addresses for organization.
+              </Text>
+            </View>
+            <View style={styles.modalActions}>
+              <TouchableOpacity 
+                style={[styles.modalCancelBtn, { backgroundColor: colors.background }]}
+                onPress={() => {
+                  setShowSubWalletModal(false);
+                  setNewSubWalletName('');
+                  setSubWalletParentId(null);
+                }}
+              >
+                <Text style={[styles.modalCancelText, { color: colors.textSecondary }]}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity 
+                style={[styles.modalConfirmBtn, { backgroundColor: colors.primary }, !newSubWalletName.trim() && styles.modalConfirmBtnDisabled]}
+                onPress={handleCreateSubWallet}
+                disabled={!newSubWalletName.trim()}
+              >
+                <Text style={[styles.modalConfirmText, { color: colors.background }]}>Create</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      )}
+
       {showCustomTokenModal && (
         <View style={styles.customTokenModalOverlay}>
           <View style={[styles.customTokenModalContent, { backgroundColor: colors.surface }]}>
@@ -1529,6 +1674,91 @@ const styles = StyleSheet.create({
   },
   walletPickerAddress: {
     fontSize: 11,
+  },
+  walletNameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  subWalletCountBadge: {
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 8,
+  },
+  subWalletCountText: {
+    fontSize: 10,
+    fontWeight: '600' as const,
+  },
+  subWalletsContainer: {
+    marginLeft: 24,
+    paddingLeft: 12,
+    borderLeftWidth: 2,
+    marginBottom: 4,
+  },
+  subWalletItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 8,
+    paddingHorizontal: 8,
+    borderRadius: 10,
+    marginBottom: 2,
+  },
+  subWalletItemMain: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  subWalletIcon: {
+    width: 28,
+    height: 28,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  subWalletInfo: {
+    flex: 1,
+  },
+  subWalletName: {
+    fontSize: 13,
+    fontWeight: '600' as const,
+    marginBottom: 1,
+  },
+  subWalletAddress: {
+    fontSize: 10,
+  },
+  subWalletActions: {
+    flexDirection: 'row',
+    gap: 2,
+  },
+  subWalletModalHeader: {
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  subWalletModalIcon: {
+    width: 56,
+    height: 56,
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 12,
+  },
+  subWalletModalSubtitle: {
+    fontSize: 13,
+    marginTop: 4,
+  },
+  subWalletInfoBox: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    padding: 12,
+    borderRadius: 10,
+    gap: 10,
+    marginBottom: 20,
+  },
+  subWalletInfoText: {
+    flex: 1,
+    fontSize: 12,
+    lineHeight: 17,
   },
   walletPickerActions: {
     flexDirection: 'row',

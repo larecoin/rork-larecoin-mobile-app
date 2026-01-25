@@ -14,6 +14,8 @@ export interface Wallet {
   address: string;
   createdAt: Date;
   isDefault: boolean;
+  parentId?: string | null;
+  isSubWallet?: boolean;
 }
 
 export type MerchantType = 'business' | 'charity';
@@ -61,6 +63,8 @@ const defaultWallet: Wallet = {
   address: '0x1a2b3c4d5e6f7890abcdef1234567890abcdef12',
   createdAt: new Date(),
   isDefault: true,
+  parentId: null,
+  isSubWallet: false,
 };
 
 export const [AppProvider, useApp] = createContextHook(() => {
@@ -190,6 +194,8 @@ export const [AppProvider, useApp] = createContextHook(() => {
       address: generateWalletAddress(),
       createdAt: new Date(),
       isDefault: wallets.length === 0,
+      parentId: null,
+      isSubWallet: false,
     };
     const updated = [...wallets, newWallet];
     setWallets(updated);
@@ -199,6 +205,39 @@ export const [AppProvider, useApp] = createContextHook(() => {
       console.log('Error saving wallets:', error);
     }
     return newWallet;
+  }, [wallets]);
+
+  const createSubWallet = useCallback(async (label: string, parentId: string) => {
+    const parentWallet = wallets.find(w => w.id === parentId);
+    if (!parentWallet || parentWallet.isSubWallet) {
+      console.log('Cannot create sub-wallet: invalid parent');
+      return null;
+    }
+    const newSubWallet: Wallet = {
+      id: Date.now().toString(),
+      label,
+      address: generateWalletAddress(),
+      createdAt: new Date(),
+      isDefault: false,
+      parentId,
+      isSubWallet: true,
+    };
+    const updated = [...wallets, newSubWallet];
+    setWallets(updated);
+    try {
+      await AsyncStorage.setItem('wallets', JSON.stringify(updated));
+    } catch (error) {
+      console.log('Error saving sub-wallet:', error);
+    }
+    return newSubWallet;
+  }, [wallets]);
+
+  const getSubWallets = useCallback((parentId: string) => {
+    return wallets.filter(w => w.parentId === parentId);
+  }, [wallets]);
+
+  const getMainWallets = useCallback(() => {
+    return wallets.filter(w => !w.isSubWallet);
   }, [wallets]);
 
   const updateWalletLabel = useCallback(async (walletId: string, newLabel: string) => {
@@ -214,11 +253,21 @@ export const [AppProvider, useApp] = createContextHook(() => {
   }, [wallets]);
 
   const deleteWallet = useCallback(async (walletId: string) => {
-    if (wallets.length <= 1) return;
-    const updated = wallets.filter(w => w.id !== walletId);
-    if (activeWalletId === walletId) {
-      setActiveWalletId(updated[0].id);
-      await AsyncStorage.setItem('activeWalletId', updated[0].id);
+    const walletToDelete = wallets.find(w => w.id === walletId);
+    if (!walletToDelete) return;
+    
+    const mainWallets = wallets.filter(w => !w.isSubWallet);
+    if (!walletToDelete.isSubWallet && mainWallets.length <= 1) return;
+    
+    let updated = wallets.filter(w => w.id !== walletId);
+    if (!walletToDelete.isSubWallet) {
+      updated = updated.filter(w => w.parentId !== walletId);
+    }
+    
+    if (activeWalletId === walletId || wallets.find(w => w.id === activeWalletId)?.parentId === walletId) {
+      const newActiveWallet = updated.find(w => !w.isSubWallet) || updated[0];
+      setActiveWalletId(newActiveWallet.id);
+      await AsyncStorage.setItem('activeWalletId', newActiveWallet.id);
     }
     setWallets(updated);
     try {
@@ -312,6 +361,9 @@ export const [AppProvider, useApp] = createContextHook(() => {
     activeWallet,
     activeWalletId,
     createWallet,
+    createSubWallet,
+    getSubWallets,
+    getMainWallets,
     updateWalletLabel,
     deleteWallet,
     switchActiveWallet,
