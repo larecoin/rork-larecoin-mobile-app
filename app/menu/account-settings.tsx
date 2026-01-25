@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Image } from 'react-native';
 import { Stack } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { User, Mail, Phone, MapPin, Shield, Bell, Lock, Camera, ChevronRight, Check } from 'lucide-react-native';
+import { User, Mail, Phone, MapPin, Shield, Bell, Lock, Camera, ChevronRight, Check, Gauge, DollarSign, Globe, Eye, Smartphone, Rss, Monitor, Fingerprint, Key, AlertTriangle } from 'lucide-react-native';
 import { useApp } from '@/contexts/AppContext';
 
 export default function AccountSettingsScreen() {
@@ -18,6 +18,25 @@ export default function AccountSettingsScreen() {
     { id: 'security', label: 'Security Settings', icon: Shield, description: 'Password, 2FA, biometrics' },
     { id: 'notifications', label: 'Notification Preferences', icon: Bell, description: 'Push, email, SMS alerts' },
     { id: 'privacy', label: 'Privacy Settings', icon: Lock, description: 'Data sharing, visibility' },
+  ];
+
+  const accountOptions = [
+    { id: 'limits', label: 'Limits', icon: Gauge, description: 'Trading, withdrawal & deposit limits' },
+    { id: 'native-currency', label: 'Native Currency', icon: DollarSign, description: 'USD', value: 'USD' },
+    { id: 'update-address', label: 'Update Address', icon: MapPin, description: 'Billing & shipping addresses' },
+    { id: 'language', label: 'Language', icon: Globe, description: 'English (US)', value: 'English' },
+    { id: 'privacy', label: 'Privacy', icon: Eye, description: 'Profile visibility, data sharing' },
+    { id: 'phone-numbers', label: 'Phone Numbers', icon: Smartphone, description: 'Manage linked phone numbers' },
+    { id: 'notification-settings', label: 'Notification Settings', icon: Bell, description: 'Push, email, SMS preferences' },
+    { id: 'feed-settings', label: 'Feed Settings', icon: Rss, description: 'Content preferences, filters' },
+    { id: 'display-settings', label: 'Display Settings', icon: Monitor, description: 'Theme, appearance, layout' },
+  ];
+
+  const securityOptions = [
+    { id: 'pin', label: 'Set PIN', icon: Key, description: 'Create or change your PIN' },
+    { id: 'biometrics', label: 'Face ID / Fingerprint', icon: Fingerprint, description: 'Enable biometric authentication' },
+    { id: '2fa', label: 'Two-Factor Authentication', icon: Shield, description: 'Authenticator app, SMS codes' },
+    { id: 'login-alerts', label: 'Login Alerts', icon: AlertTriangle, description: 'Get notified of new logins' },
   ];
 
   return (
@@ -170,6 +189,59 @@ export default function AccountSettingsScreen() {
             </View>
           </View>
         </View>
+
+        <View style={styles.section}>
+          <Text style={[styles.sectionTitle, { color: colors.textTertiary }]}>Account Preferences</Text>
+          <View style={[styles.card, { backgroundColor: colors.surface }]}>
+            {accountOptions.map((option, index) => (
+              <TouchableOpacity
+                key={option.id}
+                style={[
+                  styles.settingsRow,
+                  { borderBottomColor: colors.border },
+                  index === accountOptions.length - 1 && styles.settingsRowLast,
+                ]}
+              >
+                <View style={[styles.iconWrapper, { backgroundColor: colors.primary + '15' }]}>
+                  <option.icon size={18} color={colors.primary} />
+                </View>
+                <View style={styles.settingsContent}>
+                  <Text style={[styles.settingsLabel, { color: colors.text }]}>{option.label}</Text>
+                  <Text style={[styles.settingsDescription, { color: colors.textTertiary }]}>{option.description}</Text>
+                </View>
+                {option.value ? (
+                  <Text style={[styles.optionValue, { color: colors.textSecondary }]}>{option.value}</Text>
+                ) : null}
+                <ChevronRight size={20} color={colors.textTertiary} />
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
+
+        <View style={styles.section}>
+          <Text style={[styles.sectionTitle, { color: colors.textTertiary }]}>Security Settings</Text>
+          <View style={[styles.card, { backgroundColor: colors.surface }]}>
+            {securityOptions.map((option, index) => (
+              <TouchableOpacity
+                key={option.id}
+                style={[
+                  styles.settingsRow,
+                  { borderBottomColor: colors.border },
+                  index === securityOptions.length - 1 && styles.settingsRowLast,
+                ]}
+              >
+                <View style={[styles.iconWrapper, { backgroundColor: colors.warning + '15' }]}>
+                  <option.icon size={18} color={colors.warning} />
+                </View>
+                <View style={styles.settingsContent}>
+                  <Text style={[styles.settingsLabel, { color: colors.text }]}>{option.label}</Text>
+                  <Text style={[styles.settingsDescription, { color: colors.textTertiary }]}>{option.description}</Text>
+                </View>
+                <ChevronRight size={20} color={colors.textTertiary} />
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
       </ScrollView>
     </View>
   );
@@ -317,5 +389,10 @@ const styles = StyleSheet.create({
   statusText: {
     fontSize: 12,
     fontWeight: '600' as const,
+  },
+  optionValue: {
+    fontSize: 13,
+    fontWeight: '500' as const,
+    marginRight: 8,
   },
 });
