@@ -200,39 +200,42 @@ export default function NewsfeedScreen() {
         </TouchableOpacity>
       </View>
 
-      <ScrollView 
-        horizontal 
-        showsHorizontalScrollIndicator={false} 
-        style={styles.tabScrollContainer}
-        contentContainerStyle={[styles.tabContainer, { backgroundColor: colors.surface }]}
-      >
-        <TouchableOpacity 
-          style={[styles.tab, activeTab === 'markets' && styles.tabActive]}
-          onPress={() => setActiveTab('markets')}
+      <View style={[styles.tabWrapper, { backgroundColor: colors.surface }]}>
+        <ScrollView 
+          horizontal 
+          showsHorizontalScrollIndicator={false} 
+          contentContainerStyle={styles.tabContainer}
         >
-          <Coins size={16} color={activeTab === 'markets' ? '#1E88E5' : Colors.textSecondary} />
-          <Text style={[styles.tabText, activeTab === 'markets' && styles.tabTextActive]}>Markets</Text>
-        </TouchableOpacity>
-        <TouchableOpacity 
-          style={[styles.tab, activeTab === 'foryou' && styles.tabActive]}
-          onPress={() => setActiveTab('foryou')}
-        >
-          <Text style={[styles.tabText, activeTab === 'foryou' && styles.tabTextActive]}>For You</Text>
-        </TouchableOpacity>
-        <TouchableOpacity 
-          style={[styles.tab, activeTab === 'following' && styles.tabActive]}
-          onPress={() => setActiveTab('following')}
-        >
-          <Text style={[styles.tabText, activeTab === 'following' && styles.tabTextActive]}>Following</Text>
-        </TouchableOpacity>
-        <TouchableOpacity 
-          style={[styles.tab, activeTab === 'trending' && styles.tabActive]}
-          onPress={() => setActiveTab('trending')}
-        >
-          <TrendingUp size={16} color={activeTab === 'trending' ? '#1E88E5' : Colors.textSecondary} />
-          <Text style={[styles.tabText, activeTab === 'trending' && styles.tabTextActive]}>Trending</Text>
-        </TouchableOpacity>
-      </ScrollView>
+          <TouchableOpacity 
+            style={[styles.tab, activeTab === 'markets' && [styles.tabActive, { backgroundColor: colors.primary + '15' }]]}
+            onPress={() => setActiveTab('markets')}
+          >
+            <Coins size={16} color={activeTab === 'markets' ? colors.primary : colors.textSecondary} />
+            <Text style={[styles.tabText, { color: colors.textSecondary }, activeTab === 'markets' && [styles.tabTextActive, { color: colors.primary }]]}>Markets</Text>
+          </TouchableOpacity>
+          <TouchableOpacity 
+            style={[styles.tab, activeTab === 'foryou' && [styles.tabActive, { backgroundColor: colors.primary + '15' }]]}
+            onPress={() => setActiveTab('foryou')}
+          >
+            <Heart size={16} color={activeTab === 'foryou' ? colors.primary : colors.textSecondary} />
+            <Text style={[styles.tabText, { color: colors.textSecondary }, activeTab === 'foryou' && [styles.tabTextActive, { color: colors.primary }]]}>For You</Text>
+          </TouchableOpacity>
+          <TouchableOpacity 
+            style={[styles.tab, activeTab === 'following' && [styles.tabActive, { backgroundColor: colors.primary + '15' }]]}
+            onPress={() => setActiveTab('following')}
+          >
+            <Users size={16} color={activeTab === 'following' ? colors.primary : colors.textSecondary} />
+            <Text style={[styles.tabText, { color: colors.textSecondary }, activeTab === 'following' && [styles.tabTextActive, { color: colors.primary }]]}>Following</Text>
+          </TouchableOpacity>
+          <TouchableOpacity 
+            style={[styles.tab, activeTab === 'trending' && [styles.tabActive, { backgroundColor: colors.primary + '15' }]]}
+            onPress={() => setActiveTab('trending')}
+          >
+            <TrendingUp size={16} color={activeTab === 'trending' ? colors.primary : colors.textSecondary} />
+            <Text style={[styles.tabText, { color: colors.textSecondary }, activeTab === 'trending' && [styles.tabTextActive, { color: colors.primary }]]}>Trending</Text>
+          </TouchableOpacity>
+        </ScrollView>
+      </View>
 
       <ScrollView 
         showsVerticalScrollIndicator={false}
@@ -577,34 +580,34 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  tabScrollContainer: {
+  tabWrapper: {
     marginHorizontal: 20,
     marginBottom: 16,
+    borderRadius: 12,
+    overflow: 'hidden',
   },
   tabContainer: {
     flexDirection: 'row',
-    borderRadius: 12,
     padding: 4,
+    gap: 4,
   },
   tab: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 10,
-    paddingHorizontal: 16,
+    paddingHorizontal: 14,
     borderRadius: 8,
     gap: 6,
   },
   tabActive: {
-    backgroundColor: '#1E88E5' + '15',
+    borderRadius: 8,
   },
   tabText: {
     fontSize: 14,
     fontWeight: '500' as const,
-    color: Colors.textSecondary,
   },
   tabTextActive: {
-    color: '#1E88E5',
     fontWeight: '600' as const,
   },
   createPostCard: {
