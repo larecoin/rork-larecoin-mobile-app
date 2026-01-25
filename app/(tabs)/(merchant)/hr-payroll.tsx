@@ -41,6 +41,8 @@ const mockEmployees: Employee[] = [
   { id: '5', name: 'Lisa Park', role: 'Part-time Barista', department: 'Operations', salary: 1400, status: 'active', startDate: '2024-01-05', hoursThisWeek: 20 },
 ];
 
+const CURRENCY = 'LUSD';
+
 const upcomingPayrolls = [
   { id: '1', date: 'Jan 31, 2025', amount: 14500, employees: 5, status: 'pending' },
   { id: '2', date: 'Feb 15, 2025', amount: 14500, employees: 5, status: 'scheduled' },
@@ -90,12 +92,17 @@ export default function HRPayroll() {
       >
         <View style={styles.summaryCard}>
           <View style={styles.summaryHeader}>
-            <Text style={styles.summaryTitle}>Payroll Summary</Text>
+            <View>
+              <Text style={styles.summaryTitle}>Payroll Summary</Text>
+              <View style={styles.lusdBadge}>
+                <Text style={styles.lusdBadgeText}>All payroll paid in LUSD</Text>
+              </View>
+            </View>
             <Text style={styles.summaryPeriod}>January 2025</Text>
           </View>
           <View style={styles.summaryStats}>
             <View style={styles.summaryStatItem}>
-              <Text style={styles.summaryStatValue}>${totalPayroll.toLocaleString()}</Text>
+              <Text style={styles.summaryStatValue}>{totalPayroll.toLocaleString()} {CURRENCY}</Text>
               <Text style={styles.summaryStatLabel}>Monthly Payroll</Text>
             </View>
             <View style={styles.summaryDivider} />
@@ -188,7 +195,7 @@ export default function HRPayroll() {
                     </View>
                   </View>
                   <View style={styles.employeeSalary}>
-                    <Text style={styles.salaryAmount}>${employee.salary}</Text>
+                    <Text style={styles.salaryAmount}>{employee.salary} {CURRENCY}</Text>
                     <Text style={styles.salaryPeriod}>/month</Text>
                   </View>
                 </TouchableOpacity>
@@ -212,7 +219,7 @@ export default function HRPayroll() {
                     <Text style={styles.payrollDetails}>{payroll.employees} employees</Text>
                   </View>
                   <View style={styles.payrollAmount}>
-                    <Text style={styles.payrollValue}>${payroll.amount.toLocaleString()}</Text>
+                    <Text style={styles.payrollValue}>{payroll.amount.toLocaleString()} {CURRENCY}</Text>
                     <View style={[
                       styles.payrollStatus,
                       { backgroundColor: payroll.status === 'pending' ? Colors.warning + '20' : Colors.accent + '20' }
@@ -310,6 +317,18 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '700',
     color: '#0D3B54',
+  },
+  lusdBadge: {
+    backgroundColor: '#27AE60',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 6,
+    marginTop: 4,
+  },
+  lusdBadgeText: {
+    fontSize: 10,
+    fontWeight: '600',
+    color: '#FFFFFF',
   },
   summaryPeriod: {
     fontSize: 13,
