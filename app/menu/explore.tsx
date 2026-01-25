@@ -22,7 +22,7 @@ const trendingTopics = [
 const discoveries = [
   { id: '1', title: 'Learn to Trade', description: 'Start your trading journey', icon: '📈', color: '#4CAF50' },
   { id: '2', title: 'Stake & Earn', description: 'Passive income strategies', icon: '💰', color: '#FF9800' },
-  { id: '3', title: 'NFT Gallery', description: 'Discover digital art', icon: '🎨', color: '#9C27B0' },
+  { id: '3', title: 'NFT Viewer', description: 'Get paid to rate NFTs', icon: '🎨', color: '#9C27B0' },
   { id: '4', title: 'Gaming Hub', description: 'Play-to-earn games', icon: '🎮', color: '#2196F3' },
 ];
 

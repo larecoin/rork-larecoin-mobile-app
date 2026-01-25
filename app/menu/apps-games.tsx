@@ -7,7 +7,7 @@ import { useApp } from '@/contexts/AppContext';
 
 const featuredApps = [
   { id: '1', name: 'CryptoTracker Pro', category: 'Finance', rating: 4.8, downloads: '500K+', icon: 'https://images.unsplash.com/photo-1621761191319-c6fb62004040?w=100&h=100&fit=crop' },
-  { id: '2', name: 'NFT Gallery', category: 'Art', rating: 4.6, downloads: '200K+', icon: 'https://images.unsplash.com/photo-1620321023374-d1a68fbc720d?w=100&h=100&fit=crop' },
+  { id: '2', name: 'NFT Viewer (Get Paid to Rate NFTs)', category: 'Art', rating: 4.6, downloads: '200K+', icon: 'https://images.unsplash.com/photo-1620321023374-d1a68fbc720d?w=100&h=100&fit=crop' },
   { id: '3', name: 'DeFi Manager', category: 'Finance', rating: 4.7, downloads: '150K+', icon: 'https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=100&h=100&fit=crop' },
 ];
 
