@@ -273,8 +273,19 @@ export default function ShopScreen() {
   };
 
   const handleSubcategoryPress = (category: Category, subcategory: string) => {
-    setSelectedSubcategory({ category, subcategory });
-    setAdSearchQuery('');
+    if (subcategory === 'Rideshare') {
+      setSelectedSubcategory({ category, subcategory });
+      setAdSearchQuery('');
+    } else {
+      router.push({
+        pathname: '/menu/subcategory-listings',
+        params: {
+          category: category.id,
+          subcategory: subcategory,
+          categoryName: category.name,
+        },
+      });
+    }
   };
 
   const [pickupLocation, setPickupLocation] = useState<Location>({ address: '' });
@@ -670,111 +681,6 @@ export default function ShopScreen() {
               )}
             </View>
           )}
-
-          <View style={{ height: 100 }} />
-        </ScrollView>
-      </View>
-    );
-  }
-
-  if (selectedSubcategory) {
-    return (
-      <View style={[styles.container, { paddingTop: insets.top }]}>
-        <View style={styles.adsHeader}>
-          <TouchableOpacity 
-            style={styles.backBtn}
-            onPress={() => setSelectedSubcategory(null)}
-          >
-            <ArrowLeft size={22} color={Colors.text} />
-          </TouchableOpacity>
-          <View style={styles.adsHeaderInfo}>
-            <Text style={styles.adsHeaderTitle}>{selectedSubcategory.subcategory}</Text>
-            <Text style={styles.adsHeaderSubtitle}>{selectedSubcategory.category.name}</Text>
-          </View>
-        </View>
-
-        <TouchableOpacity style={styles.locationSelector}>
-          <View style={styles.locationIcon}>
-            <MapPin size={18} color={Colors.primary} />
-          </View>
-          <View style={styles.locationInfo}>
-            <Text style={styles.locationLabel}>Showing ads near</Text>
-            <Text style={styles.locationValue}>{selectedLocation}</Text>
-          </View>
-          <ChevronDown size={18} color={Colors.textSecondary} />
-        </TouchableOpacity>
-
-        <View style={styles.searchContainer}>
-          <Search size={18} color={Colors.textSecondary} />
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Search ads..."
-            placeholderTextColor={Colors.textTertiary}
-            value={adSearchQuery}
-            onChangeText={setAdSearchQuery}
-          />
-        </View>
-
-        <View style={styles.adsInfoBar}>
-          <Text style={styles.adsCount}>{ads.length} listings</Text>
-          <View style={styles.sortInfo}>
-            <Clock size={12} color={Colors.textTertiary} />
-            <Text style={styles.sortText}>Sorted by time</Text>
-          </View>
-        </View>
-
-        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.adsScrollContent}>
-          {ads.map((ad) => (
-            <TouchableOpacity key={ad.id} style={[
-              styles.adCard,
-              ad.isBumped && styles.adCardBumped
-            ]}>
-              {ad.isBumped && (
-                <View style={styles.bumpedBanner}>
-                  <TrendingUp size={12} color="#FFF" />
-                  <Text style={styles.bumpedText}>PRIORITY</Text>
-                  <Flame size={12} color="#FFA500" />
-                </View>
-              )}
-              <View style={styles.adContent}>
-                <Image source={{ uri: ad.image }} style={styles.adImage} />
-                <View style={styles.adInfo}>
-                  <View style={styles.adTitleRow}>
-                    <Text style={styles.adTitle} numberOfLines={1}>{ad.title}</Text>
-                    <Text style={styles.adPrice}>{ad.price}</Text>
-                  </View>
-                  <Text style={styles.adDescription} numberOfLines={2}>{ad.description}</Text>
-                  <View style={styles.adMerchantRow}>
-                    <Text style={styles.adMerchantName}>{ad.merchantName}</Text>
-                    {ad.verified && (
-                      <BadgeCheck size={14} color={Colors.primary} />
-                    )}
-                  </View>
-                  <View style={styles.adMetaRow}>
-                    <View style={styles.adMetaItem}>
-                      <MapPinIcon size={12} color={Colors.textTertiary} />
-                      <Text style={styles.adMetaText}>{ad.location} • {ad.distance}</Text>
-                    </View>
-                    <View style={styles.adMetaItem}>
-                      <Clock size={12} color={Colors.textTertiary} />
-                      <Text style={styles.adMetaText}>{formatTimeAgo(ad.postedAt)}</Text>
-                    </View>
-                  </View>
-                </View>
-              </View>
-            </TouchableOpacity>
-          ))}
-
-          <View style={styles.bumpPromo}>
-            <Flame size={20} color="#FF6B00" />
-            <View style={styles.bumpPromoContent}>
-              <Text style={styles.bumpPromoTitle}>Want more visibility?</Text>
-              <Text style={styles.bumpPromoText}>Bump your ad to the top for priority placement</Text>
-            </View>
-            <TouchableOpacity style={styles.bumpPromoBtn}>
-              <Text style={styles.bumpPromoBtnText}>Bump Ad</Text>
-            </TouchableOpacity>
-          </View>
 
           <View style={{ height: 100 }} />
         </ScrollView>
