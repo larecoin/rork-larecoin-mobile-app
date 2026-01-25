@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Animated } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { TrendingUp, TrendingDown, Search, Flame } from 'lucide-react-native';
+import { TrendingUp, TrendingDown, Search, Flame, ShoppingCart, DollarSign, ArrowLeftRight, Star, Bell } from 'lucide-react-native';
 import Colors from '@/constants/colors';
 
 interface MarketItem {
@@ -30,6 +30,28 @@ type FilterType = 'all' | 'trending' | 'gainers' | 'losers' | 'favorites';
 export default function MarketsScreen() {
   const insets = useSafeAreaInsets();
   const [activeFilter, setActiveFilter] = useState<FilterType>('all');
+  const [selectedAssetId, setSelectedAssetId] = useState<string | null>(null);
+  const [favorites, setFavorites] = useState<Set<string>>(new Set(['1', '3', '5']));
+
+  const handleAssetPress = (id: string) => {
+    setSelectedAssetId(prev => prev === id ? null : id);
+  };
+
+  const toggleFavorite = (id: string) => {
+    setFavorites(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(id)) {
+        newSet.delete(id);
+      } else {
+        newSet.add(id);
+      }
+      return newSet;
+    });
+  };
+
+  const handleAction = (action: string, item: MarketItem) => {
+    console.log(`${action} action for ${item.symbol}`);
+  };
 
   const filteredData = marketData.filter(item => {
     switch (activeFilter) {
@@ -99,31 +121,82 @@ export default function MarketsScreen() {
         </View>
 
         {filteredData.map(item => (
-          <TouchableOpacity key={item.id} style={styles.marketItem}>
-            <View style={styles.assetInfo}>
-              <View style={styles.iconWrapper}>
-                <Text style={styles.iconText}>{item.icon}</Text>
-              </View>
-              <View>
-                <View style={styles.nameRow}>
-                  <Text style={styles.assetName}>{item.name}</Text>
-                  {item.isTrending && <Flame size={12} color={Colors.warning} />}
+          <View key={item.id}>
+            <TouchableOpacity 
+              style={[styles.marketItem, selectedAssetId === item.id && styles.marketItemSelected]}
+              onPress={() => handleAssetPress(item.id)}
+              activeOpacity={0.7}
+            >
+              <View style={styles.assetInfo}>
+                <View style={[styles.iconWrapper, selectedAssetId === item.id && styles.iconWrapperSelected]}>
+                  <Text style={styles.iconText}>{item.icon}</Text>
                 </View>
-                <Text style={styles.assetSymbol}>{item.symbol}</Text>
+                <View>
+                  <View style={styles.nameRow}>
+                    <Text style={styles.assetName}>{item.name}</Text>
+                    {item.isTrending && <Flame size={12} color={Colors.warning} />}
+                    {favorites.has(item.id) && <Star size={12} color={Colors.warning} fill={Colors.warning} />}
+                  </View>
+                  <Text style={styles.assetSymbol}>{item.symbol}</Text>
+                </View>
               </View>
-            </View>
-            <Text style={styles.price}>${item.price.toLocaleString()}</Text>
-            <View style={[styles.changeWrapper, item.change24h >= 0 ? styles.changePositive : styles.changeNegative]}>
-              {item.change24h >= 0 ? (
-                <TrendingUp size={12} color={Colors.success} />
-              ) : (
-                <TrendingDown size={12} color={Colors.error} />
-              )}
-              <Text style={[styles.changeText, item.change24h >= 0 ? styles.changeTextPositive : styles.changeTextNegative]}>
-                {Math.abs(item.change24h).toFixed(2)}%
-              </Text>
-            </View>
-          </TouchableOpacity>
+              <Text style={styles.price}>${item.price.toLocaleString()}</Text>
+              <View style={[styles.changeWrapper, item.change24h >= 0 ? styles.changePositive : styles.changeNegative]}>
+                {item.change24h >= 0 ? (
+                  <TrendingUp size={12} color={Colors.success} />
+                ) : (
+                  <TrendingDown size={12} color={Colors.error} />
+                )}
+                <Text style={[styles.changeText, item.change24h >= 0 ? styles.changeTextPositive : styles.changeTextNegative]}>
+                  {Math.abs(item.change24h).toFixed(2)}%
+                </Text>
+              </View>
+            </TouchableOpacity>
+            
+            {selectedAssetId === item.id && (
+              <View style={styles.actionPanel}>
+                <TouchableOpacity 
+                  style={[styles.actionBtn, styles.actionBtnBuy]}
+                  onPress={() => handleAction('BUY', item)}
+                >
+                  <ShoppingCart size={16} color="#fff" />
+                  <Text style={styles.actionBtnText}>BUY</Text>
+                </TouchableOpacity>
+                
+                <TouchableOpacity 
+                  style={[styles.actionBtn, styles.actionBtnSell]}
+                  onPress={() => handleAction('SELL', item)}
+                >
+                  <DollarSign size={16} color="#fff" />
+                  <Text style={styles.actionBtnText}>SELL</Text>
+                </TouchableOpacity>
+                
+                <TouchableOpacity 
+                  style={[styles.actionBtn, styles.actionBtnSwap]}
+                  onPress={() => handleAction('SWAP', item)}
+                >
+                  <ArrowLeftRight size={16} color="#fff" />
+                  <Text style={styles.actionBtnText}>SWAP</Text>
+                </TouchableOpacity>
+                
+                <TouchableOpacity 
+                  style={[styles.actionBtn, favorites.has(item.id) ? styles.actionBtnStarred : styles.actionBtnStar]}
+                  onPress={() => toggleFavorite(item.id)}
+                >
+                  <Star size={16} color="#fff" fill={favorites.has(item.id) ? '#fff' : 'transparent'} />
+                  <Text style={styles.actionBtnText}>{favorites.has(item.id) ? 'STARRED' : 'STAR'}</Text>
+                </TouchableOpacity>
+                
+                <TouchableOpacity 
+                  style={[styles.actionBtn, styles.actionBtnAlert]}
+                  onPress={() => handleAction('ALERT', item)}
+                >
+                  <Bell size={16} color="#fff" />
+                  <Text style={styles.actionBtnText}>ALERT</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+          </View>
         ))}
 
         <View style={{ height: 100 }} />
@@ -272,5 +345,57 @@ const styles = StyleSheet.create({
   },
   changeTextNegative: {
     color: Colors.error,
+  },
+  marketItemSelected: {
+    backgroundColor: Colors.primary + '10',
+    borderBottomColor: Colors.primary + '30',
+  },
+  iconWrapperSelected: {
+    backgroundColor: Colors.primary + '20',
+    borderWidth: 2,
+    borderColor: Colors.primary,
+  },
+  actionPanel: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    backgroundColor: Colors.surface,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.border,
+  },
+  actionBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    borderRadius: 10,
+    minWidth: 80,
+  },
+  actionBtnText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#fff',
+  },
+  actionBtnBuy: {
+    backgroundColor: Colors.success,
+  },
+  actionBtnSell: {
+    backgroundColor: Colors.error,
+  },
+  actionBtnSwap: {
+    backgroundColor: Colors.primary,
+  },
+  actionBtnStar: {
+    backgroundColor: Colors.textSecondary,
+  },
+  actionBtnStarred: {
+    backgroundColor: Colors.warning,
+  },
+  actionBtnAlert: {
+    backgroundColor: '#8B5CF6',
   },
 });
