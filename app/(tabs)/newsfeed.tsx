@@ -162,7 +162,7 @@ export default function NewsfeedScreen() {
           style={[styles.tab, activeTab === 'trending' && styles.tabActive]}
           onPress={() => setActiveTab('trending')}
         >
-          <TrendingUp size={16} color={activeTab === 'trending' ? Colors.primary : Colors.textSecondary} />
+          <TrendingUp size={16} color={activeTab === 'trending' ? '#1E88E5' : Colors.textSecondary} />
           <Text style={[styles.tabText, activeTab === 'trending' && styles.tabTextActive]}>Trending</Text>
         </TouchableOpacity>
       </View>
@@ -397,7 +397,7 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   tabActive: {
-    backgroundColor: Colors.primary + '15',
+    backgroundColor: '#1E88E5' + '15',
   },
   tabText: {
     fontSize: 14,
@@ -405,7 +405,7 @@ const styles = StyleSheet.create({
     color: Colors.textSecondary,
   },
   tabTextActive: {
-    color: Colors.primary,
+    color: '#1E88E5',
     fontWeight: '600' as const,
   },
   createPostCard: {
