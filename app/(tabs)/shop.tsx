@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Image } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { 
-  Search, ShoppingCart, ChevronRight, MapPin, ScanLine, ChevronDown, ChevronUp,
+  Search, ShoppingCart, ChevronRight, MapPin, QrCode, ChevronDown, ChevronUp,
   Car, Briefcase, Home, MapPinned, Zap, Truck, Building2, Tag, Wrench, Globe,
   Users, Store, ArrowLeft, Clock, Flame, Star, BadgeCheck, TrendingUp, MapPinIcon
 } from 'lucide-react-native';
@@ -389,7 +389,7 @@ export default function ShopScreen() {
         <Text style={styles.title}>Shop</Text>
         <View style={styles.headerActions}>
           <TouchableOpacity style={styles.iconBtn}>
-            <ScanLine size={20} color={Colors.text} />
+            <QrCode size={20} color={Colors.text} />
           </TouchableOpacity>
           <TouchableOpacity style={styles.cartBtn}>
             <ShoppingCart size={20} color={Colors.text} />
