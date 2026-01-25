@@ -228,7 +228,6 @@ export default function CalendarScreen() {
             </Text>
           </TouchableOpacity>
         </View>
-      </View>
 
       <ScrollView 
         style={styles.content}
