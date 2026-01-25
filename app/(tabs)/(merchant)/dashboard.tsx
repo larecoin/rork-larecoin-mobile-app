@@ -40,7 +40,8 @@ import {
   X,
   Building2,
   HandHeart,
-  Copy
+  Copy,
+  Sliders
 } from 'lucide-react-native';
 import * as Clipboard from 'expo-clipboard';
 import Colors from '@/constants/colors';
@@ -66,7 +67,9 @@ export default function MerchantDashboard() {
     charityStats,
     charityGrants,
     addMerchantProfile,
-    switchMerchantProfile
+    switchMerchantProfile,
+    paymentDistribution,
+    updatePaymentDistribution
   } = useApp();
   const [refreshing, setRefreshing] = React.useState(false);
   const [showWalletLinkModal, setShowWalletLinkModal] = React.useState(false);
@@ -76,6 +79,8 @@ export default function MerchantDashboard() {
   const [showSwitchProfileModal, setShowSwitchProfileModal] = React.useState(false);
   const [newProfileType, setNewProfileType] = React.useState<'business' | 'charity'>('business');
   const [newProfileName, setNewProfileName] = React.useState('');
+  const [showDistributionModal, setShowDistributionModal] = React.useState(false);
+  const [tempLarePercent, setTempLarePercent] = React.useState(paymentDistribution.larePercent);
 
   const pendingOrders = merchantOrders.filter(o => o.status === 'pending');
   const lowStockCount = 3;
@@ -341,17 +346,27 @@ export default function MerchantDashboard() {
             <TrendingUp size={14} color="#1ABC9C" />
             <Text style={styles.revenueChangeText}>+12.5% vs yesterday</Text>
           </View>
-          <View style={styles.revenueBreakdown}>
+          <TouchableOpacity 
+            style={styles.revenueBreakdown}
+            onPress={() => {
+              setTempLarePercent(paymentDistribution.larePercent);
+              setShowDistributionModal(true);
+            }}
+            activeOpacity={0.8}
+          >
             <View style={styles.revenueBreakdownItem}>
-              <Text style={styles.breakdownLabel}>LARE Received</Text>
+              <Text style={styles.breakdownLabel}>LARE ({paymentDistribution.larePercent}%)</Text>
               <Text style={styles.breakdownValue}>{balanceVisible ? '2,450 LARE' : '••••'}</Text>
             </View>
             <View style={styles.revenueBreakdownDivider} />
             <View style={styles.revenueBreakdownItem}>
-              <Text style={styles.breakdownLabel}>LUSD Received</Text>
+              <Text style={styles.breakdownLabel}>LUSD ({paymentDistribution.lusdPercent}%)</Text>
               <Text style={styles.breakdownValue}>{balanceVisible ? '890 LUSD' : '••••'}</Text>
             </View>
-          </View>
+            <View style={styles.distributionEditIcon}>
+              <Sliders size={14} color="#1A5276" />
+            </View>
+          </TouchableOpacity>
         </View>
         )}
 
@@ -811,6 +826,101 @@ export default function MerchantDashboard() {
               onPress={() => setShowSwitchProfileModal(false)}
             >
               <Text style={styles.modalCloseText}>Close</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+      <Modal
+        visible={showDistributionModal}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setShowDistributionModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Payment Distribution</Text>
+              <TouchableOpacity onPress={() => setShowDistributionModal(false)}>
+                <X size={24} color={Colors.textSecondary} />
+              </TouchableOpacity>
+            </View>
+            <Text style={styles.modalSubtitle}>Set how you want to receive your payments</Text>
+            
+            <View style={styles.distributionPreview}>
+              <View style={styles.distributionPreviewItem}>
+                <View style={[styles.distributionDot, { backgroundColor: Colors.primary }]} />
+                <Text style={styles.distributionCurrency}>LARE</Text>
+                <Text style={styles.distributionPercent}>{tempLarePercent}%</Text>
+              </View>
+              <View style={styles.distributionPreviewItem}>
+                <View style={[styles.distributionDot, { backgroundColor: Colors.accent }]} />
+                <Text style={styles.distributionCurrency}>LUSD</Text>
+                <Text style={styles.distributionPercent}>{100 - tempLarePercent}%</Text>
+              </View>
+            </View>
+
+            <View style={styles.distributionBar}>
+              <View style={[styles.distributionBarLare, { flex: tempLarePercent || 0.01 }]} />
+              <View style={[styles.distributionBarLusd, { flex: (100 - tempLarePercent) || 0.01 }]} />
+            </View>
+
+            <View style={styles.sliderContainer}>
+              <Text style={styles.sliderLabel}>Select LARE percentage</Text>
+              <View style={styles.quickPercentages}>
+                {[0, 25, 50, 75, 100].map(val => (
+                  <TouchableOpacity 
+                    key={val}
+                    style={[
+                      styles.quickPercentBtn,
+                      tempLarePercent === val && styles.quickPercentBtnActive
+                    ]}
+                    onPress={() => setTempLarePercent(val)}
+                  >
+                    <Text style={[
+                      styles.quickPercentText,
+                      tempLarePercent === val && styles.quickPercentTextActive
+                    ]}>{val}%</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+
+            <View style={styles.customPercentRow}>
+              <Text style={styles.customPercentLabel}>Custom:</Text>
+              <View style={styles.customPercentInputWrapper}>
+                <TextInput
+                  style={styles.customPercentInput}
+                  value={tempLarePercent.toString()}
+                  onChangeText={(text) => {
+                    const num = parseInt(text) || 0;
+                    setTempLarePercent(Math.min(100, Math.max(0, num)));
+                  }}
+                  keyboardType="number-pad"
+                  maxLength={3}
+                />
+                <Text style={styles.customPercentSymbol}>%</Text>
+              </View>
+              <Text style={styles.customPercentLabel}>LARE</Text>
+            </View>
+
+            <View style={styles.distributionInfo}>
+              <View style={styles.distributionInfoIcon}>
+                <AlertCircle size={16} color={Colors.primary} />
+              </View>
+              <Text style={styles.distributionInfoText}>
+                Incoming payments will be automatically split between LARE and LUSD based on this ratio.
+              </Text>
+            </View>
+
+            <TouchableOpacity 
+              style={styles.saveDistributionBtn}
+              onPress={() => {
+                updatePaymentDistribution(tempLarePercent);
+                setShowDistributionModal(false);
+              }}
+            >
+              <Text style={styles.saveDistributionBtnText}>Save Distribution</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -1741,5 +1851,144 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 20,
     marginBottom: 20,
+  },
+  distributionEditIcon: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    width: 24,
+    height: 24,
+    borderRadius: 6,
+    backgroundColor: 'rgba(13,59,84,0.15)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  distributionPreview: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginBottom: 16,
+  },
+  distributionPreviewItem: {
+    alignItems: 'center',
+    gap: 6,
+  },
+  distributionDot: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+  },
+  distributionCurrency: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: Colors.text,
+  },
+  distributionPercent: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: Colors.text,
+  },
+  distributionBar: {
+    flexDirection: 'row',
+    height: 12,
+    borderRadius: 6,
+    overflow: 'hidden',
+    marginBottom: 24,
+  },
+  distributionBarLare: {
+    backgroundColor: Colors.primary,
+  },
+  distributionBarLusd: {
+    backgroundColor: Colors.accent,
+  },
+  sliderContainer: {
+    marginBottom: 16,
+  },
+  sliderLabel: {
+    fontSize: 13,
+    color: Colors.textSecondary,
+    marginBottom: 12,
+    textAlign: 'center',
+  },
+  quickPercentages: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    gap: 8,
+  },
+  quickPercentBtn: {
+    flex: 1,
+    paddingVertical: 12,
+    borderRadius: 10,
+    backgroundColor: Colors.background,
+    alignItems: 'center',
+  },
+  quickPercentBtnActive: {
+    backgroundColor: Colors.primary,
+  },
+  quickPercentText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: Colors.textSecondary,
+  },
+  quickPercentTextActive: {
+    color: Colors.background,
+  },
+  customPercentRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
+    marginBottom: 16,
+  },
+  customPercentLabel: {
+    fontSize: 14,
+    color: Colors.textSecondary,
+  },
+  customPercentInputWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: Colors.background,
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+  },
+  customPercentInput: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: Colors.text,
+    minWidth: 40,
+    textAlign: 'center',
+  },
+  customPercentSymbol: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: Colors.textSecondary,
+  },
+  distributionInfo: {
+    flexDirection: 'row',
+    backgroundColor: Colors.primary + '10',
+    borderRadius: 12,
+    padding: 12,
+    marginBottom: 20,
+    gap: 10,
+  },
+  distributionInfoIcon: {
+    marginTop: 2,
+  },
+  distributionInfoText: {
+    flex: 1,
+    fontSize: 12,
+    color: Colors.textSecondary,
+    lineHeight: 18,
+  },
+  saveDistributionBtn: {
+    backgroundColor: Colors.primary,
+    borderRadius: 12,
+    paddingVertical: 14,
+    alignItems: 'center',
+  },
+  saveDistributionBtnText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: Colors.background,
   },
 });

@@ -95,6 +95,8 @@ export const [AppProvider, useApp] = createContextHook(() => {
     { id: '2', donorName: 'CryptoPhilanthropy DAO', amount: 10000, currency: 'SOL', date: new Date('2025-01-18'), txHash: '0xdef456...', nftCertificateId: 'NFT-002' },
     { id: '3', donorName: 'John D.', amount: 250, currency: 'LARE', date: new Date('2025-01-15'), txHash: '0xghi789...', nftCertificateId: 'NFT-003' },
   ]);
+  const [paymentDistribution, setPaymentDistribution] = useState<{ larePercent: number; lusdPercent: number }>({ larePercent: 50, lusdPercent: 50 });
+
   const [charityStats] = useState<CharityStats>({
     totalDonations: 45250,
     totalDonors: 312,
@@ -138,6 +140,10 @@ export const [AppProvider, useApp] = createContextHook(() => {
         const savedHandle = await AsyncStorage.getItem('userHandle');
         if (savedHandle) {
           setUserHandle(savedHandle);
+        }
+        const savedDistribution = await AsyncStorage.getItem('paymentDistribution');
+        if (savedDistribution) {
+          setPaymentDistribution(JSON.parse(savedDistribution));
         }
       } catch (error) {
         console.log('Error loading data:', error);
@@ -301,6 +307,16 @@ export const [AppProvider, useApp] = createContextHook(() => {
     }
   }, []);
 
+  const updatePaymentDistribution = useCallback(async (larePercent: number) => {
+    const distribution = { larePercent, lusdPercent: 100 - larePercent };
+    setPaymentDistribution(distribution);
+    try {
+      await AsyncStorage.setItem('paymentDistribution', JSON.stringify(distribution));
+    } catch (error) {
+      console.log('Error saving payment distribution:', error);
+    }
+  }, []);
+
   const linkWalletToMerchant = useCallback(async (walletId: string | null) => {
     const updated = merchantProfiles.map(p => 
       p.id === activeMerchantId ? { ...p, linkedWalletId: walletId } : p
@@ -386,5 +402,7 @@ export const [AppProvider, useApp] = createContextHook(() => {
     linkedMerchantWallet,
     userHandle,
     updateUserHandle,
+    paymentDistribution,
+    updatePaymentDistribution,
   };
 });
