@@ -6,7 +6,7 @@ import {
   Search, ShoppingCart, ChevronRight, MapPin, QrCode, ChevronDown, ChevronUp,
   Car, Briefcase, Home, MapPinned, Zap, Truck, Building2, Tag, Wrench, Globe,
   Users, Store, ArrowLeft, Clock, Flame, Star, BadgeCheck, TrendingUp, MapPinIcon,
-  Navigation, Plus, X, CircleDot, Square, Shield, Sparkles, Timer, UserCheck, Locate
+  Navigation, Plus, X, CircleDot, Square, Shield, Sparkles, Timer, UserCheck, Locate, Package
 } from 'lucide-react-native';
 import Colors from '@/constants/colors';
 
@@ -693,6 +693,9 @@ export default function ShopScreen() {
       <View style={styles.header}>
         <Text style={styles.title}>Shop</Text>
         <View style={styles.headerActions}>
+          <TouchableOpacity style={styles.iconBtn} onPress={() => router.push('/menu/my-orders')}>
+            <Package size={20} color={Colors.text} />
+          </TouchableOpacity>
           <TouchableOpacity style={styles.iconBtn}>
             <QrCode size={20} color={Colors.text} />
           </TouchableOpacity>
