@@ -564,6 +564,44 @@ export default function WalletDashboard() {
             </View>
           </View>
 
+          <View style={styles.cardSettingsSection}>
+            <Text style={[styles.cardSettingsTitle, { color: colors.text }]}>Card Settings</Text>
+            <View style={[styles.cardSettingsCard, { backgroundColor: colors.surface }]}>
+              <TouchableOpacity style={styles.cardSettingItem} onPress={() => router.push('/(tabs)/(wallet)/transaction-limits')}>
+                <View style={[styles.cardSettingIcon, { backgroundColor: colors.primary + '20' }]}>
+                  <Lock size={16} color={colors.primary} />
+                </View>
+                <View style={styles.cardSettingContent}>
+                  <Text style={[styles.cardSettingTitle, { color: colors.text }]}>Transaction Limits</Text>
+                  <Text style={[styles.cardSettingSubtitle, { color: colors.textSecondary }]}>Daily and per-transaction limits</Text>
+                </View>
+                <ChevronRight size={18} color={colors.textTertiary} />
+              </TouchableOpacity>
+              <View style={[styles.cardSettingDivider, { backgroundColor: colors.border }]} />
+              <TouchableOpacity style={styles.cardSettingItem} onPress={() => router.push('/(tabs)/(wallet)/card-security')}>
+                <View style={[styles.cardSettingIcon, { backgroundColor: '#10B981' + '20' }]}>
+                  <Shield size={16} color="#10B981" />
+                </View>
+                <View style={styles.cardSettingContent}>
+                  <Text style={[styles.cardSettingTitle, { color: colors.text }]}>Security</Text>
+                  <Text style={[styles.cardSettingSubtitle, { color: colors.textSecondary }]}>PIN, freeze card, fraud alerts</Text>
+                </View>
+                <ChevronRight size={18} color={colors.textTertiary} />
+              </TouchableOpacity>
+              <View style={[styles.cardSettingDivider, { backgroundColor: colors.border }]} />
+              <TouchableOpacity style={styles.cardSettingItem} onPress={() => router.push('/(tabs)/(wallet)/virtual-card')}>
+                <View style={[styles.cardSettingIcon, { backgroundColor: '#6366F1' + '20' }]}>
+                  <Smartphone size={16} color="#6366F1" />
+                </View>
+                <View style={styles.cardSettingContent}>
+                  <Text style={[styles.cardSettingTitle, { color: colors.text }]}>Virtual Card</Text>
+                  <Text style={[styles.cardSettingSubtitle, { color: colors.textSecondary }]}>Generate for online purchases</Text>
+                </View>
+                <ChevronRight size={18} color={colors.textTertiary} />
+              </TouchableOpacity>
+            </View>
+          </View>
+
           <View style={[styles.cardManagerInfo, { backgroundColor: colors.surface }]}>
             <AlertCircle size={18} color={colors.primary} />
             <Text style={[styles.cardManagerInfoText, { color: colors.textSecondary }]}>
@@ -680,43 +718,6 @@ export default function WalletDashboard() {
             )}
           </View>
 
-          <View style={styles.cardSettingsSection}>
-            <Text style={[styles.cardSettingsTitle, { color: colors.text }]}>Card Settings</Text>
-            <View style={[styles.cardSettingsCard, { backgroundColor: colors.surface }]}>
-              <TouchableOpacity style={styles.cardSettingItem}>
-                <View style={[styles.cardSettingIcon, { backgroundColor: colors.primary + '20' }]}>
-                  <Lock size={16} color={colors.primary} />
-                </View>
-                <View style={styles.cardSettingContent}>
-                  <Text style={[styles.cardSettingTitle, { color: colors.text }]}>Transaction Limits</Text>
-                  <Text style={[styles.cardSettingSubtitle, { color: colors.textSecondary }]}>Daily and per-transaction limits</Text>
-                </View>
-                <ChevronRight size={18} color={colors.textTertiary} />
-              </TouchableOpacity>
-              <View style={[styles.cardSettingDivider, { backgroundColor: colors.border }]} />
-              <TouchableOpacity style={styles.cardSettingItem}>
-                <View style={[styles.cardSettingIcon, { backgroundColor: '#10B981' + '20' }]}>
-                  <Shield size={16} color="#10B981" />
-                </View>
-                <View style={styles.cardSettingContent}>
-                  <Text style={[styles.cardSettingTitle, { color: colors.text }]}>Security</Text>
-                  <Text style={[styles.cardSettingSubtitle, { color: colors.textSecondary }]}>PIN, freeze card, fraud alerts</Text>
-                </View>
-                <ChevronRight size={18} color={colors.textTertiary} />
-              </TouchableOpacity>
-              <View style={[styles.cardSettingDivider, { backgroundColor: colors.border }]} />
-              <TouchableOpacity style={styles.cardSettingItem}>
-                <View style={[styles.cardSettingIcon, { backgroundColor: '#6366F1' + '20' }]}>
-                  <Smartphone size={16} color="#6366F1" />
-                </View>
-                <View style={styles.cardSettingContent}>
-                  <Text style={[styles.cardSettingTitle, { color: colors.text }]}>Virtual Card</Text>
-                  <Text style={[styles.cardSettingSubtitle, { color: colors.textSecondary }]}>Generate for online purchases</Text>
-                </View>
-                <ChevronRight size={18} color={colors.textTertiary} />
-              </TouchableOpacity>
-            </View>
-          </View>
         </View>
 
         <View style={styles.section}>
