@@ -15,7 +15,7 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, RefreshControl, T
 import Svg, { Path, Defs, LinearGradient, Stop } from 'react-native-svg';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { ArrowUpRight, ArrowDownLeft, RefreshCw, Eye, EyeOff, ChevronRight, Plus, ChevronDown, Image, Coins, Droplets, Wallet, Check, Trash2, Edit3, Menu, Search, ArrowLeftRight, Clover, Receipt, GitBranch, Users, ShoppingCart, DollarSign, ShieldCheck, HandCoins, Send, FileText, CreditCard, Lock, Smartphone, Bell, AlertCircle, Shield, Settings } from 'lucide-react-native';
+import { ArrowUpRight, ArrowDownLeft, RefreshCw, Eye, EyeOff, ChevronRight, Plus, ChevronDown, Image, Coins, Droplets, Wallet, Check, Trash2, Edit3, Menu, Search, ArrowLeftRight, Clover, Receipt, GitBranch, Users, ShoppingCart, DollarSign, ShieldCheck, HandCoins, Send, FileText, CreditCard, Lock, Smartphone, Bell, AlertCircle, Shield, Settings, Link, Globe } from 'lucide-react-native';
 import { useApp } from '@/contexts/AppContext';
 import ModeToggle from '@/components/ModeToggle';
 import TokenCard from '@/components/TokenCard';
@@ -70,6 +70,21 @@ export default function WalletDashboard() {
     expiryDate: '',
     cvv: '',
   });
+  const [showCustomTokenModal, setShowCustomTokenModal] = React.useState(false);
+  const [selectedChain, setSelectedChain] = React.useState<string>('');
+  const [contractAddress, setContractAddress] = React.useState('');
+  const [showChainPicker, setShowChainPicker] = React.useState(false);
+
+  const chains = [
+    { id: 'ethereum', name: 'Ethereum', symbol: 'ETH' },
+    { id: 'bsc', name: 'BNB Smart Chain', symbol: 'BNB' },
+    { id: 'polygon', name: 'Polygon', symbol: 'MATIC' },
+    { id: 'avalanche', name: 'Avalanche', symbol: 'AVAX' },
+    { id: 'arbitrum', name: 'Arbitrum', symbol: 'ARB' },
+    { id: 'optimism', name: 'Optimism', symbol: 'OP' },
+    { id: 'solana', name: 'Solana', symbol: 'SOL' },
+    { id: 'base', name: 'Base', symbol: 'BASE' },
+  ];
 
   const totalBalance = getTotalBalance();
   const recentTransactions = userTransactions.slice(0, 4);
@@ -139,6 +154,15 @@ export default function WalletDashboard() {
 
   const handleRemoveCard = (cardId: string) => {
     setLinkedCards(linkedCards.filter(c => c.id !== cardId));
+  };
+
+  const handleAddCustomToken = () => {
+    if (selectedChain && contractAddress.trim()) {
+      console.log('Adding custom token:', { chain: selectedChain, address: contractAddress });
+      setShowCustomTokenModal(false);
+      setSelectedChain('');
+      setContractAddress('');
+    }
   };
 
   const handleSetDefaultCard = (cardId: string) => {
@@ -607,9 +631,21 @@ export default function WalletDashboard() {
             </View>
           </View>
           {assetTab === 'assets' ? (
-            userTokens.map(token => (
-              <TokenCard key={token.id} token={token} />
-            ))
+            <>
+              {userTokens.map(token => (
+                <TokenCard key={token.id} token={token} />
+              ))}
+              <TouchableOpacity 
+                style={[styles.addCustomTokenLink, { backgroundColor: colors.surface }]}
+                onPress={() => setShowCustomTokenModal(true)}
+              >
+                <View style={[styles.addCustomTokenIcon, { backgroundColor: colors.primary + '15' }]}>
+                  <Plus size={16} color={colors.primary} />
+                </View>
+                <Text style={[styles.addCustomTokenText, { color: colors.primary }]}>Add Custom Token</Text>
+                <ChevronRight size={16} color={colors.primary} />
+              </TouchableOpacity>
+            </>
           ) : assetTab === 'nfts' ? (
             <View style={[styles.emptyNfts, { backgroundColor: colors.surface }]}>
               <Image size={48} color={colors.textTertiary} />
@@ -715,6 +751,97 @@ export default function WalletDashboard() {
       )}
 
       <NavMenuModal visible={showNavMenu} onClose={() => setShowNavMenu(false)} />
+
+      {showCustomTokenModal && (
+        <View style={styles.customTokenModalOverlay}>
+          <View style={[styles.customTokenModalContent, { backgroundColor: colors.surface }]}>
+            <Text style={[styles.customTokenModalTitle, { color: colors.text }]}>Add Custom Token</Text>
+            <Text style={[styles.customTokenModalSubtitle, { color: colors.textSecondary }]}>
+              Import a token by selecting the network and pasting the contract address
+            </Text>
+
+            <View style={styles.customTokenInputGroup}>
+              <Text style={[styles.customTokenInputLabel, { color: colors.textSecondary }]}>Network / Chain</Text>
+              <TouchableOpacity 
+                style={[styles.customTokenChainSelector, { backgroundColor: colors.background }]}
+                onPress={() => setShowChainPicker(!showChainPicker)}
+              >
+                <View style={styles.customTokenChainSelectorContent}>
+                  <Globe size={18} color={selectedChain ? colors.primary : colors.textTertiary} />
+                  <Text style={[styles.customTokenChainText, { color: selectedChain ? colors.text : colors.textTertiary }]}>
+                    {selectedChain ? chains.find(c => c.id === selectedChain)?.name : 'Select a network'}
+                  </Text>
+                </View>
+                <ChevronDown size={18} color={colors.textSecondary} />
+              </TouchableOpacity>
+              {showChainPicker && (
+                <View style={[styles.chainPickerDropdown, { backgroundColor: colors.background, borderColor: colors.border }]}>
+                  {chains.map(chain => (
+                    <TouchableOpacity
+                      key={chain.id}
+                      style={[styles.chainPickerItem, selectedChain === chain.id && { backgroundColor: colors.primary + '15' }]}
+                      onPress={() => {
+                        setSelectedChain(chain.id);
+                        setShowChainPicker(false);
+                      }}
+                    >
+                      <Text style={[styles.chainPickerName, { color: colors.text }]}>{chain.name}</Text>
+                      <Text style={[styles.chainPickerSymbol, { color: colors.textSecondary }]}>{chain.symbol}</Text>
+                      {selectedChain === chain.id && <Check size={16} color={colors.primary} />}
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              )}
+            </View>
+
+            <View style={styles.customTokenInputGroup}>
+              <Text style={[styles.customTokenInputLabel, { color: colors.textSecondary }]}>Contract Address</Text>
+              <TextInput
+                style={[styles.customTokenInput, { backgroundColor: colors.background, color: colors.text }]}
+                placeholder="0x..."
+                placeholderTextColor={colors.textTertiary}
+                value={contractAddress}
+                onChangeText={setContractAddress}
+                autoCapitalize="none"
+                autoCorrect={false}
+              />
+            </View>
+
+            <View style={[styles.customTokenNote, { backgroundColor: colors.background }]}>
+              <AlertCircle size={14} color={colors.primary} />
+              <Text style={[styles.customTokenNoteText, { color: colors.textSecondary }]}>
+                Only import tokens you trust. Scam tokens can be disguised as popular tokens.
+              </Text>
+            </View>
+
+            <View style={styles.customTokenModalActions}>
+              <TouchableOpacity 
+                style={[styles.customTokenCancelBtn, { backgroundColor: colors.background }]}
+                onPress={() => {
+                  setShowCustomTokenModal(false);
+                  setSelectedChain('');
+                  setContractAddress('');
+                  setShowChainPicker(false);
+                }}
+              >
+                <Text style={[styles.customTokenCancelText, { color: colors.textSecondary }]}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity 
+                style={[
+                  styles.customTokenConfirmBtn, 
+                  { backgroundColor: colors.primary },
+                  (!selectedChain || !contractAddress.trim()) && styles.customTokenConfirmBtnDisabled
+                ]}
+                onPress={handleAddCustomToken}
+                disabled={!selectedChain || !contractAddress.trim()}
+              >
+                <Link size={16} color="#FFFFFF" />
+                <Text style={styles.customTokenConfirmText}>Import Token</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      )}
 
       {showAddCardModal && (
         <View style={styles.addCardModalOverlay}>
@@ -1468,6 +1595,146 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   addCardConfirmText: {
+    color: '#FFFFFF',
+    fontSize: 15,
+    fontWeight: '600' as const,
+  },
+  addCustomTokenLink: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 14,
+    borderRadius: 14,
+    marginTop: 12,
+    gap: 12,
+  },
+  addCustomTokenIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  addCustomTokenText: {
+    flex: 1,
+    fontSize: 14,
+    fontWeight: '600' as const,
+  },
+  customTokenModalOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+  },
+  customTokenModalContent: {
+    borderRadius: 20,
+    padding: 22,
+    width: '100%',
+    maxWidth: 380,
+  },
+  customTokenModalTitle: {
+    fontSize: 18,
+    fontWeight: '700' as const,
+    marginBottom: 6,
+  },
+  customTokenModalSubtitle: {
+    fontSize: 13,
+    marginBottom: 20,
+    lineHeight: 18,
+  },
+  customTokenInputGroup: {
+    marginBottom: 16,
+  },
+  customTokenInputLabel: {
+    fontSize: 12,
+    fontWeight: '500' as const,
+    marginBottom: 8,
+  },
+  customTokenChainSelector: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    borderRadius: 12,
+    padding: 14,
+  },
+  customTokenChainSelectorContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  customTokenChainText: {
+    fontSize: 15,
+  },
+  chainPickerDropdown: {
+    marginTop: 8,
+    borderRadius: 12,
+    borderWidth: 1,
+    overflow: 'hidden',
+  },
+  chainPickerItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 12,
+    gap: 10,
+  },
+  chainPickerName: {
+    flex: 1,
+    fontSize: 14,
+    fontWeight: '500' as const,
+  },
+  chainPickerSymbol: {
+    fontSize: 12,
+  },
+  customTokenInput: {
+    borderRadius: 12,
+    padding: 14,
+    fontSize: 14,
+    fontFamily: 'monospace',
+  },
+  customTokenNote: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    padding: 12,
+    borderRadius: 10,
+    gap: 10,
+    marginBottom: 20,
+  },
+  customTokenNoteText: {
+    flex: 1,
+    fontSize: 12,
+    lineHeight: 17,
+  },
+  customTokenModalActions: {
+    flexDirection: 'row',
+    gap: 10,
+  },
+  customTokenCancelBtn: {
+    flex: 1,
+    padding: 14,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  customTokenCancelText: {
+    fontSize: 15,
+    fontWeight: '600' as const,
+  },
+  customTokenConfirmBtn: {
+    flex: 1,
+    flexDirection: 'row',
+    padding: 14,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+  },
+  customTokenConfirmBtnDisabled: {
+    opacity: 0.5,
+  },
+  customTokenConfirmText: {
     color: '#FFFFFF',
     fontSize: 15,
     fontWeight: '600' as const,
