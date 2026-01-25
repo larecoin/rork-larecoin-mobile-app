@@ -83,7 +83,7 @@ const menuSections: MenuSection[] = [
       { id: 'staking-rewards', label: 'Staking & Rewards', icon: Coins },
       { id: 'payment-methods', label: 'Payment Methods', icon: CreditCard },
       { id: 'forex', label: 'Foreign Exchange', icon: Banknote },
-      { id: 'lucky-draw', label: 'My Lucky Draw', icon: Clover },
+      { id: 'lucky-draw', label: 'My Lucky Draws', icon: Clover },
       { id: 'borrow-lend', label: 'Borrow & Lend', icon: HandCoins },
     ],
   },

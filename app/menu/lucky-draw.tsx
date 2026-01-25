@@ -22,7 +22,7 @@ export default function LuckyDrawScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <Stack.Screen options={{ title: 'My Lucky Draw' }} />
+      <Stack.Screen options={{ title: 'My Lucky Draws' }} />
       <ScrollView 
         style={styles.content}
         contentContainerStyle={{ paddingBottom: insets.bottom + 20 }}
