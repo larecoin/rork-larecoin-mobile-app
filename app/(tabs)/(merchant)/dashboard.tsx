@@ -48,7 +48,7 @@ import { useApp } from '@/contexts/AppContext';
 import ModeToggle from '@/components/ModeToggle';
 import StatCard from '@/components/StatCard';
 import OrderCard from '@/components/OrderCard';
-import NavMenuModal from '@/components/NavMenuModal';
+import MerchantNavMenuModal from '@/components/MerchantNavMenuModal';
 
 export default function MerchantDashboard() {
   const insets = useSafeAreaInsets();
@@ -668,7 +668,7 @@ export default function MerchantDashboard() {
         <View style={{ height: 100 }} />
       </ScrollView>
 
-      <NavMenuModal visible={showNavMenu} onClose={() => setShowNavMenu(false)} />
+      <MerchantNavMenuModal visible={showNavMenu} onClose={() => setShowNavMenu(false)} />
 
       {showAddProfileModal && (
         <View style={styles.modalOverlay}>
