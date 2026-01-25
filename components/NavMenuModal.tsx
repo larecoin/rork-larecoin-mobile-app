@@ -45,6 +45,13 @@ const menuSections: MenuSection[] = [
     ],
   },
   {
+    title: 'Shopping',
+    items: [
+      { id: 'shopping', label: 'Shopping', icon: ShoppingCart },
+      { id: 'my-orders', label: 'My Orders', icon: ClipboardCheck },
+    ],
+  },
+  {
     title: 'Social',
     items: [
       { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -85,13 +92,6 @@ const menuSections: MenuSection[] = [
       { id: 'forex', label: 'Foreign Exchange', icon: Banknote },
       { id: 'lucky-draw', label: 'My Lucky Draws', icon: Clover },
       { id: 'borrow-lend', label: 'Borrow & Lend', icon: HandCoins },
-    ],
-  },
-  {
-    title: 'Shopping',
-    items: [
-      { id: 'shopping', label: 'Shopping', icon: ShoppingCart },
-      { id: 'my-orders', label: 'My Orders', icon: ClipboardCheck },
     ],
   },
   {
