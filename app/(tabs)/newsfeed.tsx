@@ -113,7 +113,7 @@ export default function NewsfeedScreen() {
   const router = useRouter();
   const { colors } = useApp();
   const [refreshing, setRefreshing] = useState(false);
-  const [activeTab, setActiveTab] = useState<'markets' | 'foryou' | 'following' | 'trending'>('foryou');
+  const [activeTab, setActiveTab] = useState<'markets' | 'foryou' | 'following' | 'trending'>('markets');
   const [marketFilter, setMarketFilter] = useState<MarketType>('all');
   const [favorites, setFavorites] = useState<string[]>([]);
   const [priceAlerts, setPriceAlerts] = useState<string[]>([]);
