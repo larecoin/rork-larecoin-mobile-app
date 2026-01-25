@@ -6,8 +6,9 @@ import {
   Heart, X, Star, MapPin, Briefcase, Filter, Settings, 
   Calendar, Clock, Phone, Video, Users, Check, MessageCircle,
   ChevronRight, ArrowLeft, Coffee, MapPinned, Sparkles, Shield,
-  AlertCircle, ThumbsUp, ThumbsDown, Crown, Lock
+  AlertCircle, ThumbsUp, ThumbsDown, Crown, Lock, Flame
 } from 'lucide-react-native';
+import { useRouter } from 'expo-router';
 import { useApp } from '@/contexts/AppContext';
 
 const { width } = Dimensions.get('window');
@@ -78,6 +79,7 @@ const venues = [
 export default function DatingScreen() {
   const insets = useSafeAreaInsets();
   const { colors } = useApp();
+  const router = useRouter();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [activeTab, setActiveTab] = useState<'discover' | 'matches' | 'dates'>('discover');
   const [matches, setMatches] = useState<Match[]>(mockMatches);
@@ -250,6 +252,27 @@ export default function DatingScreen() {
         contentContainerStyle={{ paddingBottom: insets.bottom + 100 }}
         showsVerticalScrollIndicator={false}
       >
+        <TouchableOpacity 
+          style={[styles.adultClassifiedsCard, { backgroundColor: '#FF1744' }]}
+          onPress={() => Alert.alert(
+            'Adult Classifieds',
+            'You are about to access Adult Classifieds. This section contains mature content for adults 18+ only. By continuing, you confirm you are of legal age.',
+            [
+              { text: 'Cancel', style: 'cancel' },
+              { text: 'Continue', onPress: () => console.log('Navigate to Adult Classifieds') }
+            ]
+          )}
+        >
+          <View style={styles.adultClassifiedsIcon}>
+            <Flame size={24} color="#FFF" fill="#FFF" />
+          </View>
+          <View style={styles.adultClassifiedsContent}>
+            <Text style={styles.adultClassifiedsTitle}>Adult Classifieds</Text>
+            <Text style={styles.adultClassifiedsSubtitle}>Skip dating • Direct connections • 18+</Text>
+          </View>
+          <ChevronRight size={20} color="rgba(255,255,255,0.8)" />
+        </TouchableOpacity>
+
         <View style={[styles.profileCard, { backgroundColor: colors.surface }]}>
           <Image source={{ uri: currentProfile.images[0] }} style={styles.profileImage} />
           <View style={styles.profileOverlay}>
@@ -1487,5 +1510,39 @@ const styles = StyleSheet.create({
   },
   statusDesc: {
     fontSize: 13,
+  },
+  adultClassifiedsCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+    borderRadius: 16,
+    marginBottom: 16,
+    shadowColor: '#FF1744',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 6,
+  },
+  adultClassifiedsIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  adultClassifiedsContent: {
+    flex: 1,
+    marginLeft: 14,
+  },
+  adultClassifiedsTitle: {
+    fontSize: 17,
+    fontWeight: '700' as const,
+    color: '#FFF',
+    marginBottom: 2,
+  },
+  adultClassifiedsSubtitle: {
+    fontSize: 13,
+    color: 'rgba(255,255,255,0.85)',
   },
 });
