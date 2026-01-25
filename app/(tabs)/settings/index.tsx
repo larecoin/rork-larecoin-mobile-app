@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Switch, Platform } from 'react-native';
+import { useRouter } from 'expo-router';
 import { 
   User, 
   Shield, 
@@ -68,6 +69,7 @@ function SettingItem({
 
 export default function SettingsScreen() {
   const { mode, merchantProfile, colors, themeMode, toggleTheme } = useApp();
+  const router = useRouter();
   const [biometricEnabled, setBiometricEnabled] = React.useState(true);
   const [notificationsEnabled, setNotificationsEnabled] = React.useState(true);
 
@@ -120,7 +122,7 @@ export default function SettingsScreen() {
           <SettingItem
             icon={<User size={20} color={colors.primary} />}
             label="Profile"
-            onPress={() => console.log('Profile')}
+            onPress={() => router.push('/menu/account-settings')}
             colors={colors}
           />
           <SettingItem
