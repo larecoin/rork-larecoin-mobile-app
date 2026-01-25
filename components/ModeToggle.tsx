@@ -39,7 +39,7 @@ export default function ModeToggle() {
       <Animated.View 
         style={[
           styles.slider,
-          { transform: [{ translateX }], backgroundColor: colors.primary }
+          { transform: [{ translateX }], backgroundColor: '#5AC8FA' }
         ]} 
       />
       <TouchableOpacity

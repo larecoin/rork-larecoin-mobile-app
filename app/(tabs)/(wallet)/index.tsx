@@ -207,7 +207,7 @@ export default function WalletDashboard() {
         </View>
 
         <View style={styles.searchContainer}>
-          <View style={[styles.searchBar, { backgroundColor: colors.surface }]}>
+          <View style={[styles.searchBar, { backgroundColor: colors.surface, borderWidth: 1.5, borderColor: '#89CFF0' }]}>
             <Search size={18} color={colors.textSecondary} />
             <TextInput
               style={[styles.searchInput, { color: colors.text }]}

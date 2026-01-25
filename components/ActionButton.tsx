@@ -21,11 +21,11 @@ export default function ActionButton({
   const getColors = () => {
     switch (variant) {
       case 'primary':
-        return { bg: themeColors.primary, text: themeColors.background };
+        return { bg: '#5AC8FA', text: '#FFFFFF' };
       case 'secondary':
-        return { bg: themeColors.surface, text: themeColors.text };
+        return { bg: '#89CFF0', text: '#FFFFFF' };
       case 'accent':
-        return { bg: themeColors.accent, text: themeColors.background };
+        return { bg: '#6BB3F0', text: '#FFFFFF' };
     }
   };
 
