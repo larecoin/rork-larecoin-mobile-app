@@ -41,7 +41,7 @@ const menuSections: MenuSection[] = [
     title: 'Quick Actions',
     items: [
       { id: 'scan-qr', label: 'Scan QR', icon: QrCode },
-      { id: 'buy-crypto', label: 'BUY CRYPTO', icon: CreditCard },
+      { id: 'buy-crypto', label: 'Buy Crypto', icon: CreditCard },
     ],
   },
   {
