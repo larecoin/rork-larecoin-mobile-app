@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, TextInput } from 'react-native';
 import { Stack } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -6,7 +6,7 @@ import {
   ChevronLeft, ChevronRight, Plus, Clock, MapPin, Users, 
   Video, Heart, Gift, ShoppingBag, Calendar as CalendarIcon,
   Bell, CreditCard, ArrowUpRight, Cloud, Sun, CloudRain, Wind, Droplets, Thermometer,
-  Search, X, Menu
+  Search, X, Menu, Globe
 } from 'lucide-react-native';
 import { useApp } from '@/contexts/AppContext';
 import NavMenuModal from '@/components/NavMenuModal';
@@ -127,6 +127,65 @@ export default function CalendarScreen() {
   const [locationInput, setLocationInput] = useState('');
   const [isEditingLocation, setIsEditingLocation] = useState(false);
   const [showNavMenu, setShowNavMenu] = useState(false);
+  const [currentTime, setCurrentTime] = useState(new Date());
+  const [userLocation, setUserLocation] = useState<{
+    city: string;
+    region: string;
+    country: string;
+    timezone: string;
+  } | null>(null);
+  const [locationLoading, setLocationLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchLocation = async () => {
+      try {
+        const response = await fetch('https://ipapi.co/json/');
+        const data = await response.json();
+        if (data && data.city) {
+          setUserLocation({
+            city: data.city,
+            region: data.region,
+            country: data.country_name,
+            timezone: data.timezone,
+          });
+        }
+      } catch (error) {
+        console.log('Failed to fetch location:', error);
+      } finally {
+        setLocationLoading(false);
+      }
+    };
+
+    fetchLocation();
+  }, []);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
+
+  const formattedTime = useMemo(() => {
+    return currentTime.toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: true,
+    });
+  }, [currentTime]);
+
+  const formattedTimezone = useMemo(() => {
+    if (userLocation?.timezone) {
+      const offset = new Intl.DateTimeFormat('en-US', {
+        timeZone: userLocation.timezone,
+        timeZoneName: 'shortOffset',
+      }).formatToParts(currentTime).find(p => p.type === 'timeZoneName')?.value || '';
+      return `${userLocation.timezone.replace('_', ' ')} (${offset})`;
+    }
+    return Intl.DateTimeFormat().resolvedOptions().timeZone;
+  }, [userLocation?.timezone, currentTime]);
 
   const getDaysInMonth = (month: number, year: number) => {
     return new Date(year, month + 1, 0).getDate();
@@ -234,6 +293,51 @@ export default function CalendarScreen() {
         contentContainerStyle={{ paddingBottom: insets.bottom + 100 }}
         showsVerticalScrollIndicator={false}
       >
+        <View style={[styles.locationTimeCard, { backgroundColor: colors.surface }]}>
+          <View style={styles.locationRow}>
+            <View style={[styles.locationIconBg, { backgroundColor: colors.primary + '20' }]}>
+              <MapPin size={18} color={colors.primary} />
+            </View>
+            <View style={styles.locationInfo}>
+              <Text style={[styles.locationLabel, { color: colors.textSecondary }]}>Your Location</Text>
+              {locationLoading ? (
+                <Text style={[styles.locationText, { color: colors.text }]}>Detecting...</Text>
+              ) : userLocation ? (
+                <Text style={[styles.locationText, { color: colors.text }]}>
+                  {userLocation.city}, {userLocation.region}, {userLocation.country}
+                </Text>
+              ) : (
+                <Text style={[styles.locationText, { color: colors.textSecondary }]}>Location unavailable</Text>
+              )}
+            </View>
+          </View>
+          
+          <View style={[styles.timeDivider, { backgroundColor: colors.border }]} />
+          
+          <View style={styles.timeSection}>
+            <View style={styles.timeRow}>
+              <View style={[styles.timeIconBg, { backgroundColor: '#10B981' + '20' }]}>
+                <Clock size={18} color="#10B981" />
+              </View>
+              <View style={styles.timeInfo}>
+                <Text style={[styles.timeLabel, { color: colors.textSecondary }]}>Current Time</Text>
+                <Text style={[styles.timeText, { color: colors.text }]}>{formattedTime}</Text>
+              </View>
+            </View>
+            <View style={styles.timezoneRow}>
+              <View style={[styles.timezoneIconBg, { backgroundColor: '#8B5CF6' + '20' }]}>
+                <Globe size={16} color="#8B5CF6" />
+              </View>
+              <View style={styles.timezoneInfo}>
+                <Text style={[styles.timezoneLabel, { color: colors.textSecondary }]}>Timezone</Text>
+                <Text style={[styles.timezoneText, { color: colors.text }]} numberOfLines={1}>
+                  {formattedTimezone}
+                </Text>
+              </View>
+            </View>
+          </View>
+        </View>
+
         {showWeather && (
           <View style={[styles.weatherCard, { backgroundColor: colors.surface }]}>
             <View style={styles.weatherHeader}>
@@ -737,6 +841,99 @@ const styles = StyleSheet.create({
   },
   declineBtnText: {
     fontSize: 12,
+    fontWeight: '500' as const,
+  },
+  locationTimeCard: {
+    margin: 16,
+    marginBottom: 0,
+    borderRadius: 20,
+    padding: 16,
+  },
+  locationRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  locationIconBg: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  locationInfo: {
+    flex: 1,
+  },
+  locationLabel: {
+    fontSize: 11,
+    fontWeight: '600' as const,
+    letterSpacing: 0.5,
+    textTransform: 'uppercase' as const,
+    marginBottom: 2,
+  },
+  locationText: {
+    fontSize: 15,
+    fontWeight: '600' as const,
+  },
+  timeDivider: {
+    height: 1,
+    marginVertical: 14,
+  },
+  timeSection: {
+    gap: 12,
+  },
+  timeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  timeIconBg: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  timeInfo: {
+    flex: 1,
+  },
+  timeLabel: {
+    fontSize: 11,
+    fontWeight: '600' as const,
+    letterSpacing: 0.5,
+    textTransform: 'uppercase' as const,
+    marginBottom: 2,
+  },
+  timeText: {
+    fontSize: 22,
+    fontWeight: '700' as const,
+    letterSpacing: 1,
+  },
+  timezoneRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  timezoneIconBg: {
+    width: 32,
+    height: 32,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginLeft: 4,
+  },
+  timezoneInfo: {
+    flex: 1,
+  },
+  timezoneLabel: {
+    fontSize: 10,
+    fontWeight: '500' as const,
+    letterSpacing: 0.3,
+    textTransform: 'uppercase' as const,
+    marginBottom: 1,
+  },
+  timezoneText: {
+    fontSize: 13,
     fontWeight: '500' as const,
   },
   calendarCard: {
