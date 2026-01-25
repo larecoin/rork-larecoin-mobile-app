@@ -11,6 +11,8 @@ export const lightTheme = {
   primaryLight: '#5DADE2',
   primaryDark: '#1A5F7A',
   
+  iconColor: '#00D4FF',
+  
   accent: '#00B88A',
   accentLight: '#33E5B8',
   
@@ -44,6 +46,8 @@ export const darkTheme = {
   primary: '#2E86AB',
   primaryLight: '#5DADE2',
   primaryDark: '#1A5F7A',
+  
+  iconColor: '#2E86AB',
   
   accent: '#00D9A5',
   accentLight: '#33E5B8',

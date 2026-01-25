@@ -253,8 +253,8 @@ export default function NavMenuModal({ visible, onClose }: NavMenuModalProps) {
                     activeOpacity={0.7}
                   >
                     <View style={styles.menuItemLeft}>
-                      <View style={[styles.iconWrapper, { backgroundColor: colors.primary + '15' }]}>
-                        <item.icon size={20} color={colors.primary} />
+                      <View style={[styles.iconWrapper, { backgroundColor: colors.iconColor + '15' }]}>
+                        <item.icon size={20} color={colors.iconColor} />
                       </View>
                       <Text style={[styles.menuItemLabel, { color: colors.text }]}>{item.label}</Text>
                     </View>
