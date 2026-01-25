@@ -32,7 +32,8 @@ const menuSections: MenuSection[] = [
   {
     title: 'Account',
     items: [
-      { id: 'account-settings', label: 'Account Settings', icon: UserCircle },
+      { id: 'account-settings', label: 'Profile Settings', icon: UserCircle },
+      { id: 'app-settings', label: 'App Settings', icon: Settings },
       { id: 'customer-service', label: 'Customer Service Chat', icon: Headphones },
       { id: 'invite-friends', label: 'Invite Friends', icon: Share2 },
     ],
@@ -76,11 +77,10 @@ const menuSections: MenuSection[] = [
     ],
   },
   {
-    title: 'Rewards & Settings',
+    title: 'Earn Rewards',
     items: [
       { id: 'bug-bounty', label: 'Bug Bounty', icon: Bug },
       { id: 'referrals', label: 'Referrals', icon: Gift },
-      { id: 'settings', label: 'Settings', icon: Settings },
     ],
   },
   {
@@ -158,8 +158,8 @@ export default function NavMenuModal({ visible, onClose }: NavMenuModalProps) {
     onClose();
     
     const routes: Record<string, string> = {
-      'settings': '/(tabs)/settings',
       'account-settings': '/menu/account-settings',
+      'app-settings': '/(tabs)/settings',
       'customer-service': '/menu/customer-service',
       'invite-friends': '/menu/invite-friends',
       'scan-qr': '/menu/scan-qr',
