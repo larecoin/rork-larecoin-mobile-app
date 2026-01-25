@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, RefreshControl, TextInput } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { ArrowUpRight, ArrowDownLeft, RefreshCw, Eye, EyeOff, ChevronRight, Plus, ChevronDown, Image, Coins, Droplets, Wallet, Check, Trash2, Edit3, Menu, Search, ArrowLeftRight, Clover, Receipt, GitBranch, Users, ShoppingCart, DollarSign, ShieldCheck, HandCoins, Send, FileText } from 'lucide-react-native';
+import { ArrowUpRight, ArrowDownLeft, RefreshCw, Eye, EyeOff, ChevronRight, Plus, ChevronDown, Image, Coins, Droplets, Wallet, Check, Trash2, Edit3, Menu, Search, ArrowLeftRight, Clover, Receipt, GitBranch, Users, ShoppingCart, DollarSign, ShieldCheck, HandCoins, Send, FileText, CreditCard } from 'lucide-react-native';
 import { useApp } from '@/contexts/AppContext';
 import ModeToggle from '@/components/ModeToggle';
 import TokenCard from '@/components/TokenCard';
@@ -75,6 +75,10 @@ export default function WalletDashboard() {
     { id: 'borrow-lend', icon: HandCoins, label: 'Borrow/Lend', color: '#8E44AD', onPress: () => router.push('/(tabs)/(wallet)/borrow-lend') },
     { id: 'dao', icon: Users, label: 'DAO', color: '#E67E22', onPress: () => router.push('/(tabs)/(wallet)/dao') },
     { id: 'transactions', icon: ArrowLeftRight, label: 'Transactions', color: '#2ECC71', onPress: () => router.push('/(tabs)/(wallet)/transactions') },
+  ];
+
+  const featureButtonsRow3 = [
+    { id: 'card-manager', icon: CreditCard, label: 'Card Manager', color: '#1A1F71', onPress: () => router.push('/(tabs)/(wallet)/card-manager') },
   ];
 
   const lareBalance = 12450.75;
@@ -276,6 +280,20 @@ export default function WalletDashboard() {
           </View>
           <View style={styles.featureButtonsRow}>
             {featureButtonsRow2.map(feature => (
+              <TouchableOpacity 
+                key={feature.id}
+                style={styles.featureButton}
+                onPress={feature.onPress}
+              >
+                <View style={[styles.featureIconWrapper, { backgroundColor: feature.color + '20' }]}>
+                  <feature.icon size={20} color={feature.color} />
+                </View>
+                <Text style={[styles.featureLabel, { color: colors.text }]}>{feature.label}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+          <View style={styles.featureButtonsRow}>
+            {featureButtonsRow3.map(feature => (
               <TouchableOpacity 
                 key={feature.id}
                 style={styles.featureButton}

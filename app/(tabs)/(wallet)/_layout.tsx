@@ -98,6 +98,13 @@ export default function WalletLayout() {
           headerStyle: { backgroundColor: Colors.backgroundSecondary },
         }} 
       />
+      <Stack.Screen 
+        name="card-manager" 
+        options={{ 
+          title: 'Card Manager',
+          headerStyle: { backgroundColor: Colors.backgroundSecondary },
+        }} 
+      />
     </Stack>
   );
 }
