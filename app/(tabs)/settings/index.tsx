@@ -1,6 +1,6 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Switch, Platform } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, Stack } from 'expo-router';
 import { 
   User, 
   Shield, 
@@ -14,8 +14,10 @@ import {
   Moon,
   Globe,
   Wallet,
-  Store
+  Store,
+  Menu
 } from 'lucide-react-native';
+import NavMenuModal from '@/components/NavMenuModal';
 import { useApp } from '@/contexts/AppContext';
 
 interface SettingItemProps {
@@ -72,6 +74,7 @@ export default function SettingsScreen() {
   const router = useRouter();
   const [biometricEnabled, setBiometricEnabled] = React.useState(true);
   const [notificationsEnabled, setNotificationsEnabled] = React.useState(true);
+  const [navMenuVisible, setNavMenuVisible] = useState(false);
 
   const isDarkMode = themeMode === 'dark';
 
@@ -88,7 +91,22 @@ export default function SettingsScreen() {
   }), [colors]);
 
   return (
-    <ScrollView style={[styles.container, dynamicStyles.container]} showsVerticalScrollIndicator={false}>
+    <>
+      <Stack.Screen 
+        options={{ 
+          title: 'Settings',
+          headerRight: () => (
+            <TouchableOpacity 
+              onPress={() => setNavMenuVisible(true)}
+              style={styles.headerMenuButton}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            >
+              <Menu size={24} color={colors.text} />
+            </TouchableOpacity>
+          ),
+        }} 
+      />
+      <ScrollView style={[styles.container, dynamicStyles.container]} showsVerticalScrollIndicator={false}>
       <View style={[styles.profileSection, dynamicStyles.profileSection]}>
         <View style={[styles.avatar, { backgroundColor: colors.primary + '20' }]}>
           <Text style={styles.avatarText}>
@@ -205,7 +223,13 @@ export default function SettingsScreen() {
       <Text style={[styles.version, dynamicStyles.version]}>Larecoin v1.0.0</Text>
       
       <View style={{ height: 100 }} />
-    </ScrollView>
+      </ScrollView>
+      
+      <NavMenuModal 
+        visible={navMenuVisible} 
+        onClose={() => setNavMenuVisible(false)} 
+      />
+    </>
   );
 }
 
@@ -315,5 +339,9 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 13,
     marginTop: 24,
+  },
+  headerMenuButton: {
+    padding: 4,
+    marginRight: 8,
   },
 });
