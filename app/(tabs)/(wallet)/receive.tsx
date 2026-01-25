@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Share, Platform } from 'react-native';
 import { Copy, Share2, ChevronDown, Check } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
+import * as Clipboard from 'expo-clipboard';
 import Colors from '@/constants/colors';
 import { useApp } from '@/contexts/AppContext';
 
@@ -13,12 +14,33 @@ export default function ReceiveScreen() {
 
   const walletAddress = '0xLARE1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t';
 
-  const handleCopy = async () => {
-    if (Platform.OS !== 'web') {
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+  const qrPattern = useMemo(() => {
+    const pattern: boolean[][] = [];
+    let seed = walletAddress.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    const random = () => {
+      seed = (seed * 9301 + 49297) % 233280;
+      return seed / 233280;
+    };
+    for (let row = 0; row < 8; row++) {
+      pattern[row] = [];
+      for (let col = 0; col < 8; col++) {
+        pattern[row][col] = random() > 0.5;
+      }
     }
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    return pattern;
+  }, [walletAddress]);
+
+  const handleCopy = async () => {
+    try {
+      await Clipboard.setStringAsync(walletAddress);
+      if (Platform.OS !== 'web') {
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      }
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (error) {
+      console.log('Copy error:', error);
+    }
   };
 
   const handleShare = async () => {
@@ -71,14 +93,14 @@ export default function ReceiveScreen() {
       <View style={styles.qrContainer}>
         <View style={styles.qrPlaceholder}>
           <View style={styles.qrCode}>
-            {[...Array(8)].map((_, row) => (
-              <View key={row} style={styles.qrRow}>
-                {[...Array(8)].map((_, col) => (
+            {qrPattern.map((row, rowIndex) => (
+              <View key={rowIndex} style={styles.qrRow}>
+                {row.map((filled, colIndex) => (
                   <View 
-                    key={col} 
+                    key={colIndex} 
                     style={[
                       styles.qrCell,
-                      Math.random() > 0.5 && styles.qrCellFilled
+                      filled && styles.qrCellFilled
                     ]} 
                   />
                 ))}
