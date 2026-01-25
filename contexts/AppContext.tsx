@@ -89,6 +89,7 @@ export const [AppProvider, useApp] = createContextHook(() => {
     },
   ]);
   const [activeMerchantId, setActiveMerchantId] = useState<string>('1');
+  const [userHandle, setUserHandle] = useState<string>('alexjohnson');
   const [charityGrants, setCharityGrants] = useState<CharityGrant[]>([
     { id: '1', donorName: 'Anonymous Whale', amount: 5000, currency: 'USDC', date: new Date('2025-01-20'), txHash: '0xabc123...', nftCertificateId: 'NFT-001' },
     { id: '2', donorName: 'CryptoPhilanthropy DAO', amount: 10000, currency: 'SOL', date: new Date('2025-01-18'), txHash: '0xdef456...', nftCertificateId: 'NFT-002' },
@@ -133,6 +134,10 @@ export const [AppProvider, useApp] = createContextHook(() => {
         const savedActiveMerchant = await AsyncStorage.getItem('activeMerchantId');
         if (savedActiveMerchant) {
           setActiveMerchantId(savedActiveMerchant);
+        }
+        const savedHandle = await AsyncStorage.getItem('userHandle');
+        if (savedHandle) {
+          setUserHandle(savedHandle);
         }
       } catch (error) {
         console.log('Error loading data:', error);
@@ -286,6 +291,16 @@ export const [AppProvider, useApp] = createContextHook(() => {
     }
   }, []);
 
+  const updateUserHandle = useCallback(async (handle: string) => {
+    const sanitized = handle.toLowerCase().replace(/[^a-z0-9_]/g, '');
+    setUserHandle(sanitized);
+    try {
+      await AsyncStorage.setItem('userHandle', sanitized);
+    } catch (error) {
+      console.log('Error saving user handle:', error);
+    }
+  }, []);
+
   const linkWalletToMerchant = useCallback(async (walletId: string | null) => {
     const updated = merchantProfiles.map(p => 
       p.id === activeMerchantId ? { ...p, linkedWalletId: walletId } : p
@@ -369,5 +384,7 @@ export const [AppProvider, useApp] = createContextHook(() => {
     switchActiveWallet,
     linkWalletToMerchant,
     linkedMerchantWallet,
+    userHandle,
+    updateUserHandle,
   };
 });

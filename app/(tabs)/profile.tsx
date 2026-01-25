@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Modal, TextInput, Linking, Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { 
@@ -8,7 +8,8 @@ import {
   Compass, MessageCircle, Rss, UserPlus, ThumbsUp, Send, Bookmark,
   MoreHorizontal, Globe, Palette, Video, FolderOpen, FileUser, Calendar,
   Contact, Code, Link, Mic, PenTool, Camera, Newspaper, Menu,
-  DollarSign, Wallet, TrendingUp, CreditCard, Coins, ToggleLeft, ToggleRight, Clock
+  DollarSign, Wallet, TrendingUp, CreditCard, Coins, ToggleLeft, ToggleRight, Clock,
+  AtSign, ExternalLink, X
 } from 'lucide-react-native';
 import Colors from '@/constants/colors';
 import { useApp } from '@/contexts/AppContext';
@@ -86,13 +87,15 @@ const feedPosts = [
 export default function ProfileScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const { activeWallet } = useApp();
+  const { activeWallet, userHandle, updateUserHandle } = useApp();
   const [copied, setCopied] = useState(false);
   const [activeTab, setActiveTab] = useState<'social' | 'content' | 'settings'>('social');
   const [likedPosts, setLikedPosts] = useState<string[]>([]);
   const [savedPosts, setSavedPosts] = useState<string[]>([]);
   const [showNavMenu, setShowNavMenu] = useState(false);
   const [monetizationEnabled, setMonetizationEnabled] = useState(true);
+  const [showHandleModal, setShowHandleModal] = useState(false);
+  const [editHandle, setEditHandle] = useState(userHandle);
   const [tipsEnabled, setTipsEnabled] = useState(true);
   const [subscriptionsEnabled, setSubscriptionsEnabled] = useState(false);
   const [payPerViewEnabled, setPayPerViewEnabled] = useState(true);
@@ -100,6 +103,27 @@ export default function ProfileScreen() {
   const handleCopyAddress = () => {
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleOpenHandleModal = () => {
+    setEditHandle(userHandle);
+    setShowHandleModal(true);
+  };
+
+  const handleSaveHandle = () => {
+    if (editHandle.trim()) {
+      updateUserHandle(editHandle.trim());
+    }
+    setShowHandleModal(false);
+  };
+
+  const handleOpenProfileLink = () => {
+    const url = `https://larecoin.com/profile/${userHandle}`;
+    if (Platform.OS === 'web') {
+      window.open(url, '_blank');
+    } else {
+      Linking.openURL(url);
+    }
   };
 
   const handleSocialFeature = (route: string | null) => {
@@ -150,6 +174,18 @@ export default function ProfileScreen() {
             </TouchableOpacity>
           </View>
           <Text style={styles.userName}>Alex Johnson</Text>
+          
+          <TouchableOpacity style={styles.handleContainer} onPress={handleOpenHandleModal}>
+            <AtSign size={14} color={Colors.primary} />
+            <Text style={styles.handleText}>{userHandle}</Text>
+            <Edit2 size={12} color={Colors.textSecondary} />
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.profileLinkContainer} onPress={handleOpenProfileLink}>
+            <Text style={styles.profileLinkText}>larecoin.com/profile/{userHandle}</Text>
+            <ExternalLink size={12} color={Colors.primary} />
+          </TouchableOpacity>
+          
           <Text style={styles.userEmail}>alex.johnson@email.com</Text>
           
           <TouchableOpacity style={styles.addressContainer} onPress={handleCopyAddress}>
@@ -536,6 +572,72 @@ export default function ProfileScreen() {
       </ScrollView>
 
       <NavMenuModal visible={showNavMenu} onClose={() => setShowNavMenu(false)} />
+
+      <Modal
+        visible={showHandleModal}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setShowHandleModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Edit Profile Handle</Text>
+              <TouchableOpacity onPress={() => setShowHandleModal(false)}>
+                <X size={24} color={Colors.text} />
+              </TouchableOpacity>
+            </View>
+
+            <Text style={styles.modalSubtitle}>
+              Your unique handle for your public profile
+            </Text>
+
+            <View style={styles.handleInputContainer}>
+              <View style={styles.handleInputPrefix}>
+                <AtSign size={18} color={Colors.primary} />
+              </View>
+              <TextInput
+                style={styles.handleInput}
+                value={editHandle}
+                onChangeText={(text) => setEditHandle(text.toLowerCase().replace(/[^a-z0-9_]/g, ''))}
+                placeholder="yourhandle"
+                placeholderTextColor={Colors.textTertiary}
+                autoCapitalize="none"
+                autoCorrect={false}
+                maxLength={30}
+              />
+            </View>
+
+            <View style={styles.profileLinkPreview}>
+              <Text style={styles.previewLabel}>Your profile link:</Text>
+              <Text style={styles.previewLink}>larecoin.com/profile/{editHandle || 'yourhandle'}</Text>
+            </View>
+
+            <View style={styles.handleRules}>
+              <Text style={styles.rulesTitle}>Handle requirements:</Text>
+              <Text style={styles.ruleText}>• Lowercase letters, numbers, and underscores only</Text>
+              <Text style={styles.ruleText}>• Maximum 30 characters</Text>
+              <Text style={styles.ruleText}>• Must be unique</Text>
+            </View>
+
+            <View style={styles.modalActions}>
+              <TouchableOpacity
+                style={styles.cancelButton}
+                onPress={() => setShowHandleModal(false)}
+              >
+                <Text style={styles.cancelButtonText}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.saveButton, !editHandle.trim() && styles.saveButtonDisabled]}
+                onPress={handleSaveHandle}
+                disabled={!editHandle.trim()}
+              >
+                <Text style={styles.saveButtonText}>Save Handle</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -615,6 +717,31 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: Colors.textSecondary,
     marginBottom: 12,
+  },
+  handleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: Colors.primary + '10',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+    marginBottom: 6,
+  },
+  handleText: {
+    fontSize: 14,
+    fontWeight: '600' as const,
+    color: Colors.primary,
+  },
+  profileLinkContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginBottom: 8,
+  },
+  profileLinkText: {
+    fontSize: 12,
+    color: Colors.textSecondary,
   },
   addressContainer: {
     flexDirection: 'row',
@@ -1123,5 +1250,116 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderBottomWidth: 1,
     borderBottomColor: Colors.border,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  modalContent: {
+    width: '100%',
+    maxWidth: 400,
+    backgroundColor: Colors.surface,
+    borderRadius: 20,
+    padding: 24,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: '700' as const,
+    color: Colors.text,
+  },
+  modalSubtitle: {
+    fontSize: 14,
+    color: Colors.textSecondary,
+    marginBottom: 20,
+  },
+  handleInputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: Colors.background,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    marginBottom: 16,
+  },
+  handleInputPrefix: {
+    paddingLeft: 14,
+    paddingRight: 4,
+  },
+  handleInput: {
+    flex: 1,
+    fontSize: 16,
+    color: Colors.text,
+    paddingVertical: 14,
+    paddingRight: 14,
+  },
+  profileLinkPreview: {
+    backgroundColor: Colors.primary + '10',
+    borderRadius: 10,
+    padding: 12,
+    marginBottom: 16,
+  },
+  previewLabel: {
+    fontSize: 12,
+    color: Colors.textSecondary,
+    marginBottom: 4,
+  },
+  previewLink: {
+    fontSize: 14,
+    fontWeight: '600' as const,
+    color: Colors.primary,
+  },
+  handleRules: {
+    marginBottom: 20,
+  },
+  rulesTitle: {
+    fontSize: 13,
+    fontWeight: '600' as const,
+    color: Colors.text,
+    marginBottom: 6,
+  },
+  ruleText: {
+    fontSize: 12,
+    color: Colors.textSecondary,
+    marginBottom: 2,
+  },
+  modalActions: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  cancelButton: {
+    flex: 1,
+    paddingVertical: 14,
+    borderRadius: 12,
+    backgroundColor: Colors.background,
+    alignItems: 'center',
+  },
+  cancelButtonText: {
+    fontSize: 15,
+    fontWeight: '600' as const,
+    color: Colors.textSecondary,
+  },
+  saveButton: {
+    flex: 1,
+    paddingVertical: 14,
+    borderRadius: 12,
+    backgroundColor: Colors.primary,
+    alignItems: 'center',
+  },
+  saveButtonDisabled: {
+    opacity: 0.5,
+  },
+  saveButtonText: {
+    fontSize: 15,
+    fontWeight: '600' as const,
+    color: '#FFF',
   },
 });
