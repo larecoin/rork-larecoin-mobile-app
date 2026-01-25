@@ -1,11 +1,12 @@
 import React, { useState, useMemo } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, TextInput } from 'react-native';
 import { Stack } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { 
   ChevronLeft, ChevronRight, Plus, Clock, MapPin, Users, 
   Video, Wallet, Heart, Gift, ShoppingBag, Calendar as CalendarIcon,
-  Bell, Star, CreditCard, ArrowUpRight, Cloud, Sun, CloudRain, Wind, Droplets, Thermometer
+  Bell, Star, CreditCard, ArrowUpRight, Cloud, Sun, CloudRain, Wind, Droplets, Thermometer,
+  Search, X
 } from 'lucide-react-native';
 import { useApp } from '@/contexts/AppContext';
 
@@ -121,6 +122,9 @@ export default function CalendarScreen() {
   const [currentMonth, setCurrentMonth] = useState(0);
   const [currentYear, setCurrentYear] = useState(2026);
   const [showWeather, setShowWeather] = useState(false);
+  const [weatherLocation, setWeatherLocation] = useState('San Francisco, CA');
+  const [locationInput, setLocationInput] = useState('');
+  const [isEditingLocation, setIsEditingLocation] = useState(false);
 
   const getDaysInMonth = (month: number, year: number) => {
     return new Date(year, month + 1, 0).getDate();
@@ -225,12 +229,46 @@ export default function CalendarScreen() {
         {showWeather && (
           <View style={[styles.weatherCard, { backgroundColor: colors.surface }]}>
             <View style={styles.weatherHeader}>
-              <View style={styles.weatherLocation}>
-                <MapPin size={14} color={colors.primary} />
-                <Text style={[styles.weatherLocationText, { color: colors.text }]}>
-                  {mockWeather.location}
-                </Text>
-              </View>
+              {isEditingLocation ? (
+                <View style={[styles.locationInputContainer, { backgroundColor: colors.background, borderColor: colors.border }]}>
+                  <Search size={16} color={colors.textTertiary} />
+                  <TextInput
+                    style={[styles.locationInput, { color: colors.text }]}
+                    placeholder="City, State, ZIP, or Country"
+                    placeholderTextColor={colors.textTertiary}
+                    value={locationInput}
+                    onChangeText={setLocationInput}
+                    autoFocus
+                    onSubmitEditing={() => {
+                      if (locationInput.trim()) {
+                        setWeatherLocation(locationInput.trim());
+                      }
+                      setIsEditingLocation(false);
+                      setLocationInput('');
+                    }}
+                    returnKeyType="search"
+                  />
+                  <TouchableOpacity
+                    onPress={() => {
+                      setIsEditingLocation(false);
+                      setLocationInput('');
+                    }}
+                    hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                  >
+                    <X size={16} color={colors.textTertiary} />
+                  </TouchableOpacity>
+                </View>
+              ) : (
+                <TouchableOpacity
+                  style={styles.weatherLocation}
+                  onPress={() => setIsEditingLocation(true)}
+                >
+                  <MapPin size={14} color={colors.primary} />
+                  <Text style={[styles.weatherLocationText, { color: colors.text }]}>
+                    {weatherLocation}
+                  </Text>
+                </TouchableOpacity>
+              )}
               <Text style={[styles.weatherDate, { color: colors.textSecondary }]}>
                 {months[currentMonth]} {selectedDate}, {currentYear}
               </Text>
@@ -531,6 +569,22 @@ const styles = StyleSheet.create({
   weatherLocationText: {
     fontSize: 14,
     fontWeight: '600' as const,
+  },
+  locationInputContainer: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 10,
+    borderWidth: 1,
+    gap: 8,
+    marginRight: 12,
+  },
+  locationInput: {
+    flex: 1,
+    fontSize: 14,
+    padding: 0,
   },
   weatherDate: {
     fontSize: 12,
