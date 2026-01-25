@@ -4,8 +4,8 @@ import { Stack } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { 
   ChevronLeft, ChevronRight, Plus, Clock, MapPin, Users, 
-  Video, Wallet, Heart, Gift, ShoppingBag, Calendar as CalendarIcon,
-  Bell, Star, CreditCard, ArrowUpRight, Cloud, Sun, CloudRain, Wind, Droplets, Thermometer,
+  Video, Heart, Gift, ShoppingBag, Calendar as CalendarIcon,
+  Bell, CreditCard, ArrowUpRight, Cloud, Sun, CloudRain, Wind, Droplets, Thermometer,
   Search, X, Menu
 } from 'lucide-react-native';
 import { useApp } from '@/contexts/AppContext';
@@ -211,7 +211,6 @@ export default function CalendarScreen() {
               Events & Invitations
             </Text>
           </View>
-          </View>
           <TouchableOpacity
             style={[
               styles.weatherToggle,
@@ -228,6 +227,7 @@ export default function CalendarScreen() {
             </Text>
           </TouchableOpacity>
         </View>
+      </View>
 
       <ScrollView 
         style={styles.content}
