@@ -6,10 +6,11 @@ import {
   Search, Bell, Plus, ThumbsUp, MessageCircle, Send, Bookmark,
   MoreHorizontal, CheckCircle, Image as ImageIcon, Video, Smile,
   TrendingUp, Users, Hash, Filter, Heart, ShoppingCart, BellRing,
-  ChevronDown, Coins, DollarSign, Image as ImageIcon2, ArrowUpRight, ArrowDownRight
+  ChevronDown, Coins, DollarSign, Image as ImageIcon2, ArrowUpRight, ArrowDownRight, Menu
 } from 'lucide-react-native';
 import Colors from '@/constants/colors';
 import { useApp } from '@/contexts/AppContext';
+import NavMenuModal from '@/components/NavMenuModal';
 
 const feedPosts = [
   {
@@ -121,6 +122,7 @@ export default function NewsfeedScreen() {
   const [likedPosts, setLikedPosts] = useState<string[]>([]);
   const [savedPosts, setSavedPosts] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [showNavMenu, setShowNavMenu] = useState(false);
 
   const onRefresh = () => {
     setRefreshing(true);
@@ -167,6 +169,12 @@ export default function NewsfeedScreen() {
   return (
     <View style={[styles.container, { paddingTop: insets.top, backgroundColor: colors.background }]}>
       <View style={[styles.header, { backgroundColor: colors.background }]}>
+        <TouchableOpacity 
+          style={[styles.menuButton, { backgroundColor: colors.surface }]}
+          onPress={() => setShowNavMenu(true)}
+        >
+          <Menu size={24} color={colors.text} />
+        </TouchableOpacity>
         <Text style={[styles.title, { color: colors.text }]}>Feed</Text>
         <View style={styles.headerActions}>
           <TouchableOpacity style={[styles.headerBtn, { backgroundColor: colors.surface }]}>
@@ -491,6 +499,8 @@ export default function NewsfeedScreen() {
       <TouchableOpacity style={styles.fab} onPress={() => router.push('/menu/create-post')}>
         <Plus size={24} color="#FFF" />
       </TouchableOpacity>
+
+      <NavMenuModal visible={showNavMenu} onClose={() => setShowNavMenu(false)} />
     </View>
   );
 }
@@ -505,6 +515,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 20,
     paddingVertical: 12,
+    gap: 12,
+  },
+  menuButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   title: {
     fontSize: 28,

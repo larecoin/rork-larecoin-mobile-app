@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Gift, Coins, Users, Target, Trophy, ChevronRight, Zap, CheckCircle, Sparkles, TrendingUp, Ticket, Landmark, Leaf } from 'lucide-react-native';
+import { Gift, Coins, Users, Target, Trophy, ChevronRight, Zap, CheckCircle, Sparkles, TrendingUp, Ticket, Landmark, Leaf, Menu } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Colors from '@/constants/colors';
+import NavMenuModal from '@/components/NavMenuModal';
 
 interface EarnOption {
   id: string;
@@ -52,6 +53,7 @@ export default function EarnScreen() {
   const insets = useSafeAreaInsets();
   const [pendingRewardsList, setPendingRewardsList] = useState<PendingReward[]>(initialPendingRewards);
   const [isHarvesting, setIsHarvesting] = useState(false);
+  const [showNavMenu, setShowNavMenu] = useState(false);
 
   const totalEarned = 1250;
   const totalPendingAmount = pendingRewardsList.reduce((sum, r) => sum + r.amount, 0);
@@ -107,6 +109,12 @@ export default function EarnScreen() {
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
       <View style={styles.header}>
+        <TouchableOpacity 
+          style={styles.menuButton}
+          onPress={() => setShowNavMenu(true)}
+        >
+          <Menu size={24} color={Colors.text} />
+        </TouchableOpacity>
         <Text style={styles.title}>Earn</Text>
         <View style={styles.trophyBadge}>
           <Trophy size={14} color={Colors.primary} />
@@ -229,6 +237,8 @@ export default function EarnScreen() {
 
         <View style={{ height: 100 }} />
       </ScrollView>
+
+      <NavMenuModal visible={showNavMenu} onClose={() => setShowNavMenu(false)} />
     </View>
   );
 }
@@ -244,6 +254,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 20,
     paddingVertical: 16,
+    gap: 12,
+  },
+  menuButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    backgroundColor: Colors.surface,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   title: {
     fontSize: 28,

@@ -6,9 +6,10 @@ import {
   ChevronLeft, ChevronRight, Plus, Clock, MapPin, Users, 
   Video, Wallet, Heart, Gift, ShoppingBag, Calendar as CalendarIcon,
   Bell, Star, CreditCard, ArrowUpRight, Cloud, Sun, CloudRain, Wind, Droplets, Thermometer,
-  Search, X
+  Search, X, Menu
 } from 'lucide-react-native';
 import { useApp } from '@/contexts/AppContext';
+import NavMenuModal from '@/components/NavMenuModal';
 
 type EventType = 'social' | 'payment' | 'invitation' | 'meeting' | 'reminder' | 'shopping';
 
@@ -125,6 +126,7 @@ export default function CalendarScreen() {
   const [weatherLocation, setWeatherLocation] = useState('San Francisco, CA');
   const [locationInput, setLocationInput] = useState('');
   const [isEditingLocation, setIsEditingLocation] = useState(false);
+  const [showNavMenu, setShowNavMenu] = useState(false);
 
   const getDaysInMonth = (month: number, year: number) => {
     return new Date(year, month + 1, 0).getDate();
@@ -197,11 +199,18 @@ export default function CalendarScreen() {
       
       <View style={[styles.header, { paddingTop: insets.top + 10, backgroundColor: colors.surface }]}>
         <View style={styles.headerRow}>
-          <View>
+          <TouchableOpacity 
+            style={[styles.menuButton, { backgroundColor: colors.background }]}
+            onPress={() => setShowNavMenu(true)}
+          >
+            <Menu size={24} color={colors.text} />
+          </TouchableOpacity>
+          <View style={styles.headerTitleContainer}>
             <Text style={[styles.headerTitle, { color: colors.text }]}>Calendar</Text>
             <Text style={[styles.headerSubtitle, { color: colors.textSecondary }]}>
               Events & Invitations
             </Text>
+          </View>
           </View>
           <TouchableOpacity
             style={[
@@ -512,6 +521,8 @@ export default function CalendarScreen() {
           )}
         </View>
       </ScrollView>
+
+      <NavMenuModal visible={showNavMenu} onClose={() => setShowNavMenu(false)} />
     </View>
   );
 }
@@ -536,6 +547,17 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+  },
+  headerTitleContainer: {
+    flex: 1,
+  },
+  menuButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
   },
   weatherToggle: {
     flexDirection: 'row',

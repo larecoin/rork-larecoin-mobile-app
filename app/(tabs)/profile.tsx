@@ -7,10 +7,11 @@ import {
   Share2, Star, LogOut, Copy, CheckCircle, Edit2, Users, Heart,
   Compass, MessageCircle, Rss, UserPlus, ThumbsUp, Send, Bookmark,
   MoreHorizontal, Globe, Palette, Video, FolderOpen, FileUser, Calendar,
-  Contact, Code, Link, Mic, PenTool, Camera, Newspaper
+  Contact, Code, Link, Mic, PenTool, Camera, Newspaper, Menu
 } from 'lucide-react-native';
 import Colors from '@/constants/colors';
 import { useApp } from '@/contexts/AppContext';
+import NavMenuModal from '@/components/NavMenuModal';
 
 const menuItems = [
   { id: 'security', title: 'Security', subtitle: '2FA enabled', icon: Shield, color: '#3498DB' },
@@ -89,6 +90,7 @@ export default function ProfileScreen() {
   const [activeTab, setActiveTab] = useState<'social' | 'content' | 'settings'>('social');
   const [likedPosts, setLikedPosts] = useState<string[]>([]);
   const [savedPosts, setSavedPosts] = useState<string[]>([]);
+  const [showNavMenu, setShowNavMenu] = useState(false);
 
   const handleCopyAddress = () => {
     setCopied(true);
@@ -119,6 +121,12 @@ export default function ProfileScreen() {
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
       <View style={styles.header}>
+        <TouchableOpacity 
+          style={styles.menuButton}
+          onPress={() => setShowNavMenu(true)}
+        >
+          <Menu size={24} color={Colors.text} />
+        </TouchableOpacity>
         <Text style={styles.title}>Profile</Text>
         <TouchableOpacity style={styles.settingsBtn}>
           <Settings size={20} color={Colors.text} />
@@ -374,6 +382,8 @@ export default function ProfileScreen() {
 
         <View style={{ height: 100 }} />
       </ScrollView>
+
+      <NavMenuModal visible={showNavMenu} onClose={() => setShowNavMenu(false)} />
     </View>
   );
 }
@@ -389,6 +399,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 20,
     paddingVertical: 16,
+    gap: 12,
+  },
+  menuButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    backgroundColor: Colors.surface,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   title: {
     fontSize: 28,

@@ -6,9 +6,10 @@ import {
   Search, ShoppingCart, ChevronRight, MapPin, QrCode, ChevronDown, ChevronUp,
   Car, Briefcase, Home, MapPinned, Zap, Truck, Building2, Tag, Wrench, Globe,
   Users, Store, ArrowLeft, Clock, Flame, Star, BadgeCheck, TrendingUp, MapPinIcon,
-  Navigation, Plus, X, CircleDot, Square, Shield, Sparkles, Timer, UserCheck, Locate, Package
+  Navigation, Plus, X, CircleDot, Square, Shield, Sparkles, Timer, UserCheck, Locate, Package, Menu
 } from 'lucide-react-native';
 import Colors from '@/constants/colors';
+import NavMenuModal from '@/components/NavMenuModal';
 
 interface Category {
   id: string;
@@ -294,6 +295,7 @@ export default function ShopScreen() {
   const [selectedRideType, setSelectedRideType] = useState<string>('economy');
   const [showRideOptions, setShowRideOptions] = useState(false);
   const [selectedRide, setSelectedRide] = useState<RideOption | null>(null);
+  const [showNavMenu, setShowNavMenu] = useState(false);
 
   const rideTypes = [
     { id: 'economy', name: 'Economy', icon: '🚗', description: 'Affordable everyday rides' },
@@ -691,6 +693,12 @@ export default function ShopScreen() {
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
       <View style={styles.header}>
+        <TouchableOpacity 
+          style={styles.menuButton}
+          onPress={() => setShowNavMenu(true)}
+        >
+          <Menu size={24} color={Colors.text} />
+        </TouchableOpacity>
         <Text style={styles.title}>Shop</Text>
         <View style={styles.headerActions}>
           <TouchableOpacity style={styles.iconBtn} onPress={() => router.push('/menu/my-orders')}>
@@ -781,6 +789,8 @@ export default function ShopScreen() {
 
         <View style={{ height: 100 }} />
       </ScrollView>
+
+      <NavMenuModal visible={showNavMenu} onClose={() => setShowNavMenu(false)} />
     </View>
   );
 }
@@ -796,6 +806,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 20,
     paddingVertical: 16,
+    gap: 12,
+  },
+  menuButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    backgroundColor: Colors.surface,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   title: {
     fontSize: 28,
