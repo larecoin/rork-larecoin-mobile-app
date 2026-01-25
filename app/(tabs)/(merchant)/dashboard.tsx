@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, RefreshControl } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, RefreshControl, TextInput, Modal } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { 
@@ -670,7 +670,12 @@ export default function MerchantDashboard() {
 
       <MerchantNavMenuModal visible={showNavMenu} onClose={() => setShowNavMenu(false)} />
 
-      {showAddProfileModal && (
+      <Modal
+        visible={showAddProfileModal}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setShowAddProfileModal(false)}
+      >
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
@@ -714,19 +719,24 @@ export default function MerchantDashboard() {
             <View style={styles.inputContainer}>
               <Text style={styles.inputLabel}>{newProfileType === 'charity' ? 'Charity Name' : 'Business Name'}</Text>
               <View style={styles.textInputWrapper}>
-                <View style={styles.textInput}>
-                  <Text style={styles.textInputPlaceholder}>
-                    {newProfileName || (newProfileType === 'charity' ? 'Enter charity name...' : 'Enter business name...')}
-                  </Text>
-                </View>
+                <TextInput
+                  style={styles.textInputReal}
+                  value={newProfileName}
+                  onChangeText={setNewProfileName}
+                  placeholder={newProfileType === 'charity' ? 'Enter charity name...' : 'Enter business name...'}
+                  placeholderTextColor={Colors.textSecondary}
+                  autoCapitalize="words"
+                  autoCorrect={false}
+                />
               </View>
             </View>
 
             <TouchableOpacity 
               style={styles.createProfileBtn}
               onPress={async () => {
+                const profileName = newProfileName.trim() || (newProfileType === 'charity' ? 'My Charity' : 'My Business');
                 const profile = await addMerchantProfile({
-                  name: newProfileName || (newProfileType === 'charity' ? 'My Charity' : 'My Business'),
+                  name: profileName,
                   category: newProfileType === 'charity' ? 'Non-Profit' : 'General',
                   description: '',
                   linkedWalletId: null,
@@ -734,6 +744,7 @@ export default function MerchantDashboard() {
                 });
                 setShowAddProfileModal(false);
                 setNewProfileName('');
+                setNewProfileType('business');
                 switchMerchantProfile(profile.id);
               }}
             >
@@ -741,9 +752,14 @@ export default function MerchantDashboard() {
             </TouchableOpacity>
           </View>
         </View>
-      )}
+      </Modal>
 
-      {showSwitchProfileModal && (
+      <Modal
+        visible={showSwitchProfileModal}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setShowSwitchProfileModal(false)}
+      >
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
@@ -798,9 +814,14 @@ export default function MerchantDashboard() {
             </TouchableOpacity>
           </View>
         </View>
-      )}
+      </Modal>
 
-      {showWalletLinkModal && (
+      <Modal
+        visible={showWalletLinkModal}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setShowWalletLinkModal(false)}
+      >
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Link Receiving Wallet</Text>
@@ -844,7 +865,7 @@ export default function MerchantDashboard() {
             </TouchableOpacity>
           </View>
         </View>
-      )}
+      </Modal>
     </View>
   );
 }
@@ -1502,13 +1523,11 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     overflow: 'hidden',
   },
-  textInput: {
+  textInputReal: {
     paddingHorizontal: 14,
     paddingVertical: 14,
-  },
-  textInputPlaceholder: {
     fontSize: 15,
-    color: Colors.textSecondary,
+    color: Colors.text,
   },
   createProfileBtn: {
     backgroundColor: Colors.primary,
