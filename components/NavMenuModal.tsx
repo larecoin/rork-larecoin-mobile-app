@@ -32,7 +32,6 @@ const menuSections: MenuSection[] = [
   {
     title: 'Account',
     items: [
-      { id: 'account-settings', label: 'Profile Settings', icon: UserCircle },
       { id: 'app-settings', label: 'App Settings', icon: Settings },
       { id: 'customer-service', label: 'Customer Service Chat', icon: Headphones },
       { id: 'invite-friends', label: 'Invite Friends', icon: Share2 },
