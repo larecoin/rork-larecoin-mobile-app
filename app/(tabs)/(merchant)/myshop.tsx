@@ -3,8 +3,10 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Refres
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { 
   Store, QrCode, Package, Edit2, Eye, Share2, Settings, 
-  Heart, ChevronRight, Plus, Check, X, Globe, MapPin
+  Heart, ChevronRight, Plus, Check, X, Globe, MapPin, Copy, Link
 } from 'lucide-react-native';
+import { Platform } from 'react-native';
+import * as Clipboard from 'expo-clipboard';
 import Colors from '@/constants/colors';
 import { useApp } from '@/contexts/AppContext';
 
@@ -30,6 +32,20 @@ export default function MyShopScreen() {
   const [showCharityModal, setShowCharityModal] = useState(false);
   const [selectedCharity, setSelectedCharity] = useState<Charity | null>(charities[0]);
   const [donationPercent, setDonationPercent] = useState('2');
+  const [copiedUrl, setCopiedUrl] = useState(false);
+
+  const shopSlug = merchantProfile.name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+  const shopUrl = `larecoin.com/shop/${shopSlug}`;
+
+  const copyShopUrl = async () => {
+    if (Platform.OS === 'web') {
+      await navigator.clipboard.writeText(`https://${shopUrl}`);
+    } else {
+      await Clipboard.setStringAsync(`https://${shopUrl}`);
+    }
+    setCopiedUrl(true);
+    setTimeout(() => setCopiedUrl(false), 2000);
+  };
 
   const onRefresh = () => {
     setRefreshing(true);
@@ -104,6 +120,15 @@ export default function MyShopScreen() {
             <View style={styles.qrInfo}>
               <Text style={styles.qrTitle}>Your Shop QR Code</Text>
               <Text style={styles.qrDesc}>Customers scan to browse & order</Text>
+              <TouchableOpacity style={styles.shopUrlRow} onPress={copyShopUrl}>
+                <Link size={14} color={Colors.primary} />
+                <Text style={styles.shopUrlText} numberOfLines={1}>{shopUrl}</Text>
+                {copiedUrl ? (
+                  <Check size={16} color={Colors.accent} />
+                ) : (
+                  <Copy size={16} color={Colors.textSecondary} />
+                )}
+              </TouchableOpacity>
             </View>
           </View>
           <View style={styles.qrActions}>
@@ -391,6 +416,22 @@ const styles = StyleSheet.create({
   qrDesc: {
     fontSize: 13,
     color: Colors.textSecondary,
+  },
+  shopUrlRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: Colors.background,
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    marginTop: 10,
+    gap: 8,
+  },
+  shopUrlText: {
+    flex: 1,
+    fontSize: 13,
+    color: Colors.primary,
+    fontWeight: '500',
   },
   qrActions: {
     flexDirection: 'row',
