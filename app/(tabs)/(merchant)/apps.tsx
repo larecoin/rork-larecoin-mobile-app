@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, RefreshControl } 
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { 
   Grid3X3, Download, Star, ExternalLink, Check, 
-  Calculator, FileText, BarChart3, MessageSquare, Bell, Shield, Truck, CreditCard
+  Calculator, FileText, BarChart3, MessageSquare, Bell, Shield, Truck, CreditCard, DollarSign
 } from 'lucide-react-native';
 import Colors from '@/constants/colors';
 
@@ -27,6 +27,7 @@ const availableApps: App[] = [
   { id: '6', name: 'Fraud Shield', description: 'Payment fraud detection', icon: Shield, color: '#F39C12', installed: false, rating: 4.8, category: 'Security' },
   { id: '7', name: 'Shipping Manager', description: 'Track & manage deliveries', icon: Truck, color: '#1ABC9C', installed: true, rating: 4.4, category: 'Logistics' },
   { id: '8', name: 'Tax Calculator', description: 'Automated tax calculations', icon: Calculator, color: '#95A5A6', installed: false, rating: 4.3, category: 'Finance' },
+  { id: '9', name: 'CashMatrix', description: 'Smart cash flow & payment matrix', icon: DollarSign, color: '#27AE60', installed: true, rating: 4.9, category: 'Finance' },
 ];
 
 export default function MyAppsScreen() {
