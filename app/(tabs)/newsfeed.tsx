@@ -5,7 +5,8 @@ import { useRouter } from 'expo-router';
 import { 
   Search, Bell, Plus, ThumbsUp, MessageCircle, Send, Bookmark,
   MoreHorizontal, CheckCircle, Image as ImageIcon, Video, Smile,
-  TrendingUp, Users, Hash, Filter
+  TrendingUp, Users, Hash, Filter, Heart, ShoppingCart, BellRing,
+  ChevronDown, Coins, DollarSign, Image as ImageIcon2, ArrowUpRight, ArrowDownRight
 } from 'lucide-react-native';
 import Colors from '@/constants/colors';
 import { useApp } from '@/contexts/AppContext';
@@ -78,6 +79,23 @@ const feedPosts = [
   },
 ];
 
+type MarketType = 'all' | 'crypto' | 'stablecoin' | 'nft';
+
+const marketAssets = [
+  { id: '1', symbol: 'BTC', name: 'Bitcoin', price: 67432.50, change: 2.34, marketCap: '1.32T', volume: '28.5B', type: 'crypto', icon: '₿', color: '#F7931A' },
+  { id: '2', symbol: 'ETH', name: 'Ethereum', price: 3245.80, change: -1.23, marketCap: '389.2B', volume: '15.2B', type: 'crypto', icon: '⟠', color: '#627EEA' },
+  { id: '3', symbol: 'SOL', name: 'Solana', price: 142.65, change: 5.67, marketCap: '62.1B', volume: '3.8B', type: 'crypto', icon: '◎', color: '#9945FF' },
+  { id: '4', symbol: 'LARE', name: 'Larecoin', price: 1.24, change: 8.92, marketCap: '124.5M', volume: '45.2M', type: 'crypto', icon: '💰', color: '#D4AF37' },
+  { id: '5', symbol: 'USDT', name: 'Tether', price: 1.00, change: 0.01, marketCap: '95.2B', volume: '52.1B', type: 'stablecoin', icon: '₮', color: '#26A17B' },
+  { id: '6', symbol: 'USDC', name: 'USD Coin', price: 1.00, change: 0.00, marketCap: '32.8B', volume: '8.4B', type: 'stablecoin', icon: '💵', color: '#2775CA' },
+  { id: '7', symbol: 'LUSD', name: 'Lare USD', price: 1.00, change: 0.00, marketCap: '850M', volume: '125M', type: 'stablecoin', icon: '💲', color: '#00D395' },
+  { id: '8', symbol: 'DAI', name: 'Dai', price: 1.00, change: -0.01, marketCap: '5.3B', volume: '320M', type: 'stablecoin', icon: '◈', color: '#F5AC37' },
+  { id: '9', symbol: 'BAYC', name: 'Bored Ape YC', price: 28.5, change: -3.45, marketCap: '285M', volume: '12.4M', type: 'nft', icon: '🐵', color: '#BFAD7E' },
+  { id: '10', symbol: 'PUNK', name: 'CryptoPunks', price: 45.2, change: 1.23, marketCap: '452M', volume: '8.9M', type: 'nft', icon: '👾', color: '#638596' },
+  { id: '11', symbol: 'AZUKI', name: 'Azuki', price: 8.75, change: 12.34, marketCap: '87.5M', volume: '5.2M', type: 'nft', icon: '🎭', color: '#C93D3D' },
+  { id: '12', symbol: 'DOODLE', name: 'Doodles', price: 3.2, change: -5.67, marketCap: '32M', volume: '1.8M', type: 'nft', icon: '🎨', color: '#F9D54A' },
+];
+
 const trendingTopics = [
   { tag: '#DeFi', posts: '12.5K' },
   { tag: '#NFTs', posts: '8.2K' },
@@ -95,7 +113,11 @@ export default function NewsfeedScreen() {
   const router = useRouter();
   const { colors } = useApp();
   const [refreshing, setRefreshing] = useState(false);
-  const [activeTab, setActiveTab] = useState<'foryou' | 'following' | 'trending'>('foryou');
+  const [activeTab, setActiveTab] = useState<'markets' | 'foryou' | 'following' | 'trending'>('foryou');
+  const [marketFilter, setMarketFilter] = useState<MarketType>('all');
+  const [favorites, setFavorites] = useState<string[]>([]);
+  const [priceAlerts, setPriceAlerts] = useState<string[]>([]);
+  const [showFilterDropdown, setShowFilterDropdown] = useState(false);
   const [likedPosts, setLikedPosts] = useState<string[]>([]);
   const [savedPosts, setSavedPosts] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -115,6 +137,31 @@ export default function NewsfeedScreen() {
     setSavedPosts(prev => 
       prev.includes(postId) ? prev.filter(id => id !== postId) : [...prev, postId]
     );
+  };
+
+  const toggleFavorite = (assetId: string) => {
+    setFavorites(prev => 
+      prev.includes(assetId) ? prev.filter(id => id !== assetId) : [...prev, assetId]
+    );
+  };
+
+  const togglePriceAlert = (assetId: string) => {
+    setPriceAlerts(prev => 
+      prev.includes(assetId) ? prev.filter(id => id !== assetId) : [...prev, assetId]
+    );
+  };
+
+  const filteredMarkets = marketAssets.filter(asset => 
+    marketFilter === 'all' ? true : asset.type === marketFilter
+  );
+
+  const getFilterLabel = (filter: MarketType) => {
+    switch (filter) {
+      case 'all': return 'All Markets';
+      case 'crypto': return 'Crypto';
+      case 'stablecoin': return 'Stablecoins';
+      case 'nft': return 'NFTs';
+    }
   };
 
   return (
@@ -145,7 +192,19 @@ export default function NewsfeedScreen() {
         </TouchableOpacity>
       </View>
 
-      <View style={[styles.tabContainer, { backgroundColor: colors.surface }]}>
+      <ScrollView 
+        horizontal 
+        showsHorizontalScrollIndicator={false} 
+        style={styles.tabScrollContainer}
+        contentContainerStyle={[styles.tabContainer, { backgroundColor: colors.surface }]}
+      >
+        <TouchableOpacity 
+          style={[styles.tab, activeTab === 'markets' && styles.tabActive]}
+          onPress={() => setActiveTab('markets')}
+        >
+          <Coins size={16} color={activeTab === 'markets' ? '#1E88E5' : Colors.textSecondary} />
+          <Text style={[styles.tabText, activeTab === 'markets' && styles.tabTextActive]}>Markets</Text>
+        </TouchableOpacity>
         <TouchableOpacity 
           style={[styles.tab, activeTab === 'foryou' && styles.tabActive]}
           onPress={() => setActiveTab('foryou')}
@@ -165,7 +224,7 @@ export default function NewsfeedScreen() {
           <TrendingUp size={16} color={activeTab === 'trending' ? '#1E88E5' : Colors.textSecondary} />
           <Text style={[styles.tabText, activeTab === 'trending' && styles.tabTextActive]}>Trending</Text>
         </TouchableOpacity>
-      </View>
+      </ScrollView>
 
       <ScrollView 
         showsVerticalScrollIndicator={false}
@@ -173,7 +232,127 @@ export default function NewsfeedScreen() {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={Colors.primary} />
         }
       >
-        <View style={[styles.createPostCard, { backgroundColor: colors.surface }]}>
+        {activeTab === 'markets' && (
+          <View style={styles.marketsContainer}>
+            <View style={styles.marketFiltersRow}>
+              <TouchableOpacity 
+                style={[styles.filterDropdown, { backgroundColor: colors.surface }]}
+                onPress={() => setShowFilterDropdown(!showFilterDropdown)}
+              >
+                <Text style={[styles.filterDropdownText, { color: colors.text }]}>{getFilterLabel(marketFilter)}</Text>
+                <ChevronDown size={16} color={colors.textSecondary} />
+              </TouchableOpacity>
+              <View style={styles.marketFilterChips}>
+                {(['all', 'crypto', 'stablecoin', 'nft'] as MarketType[]).map((filter) => (
+                  <TouchableOpacity 
+                    key={filter}
+                    style={[
+                      styles.filterChip, 
+                      { backgroundColor: colors.surface },
+                      marketFilter === filter && styles.filterChipActive
+                    ]}
+                    onPress={() => setMarketFilter(filter)}
+                  >
+                    {filter === 'crypto' && <Coins size={14} color={marketFilter === filter ? '#FFF' : colors.textSecondary} />}
+                    {filter === 'stablecoin' && <DollarSign size={14} color={marketFilter === filter ? '#FFF' : colors.textSecondary} />}
+                    {filter === 'nft' && <ImageIcon2 size={14} color={marketFilter === filter ? '#FFF' : colors.textSecondary} />}
+                    <Text style={[
+                      styles.filterChipText,
+                      { color: colors.textSecondary },
+                      marketFilter === filter && styles.filterChipTextActive
+                    ]}>
+                      {filter === 'all' ? 'All' : filter === 'crypto' ? 'Crypto' : filter === 'stablecoin' ? 'Stable' : 'NFT'}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+
+            <View style={[styles.marketHeader, { backgroundColor: colors.surface }]}>
+              <Text style={[styles.marketHeaderText, { color: colors.textSecondary, flex: 2 }]}>Asset</Text>
+              <Text style={[styles.marketHeaderText, { color: colors.textSecondary, flex: 1, textAlign: 'right' }]}>Price</Text>
+              <Text style={[styles.marketHeaderText, { color: colors.textSecondary, flex: 1, textAlign: 'right' }]}>24h</Text>
+              <Text style={[styles.marketHeaderText, { color: colors.textSecondary, flex: 2, textAlign: 'right' }]}>Actions</Text>
+            </View>
+
+            {filteredMarkets.map((asset) => (
+              <View key={asset.id} style={[styles.marketItem, { backgroundColor: colors.surface }]}>
+                <View style={styles.marketAssetInfo}>
+                  <View style={[styles.marketIcon, { backgroundColor: asset.color + '20' }]}>
+                    <Text style={styles.marketIconText}>{asset.icon}</Text>
+                  </View>
+                  <View style={styles.marketAssetDetails}>
+                    <Text style={[styles.marketSymbol, { color: colors.text }]}>{asset.symbol}</Text>
+                    <Text style={[styles.marketName, { color: colors.textSecondary }]}>{asset.name}</Text>
+                  </View>
+                </View>
+                <View style={styles.marketPriceCol}>
+                  <Text style={[styles.marketPrice, { color: colors.text }]}>
+                    ${asset.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </Text>
+                  <Text style={[styles.marketCap, { color: colors.textTertiary }]}>{asset.marketCap}</Text>
+                </View>
+                <View style={styles.marketChangeCol}>
+                  <View style={[styles.changeBadge, { backgroundColor: asset.change >= 0 ? '#10B98120' : '#EF444420' }]}>
+                    {asset.change >= 0 ? (
+                      <ArrowUpRight size={12} color="#10B981" />
+                    ) : (
+                      <ArrowDownRight size={12} color="#EF4444" />
+                    )}
+                    <Text style={[styles.changeText, { color: asset.change >= 0 ? '#10B981' : '#EF4444' }]}>
+                      {Math.abs(asset.change).toFixed(2)}%
+                    </Text>
+                  </View>
+                </View>
+                <View style={styles.marketActions}>
+                  <TouchableOpacity style={[styles.actionBtn, styles.buyBtn]}>
+                    <ShoppingCart size={14} color="#FFF" />
+                  </TouchableOpacity>
+                  <TouchableOpacity 
+                    style={[styles.actionBtn, { backgroundColor: favorites.includes(asset.id) ? '#EF444420' : colors.background }]}
+                    onPress={() => toggleFavorite(asset.id)}
+                  >
+                    <Heart 
+                      size={14} 
+                      color={favorites.includes(asset.id) ? '#EF4444' : colors.textSecondary} 
+                      fill={favorites.includes(asset.id) ? '#EF4444' : 'transparent'}
+                    />
+                  </TouchableOpacity>
+                  <TouchableOpacity 
+                    style={[styles.actionBtn, { backgroundColor: priceAlerts.includes(asset.id) ? '#F5920020' : colors.background }]}
+                    onPress={() => togglePriceAlert(asset.id)}
+                  >
+                    <BellRing 
+                      size={14} 
+                      color={priceAlerts.includes(asset.id) ? '#F59200' : colors.textSecondary}
+                    />
+                  </TouchableOpacity>
+                </View>
+              </View>
+            ))}
+
+            <View style={styles.marketStats}>
+              <View style={[styles.statCard, { backgroundColor: colors.surface }]}>
+                <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Total Market Cap</Text>
+                <Text style={[styles.statValue, { color: colors.text }]}>$2.45T</Text>
+                <View style={styles.statChange}>
+                  <ArrowUpRight size={12} color="#10B981" />
+                  <Text style={styles.statChangeText}>+2.34%</Text>
+                </View>
+              </View>
+              <View style={[styles.statCard, { backgroundColor: colors.surface }]}>
+                <Text style={[styles.statLabel, { color: colors.textSecondary }]}>24h Volume</Text>
+                <Text style={[styles.statValue, { color: colors.text }]}>$89.2B</Text>
+                <View style={styles.statChange}>
+                  <ArrowUpRight size={12} color="#10B981" />
+                  <Text style={styles.statChangeText}>+5.12%</Text>
+                </View>
+              </View>
+            </View>
+          </View>
+        )}
+
+        {activeTab !== 'markets' && <View style={[styles.createPostCard, { backgroundColor: colors.surface }]}>
           <Image 
             source={{ uri: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100' }} 
             style={styles.userAvatar} 
@@ -192,7 +371,7 @@ export default function NewsfeedScreen() {
               <Smile size={20} color="#F39C12" />
             </TouchableOpacity>
           </View>
-        </View>
+        </View>}
 
         {activeTab === 'trending' && (
           <View style={[styles.trendingSection, { backgroundColor: colors.surface }]}>
@@ -237,7 +416,7 @@ export default function NewsfeedScreen() {
           </View>
         )}
 
-        {feedPosts.map((post) => (
+        {activeTab !== 'markets' && feedPosts.map((post) => (
           <View key={post.id} style={[styles.postCard, { backgroundColor: colors.surface }]}>
             <View style={styles.postHeader}>
               <Image source={{ uri: post.avatar }} style={styles.postAvatar} />
@@ -380,19 +559,21 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  tabContainer: {
-    flexDirection: 'row',
+  tabScrollContainer: {
     marginHorizontal: 20,
     marginBottom: 16,
+  },
+  tabContainer: {
+    flexDirection: 'row',
     borderRadius: 12,
     padding: 4,
   },
   tab: {
-    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 10,
+    paddingHorizontal: 16,
     borderRadius: 8,
     gap: 6,
   },
@@ -616,5 +797,170 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 8,
+  },
+  marketsContainer: {
+    paddingHorizontal: 20,
+  },
+  marketFiltersRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 12,
+  },
+  filterDropdown: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 8,
+    gap: 6,
+  },
+  filterDropdownText: {
+    fontSize: 14,
+    fontWeight: '600' as const,
+  },
+  marketFilterChips: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  filterChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 16,
+    gap: 4,
+  },
+  filterChipActive: {
+    backgroundColor: '#1E88E5',
+  },
+  filterChipText: {
+    fontSize: 12,
+    fontWeight: '500' as const,
+  },
+  filterChipTextActive: {
+    color: '#FFF',
+  },
+  marketHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    borderRadius: 10,
+    marginBottom: 8,
+  },
+  marketHeaderText: {
+    fontSize: 11,
+    fontWeight: '600' as const,
+    textTransform: 'uppercase' as const,
+    letterSpacing: 0.5,
+  },
+  marketItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 12,
+    borderRadius: 12,
+    marginBottom: 8,
+  },
+  marketAssetInfo: {
+    flex: 2,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  marketIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  marketIconText: {
+    fontSize: 18,
+  },
+  marketAssetDetails: {
+    flex: 1,
+  },
+  marketSymbol: {
+    fontSize: 15,
+    fontWeight: '700' as const,
+  },
+  marketName: {
+    fontSize: 12,
+    marginTop: 2,
+  },
+  marketPriceCol: {
+    flex: 1,
+    alignItems: 'flex-end',
+  },
+  marketPrice: {
+    fontSize: 14,
+    fontWeight: '600' as const,
+  },
+  marketCap: {
+    fontSize: 11,
+    marginTop: 2,
+  },
+  marketChangeCol: {
+    flex: 1,
+    alignItems: 'flex-end',
+  },
+  changeBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 6,
+    gap: 2,
+  },
+  changeText: {
+    fontSize: 12,
+    fontWeight: '600' as const,
+  },
+  marketActions: {
+    flex: 2,
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    gap: 6,
+  },
+  actionBtn: {
+    width: 32,
+    height: 32,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  buyBtn: {
+    backgroundColor: '#10B981',
+  },
+  marketStats: {
+    flexDirection: 'row',
+    gap: 12,
+    marginTop: 8,
+    marginBottom: 16,
+  },
+  statCard: {
+    flex: 1,
+    padding: 14,
+    borderRadius: 12,
+  },
+  statLabel: {
+    fontSize: 12,
+    marginBottom: 4,
+  },
+  statValue: {
+    fontSize: 18,
+    fontWeight: '700' as const,
+    marginBottom: 4,
+  },
+  statChange: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 2,
+  },
+  statChangeText: {
+    fontSize: 12,
+    fontWeight: '600' as const,
+    color: '#10B981',
   },
 });
