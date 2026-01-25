@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, RefreshControl } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { 
-  Search, Filter, Download, Share2, ChevronRight, Receipt, Calendar,
+  Search, Filter, Download, Share2, ChevronRight, Receipt, Calendar, QrCode,
   DollarSign, User, CreditCard, CheckCircle, Clock, XCircle, Eye,
   FileText, Printer, Mail
 } from 'lucide-react-native';
@@ -166,6 +166,9 @@ export default function ReceiptsScreen() {
         />
         <TouchableOpacity style={[styles.filterBtn, { backgroundColor: colors.background }]}>
           <Filter size={16} color={colors.textSecondary} />
+        </TouchableOpacity>
+        <TouchableOpacity style={[styles.filterBtn, { backgroundColor: colors.background }]}>
+          <QrCode size={16} color={colors.textSecondary} />
         </TouchableOpacity>
       </View>
 
