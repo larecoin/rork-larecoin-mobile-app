@@ -11,6 +11,16 @@ export interface Token {
 
 export const tokens: Token[] = [
   {
+    id: 'lusd',
+    symbol: 'LUSD',
+    name: 'Lare USD',
+    icon: '💲',
+    color: '#00D395',
+    balance: 10000.00,
+    usdValue: 1.00,
+    change24h: 0.00,
+  },
+  {
     id: 'lare',
     symbol: 'LARE',
     name: 'Larecoin',
