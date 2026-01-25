@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { TrendingUp, TrendingDown, Search } from 'lucide-react-native';
+import { TrendingUp, TrendingDown, Search, Flame } from 'lucide-react-native';
 import Colors from '@/constants/colors';
 
 interface MarketItem {
@@ -12,19 +12,39 @@ interface MarketItem {
   change24h: number;
   marketCap: string;
   icon: string;
+  isTrending?: boolean;
+  isFavorite?: boolean;
 }
 
 const marketData: MarketItem[] = [
-  { id: '1', name: 'Bitcoin', symbol: 'BTC', price: 67234.50, change24h: 2.45, marketCap: '$1.32T', icon: '₿' },
-  { id: '2', name: 'Ethereum', symbol: 'ETH', price: 3456.78, change24h: 1.23, marketCap: '$415B', icon: 'Ξ' },
-  { id: '3', name: 'Larecoin', symbol: 'LARE', price: 1.85, change24h: 5.67, marketCap: '$185M', icon: 'L' },
-  { id: '4', name: 'Solana', symbol: 'SOL', price: 142.30, change24h: -1.45, marketCap: '$62B', icon: '◎' },
-  { id: '5', name: 'LUSD', symbol: 'LUSD', price: 1.00, change24h: 0.01, marketCap: '$52M', icon: '$' },
+  { id: '1', name: 'Bitcoin', symbol: 'BTC', price: 67234.50, change24h: 2.45, marketCap: '$1.32T', icon: '₿', isTrending: true, isFavorite: true },
+  { id: '2', name: 'Ethereum', symbol: 'ETH', price: 3456.78, change24h: 1.23, marketCap: '$415B', icon: 'Ξ', isTrending: true },
+  { id: '3', name: 'Larecoin', symbol: 'LARE', price: 1.85, change24h: 5.67, marketCap: '$185M', icon: 'L', isTrending: true, isFavorite: true },
+  { id: '4', name: 'Solana', symbol: 'SOL', price: 142.30, change24h: -1.45, marketCap: '$62B', icon: '◎', isTrending: true },
+  { id: '5', name: 'LUSD', symbol: 'LUSD', price: 1.00, change24h: 0.01, marketCap: '$52M', icon: '$', isFavorite: true },
   { id: '6', name: 'Polygon', symbol: 'MATIC', price: 0.72, change24h: -2.34, marketCap: '$7.1B', icon: '⬡' },
 ];
 
+type FilterType = 'all' | 'trending' | 'gainers' | 'losers' | 'favorites';
+
 export default function MarketsScreen() {
   const insets = useSafeAreaInsets();
+  const [activeFilter, setActiveFilter] = useState<FilterType>('all');
+
+  const filteredData = marketData.filter(item => {
+    switch (activeFilter) {
+      case 'trending':
+        return item.isTrending;
+      case 'gainers':
+        return item.change24h > 0;
+      case 'losers':
+        return item.change24h < 0;
+      case 'favorites':
+        return item.isFavorite;
+      default:
+        return true;
+    }
+  });
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
@@ -35,20 +55,41 @@ export default function MarketsScreen() {
         </TouchableOpacity>
       </View>
 
-      <View style={styles.tabs}>
-        <TouchableOpacity style={[styles.tab, styles.tabActive]}>
-          <Text style={[styles.tabText, styles.tabTextActive]}>All</Text>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.tabsScroll} contentContainerStyle={styles.tabs}>
+        <TouchableOpacity 
+          style={[styles.tab, activeFilter === 'all' && styles.tabActive]}
+          onPress={() => setActiveFilter('all')}
+        >
+          <Text style={[styles.tabText, activeFilter === 'all' && styles.tabTextActive]}>All</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.tab}>
-          <Text style={styles.tabText}>Gainers</Text>
+        <TouchableOpacity 
+          style={[styles.tab, activeFilter === 'trending' && styles.tabActive]}
+          onPress={() => setActiveFilter('trending')}
+        >
+          <View style={styles.tabWithIcon}>
+            <Flame size={14} color={activeFilter === 'trending' ? Colors.background : Colors.textSecondary} />
+            <Text style={[styles.tabText, activeFilter === 'trending' && styles.tabTextActive]}>Trending</Text>
+          </View>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.tab}>
-          <Text style={styles.tabText}>Losers</Text>
+        <TouchableOpacity 
+          style={[styles.tab, activeFilter === 'gainers' && styles.tabActive]}
+          onPress={() => setActiveFilter('gainers')}
+        >
+          <Text style={[styles.tabText, activeFilter === 'gainers' && styles.tabTextActive]}>Gainers</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.tab}>
-          <Text style={styles.tabText}>Favorites</Text>
+        <TouchableOpacity 
+          style={[styles.tab, activeFilter === 'losers' && styles.tabActive]}
+          onPress={() => setActiveFilter('losers')}
+        >
+          <Text style={[styles.tabText, activeFilter === 'losers' && styles.tabTextActive]}>Losers</Text>
         </TouchableOpacity>
-      </View>
+        <TouchableOpacity 
+          style={[styles.tab, activeFilter === 'favorites' && styles.tabActive]}
+          onPress={() => setActiveFilter('favorites')}
+        >
+          <Text style={[styles.tabText, activeFilter === 'favorites' && styles.tabTextActive]}>Favorites</Text>
+        </TouchableOpacity>
+      </ScrollView>
 
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.tableHeader}>
@@ -57,14 +98,17 @@ export default function MarketsScreen() {
           <Text style={[styles.tableHeaderText, { flex: 1, textAlign: 'right' }]}>24h</Text>
         </View>
 
-        {marketData.map(item => (
+        {filteredData.map(item => (
           <TouchableOpacity key={item.id} style={styles.marketItem}>
             <View style={styles.assetInfo}>
               <View style={styles.iconWrapper}>
                 <Text style={styles.iconText}>{item.icon}</Text>
               </View>
               <View>
-                <Text style={styles.assetName}>{item.name}</Text>
+                <View style={styles.nameRow}>
+                  <Text style={styles.assetName}>{item.name}</Text>
+                  {item.isTrending && <Flame size={12} color={Colors.warning} />}
+                </View>
                 <Text style={styles.assetSymbol}>{item.symbol}</Text>
               </View>
             </View>
@@ -113,11 +157,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  tabsScroll: {
+    flexGrow: 0,
+    marginBottom: 16,
+  },
   tabs: {
     flexDirection: 'row',
     paddingHorizontal: 20,
     gap: 8,
-    marginBottom: 16,
   },
   tab: {
     paddingHorizontal: 16,
@@ -127,6 +174,11 @@ const styles = StyleSheet.create({
   },
   tabActive: {
     backgroundColor: Colors.primary,
+  },
+  tabWithIcon: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
   },
   tabText: {
     fontSize: 13,
@@ -173,6 +225,11 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '700',
     color: Colors.primary,
+  },
+  nameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
   },
   assetName: {
     fontSize: 15,
