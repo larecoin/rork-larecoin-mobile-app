@@ -15,8 +15,8 @@ function CustomTabBar() {
   const insets = useSafeAreaInsets();
 
   const walletTabs = [
-    { name: 'newsfeed', title: 'Feed', icon: Newspaper, route: '/newsfeed' },
     { name: '(wallet)', title: 'Wallet', icon: Wallet, route: '/' },
+    { name: 'newsfeed', title: 'Feed', icon: Newspaper, route: '/newsfeed' },
     { name: 'calendar', title: 'Calendar', icon: Calendar, route: '/calendar' },
     { name: 'earn', title: 'Earn', icon: Gift, route: '/earn' },
     { name: 'shop', title: 'Shop', icon: ShoppingBag, route: '/shop' },
@@ -74,8 +74,8 @@ export default function TabLayout() {
       }}
       tabBar={() => <CustomTabBar />}
     >
-      <Tabs.Screen name="newsfeed" />
       <Tabs.Screen name="(wallet)" />
+      <Tabs.Screen name="newsfeed" />
       <Tabs.Screen name="calendar" />
       <Tabs.Screen name="(merchant)" />
       <Tabs.Screen name="markets" />
