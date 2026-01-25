@@ -704,7 +704,7 @@ export default function ShopScreen() {
           <TouchableOpacity style={styles.iconBtn} onPress={() => router.push('/menu/my-orders')}>
             <Package size={20} color={Colors.text} />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.iconBtn}>
+          <TouchableOpacity style={styles.iconBtn} onPress={() => router.push('/menu/scan-qr')}>
             <QrCode size={20} color={Colors.text} />
           </TouchableOpacity>
           <TouchableOpacity style={styles.cartBtn} onPress={() => router.push('/menu/cart')}>
