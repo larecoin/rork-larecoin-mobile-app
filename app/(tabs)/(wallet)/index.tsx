@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, RefreshControl, TextInput } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { ArrowUpRight, ArrowDownLeft, RefreshCw, Eye, EyeOff, ChevronRight, Plus, ChevronDown, Image, Coins, Droplets, Wallet, Check, Trash2, Edit3, Menu, Search, ArrowLeftRight, Clover, Receipt, GitBranch, Users, ShoppingCart, DollarSign, ShieldCheck, HandCoins, Send } from 'lucide-react-native';
+import { ArrowUpRight, ArrowDownLeft, RefreshCw, Eye, EyeOff, ChevronRight, Plus, ChevronDown, Image, Coins, Droplets, Wallet, Check, Trash2, Edit3, Menu, Search, ArrowLeftRight, Clover, Receipt, GitBranch, Users, ShoppingCart, DollarSign, ShieldCheck, HandCoins, Send, FileText } from 'lucide-react-native';
 import { useApp } from '@/contexts/AppContext';
 import ModeToggle from '@/components/ModeToggle';
 import TokenCard from '@/components/TokenCard';
@@ -35,7 +35,7 @@ export default function WalletDashboard() {
   const [editWalletName, setEditWalletName] = React.useState('');
   const [showNavMenu, setShowNavMenu] = React.useState(false);
   const [searchQuery, setSearchQuery] = React.useState('');
-  const [showNFTs, setShowNFTs] = React.useState(false);
+  const [assetTab, setAssetTab] = React.useState<'assets' | 'nfts' | 'receipts'>('assets');
 
   const totalBalance = getTotalBalance();
   const recentTransactions = userTransactions.slice(0, 4);
@@ -293,33 +293,49 @@ export default function WalletDashboard() {
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <View style={styles.sectionTitleRow}>
-              <Text style={[styles.sectionTitle, { color: colors.text }]}>{showNFTs ? 'NFTs' : 'Assets'}</Text>
-              <TouchableOpacity 
-                style={[styles.assetNftToggle, { backgroundColor: colors.surface }]}
-                onPress={() => setShowNFTs(!showNFTs)}
-              >
-                <View style={[styles.toggleOption, !showNFTs && { backgroundColor: colors.primary }]}>
-                  <Wallet size={14} color={!showNFTs ? colors.background : colors.textSecondary} />
-                  <Text style={[styles.toggleOptionText, { color: !showNFTs ? colors.background : colors.textSecondary }]}>Assets</Text>
-                </View>
-                <View style={[styles.toggleOption, showNFTs && { backgroundColor: colors.primary }]}>
-                  <Image size={14} color={showNFTs ? colors.background : colors.textSecondary} />
-                  <Text style={[styles.toggleOptionText, { color: showNFTs ? colors.background : colors.textSecondary }]}>NFTs</Text>
-                </View>
-              </TouchableOpacity>
+              <Text style={[styles.sectionTitle, { color: colors.text }]}>{assetTab === 'assets' ? 'Assets' : assetTab === 'nfts' ? 'NFTs' : 'NFT Receipts'}</Text>
+              <View style={[styles.assetNftToggle, { backgroundColor: colors.surface }]}>
+                <TouchableOpacity 
+                  style={[styles.toggleOption, assetTab === 'assets' && { backgroundColor: colors.primary }]}
+                  onPress={() => setAssetTab('assets')}
+                >
+                  <Wallet size={14} color={assetTab === 'assets' ? colors.background : colors.textSecondary} />
+                  <Text style={[styles.toggleOptionText, { color: assetTab === 'assets' ? colors.background : colors.textSecondary }]}>Assets</Text>
+                </TouchableOpacity>
+                <TouchableOpacity 
+                  style={[styles.toggleOption, assetTab === 'nfts' && { backgroundColor: colors.primary }]}
+                  onPress={() => setAssetTab('nfts')}
+                >
+                  <Image size={14} color={assetTab === 'nfts' ? colors.background : colors.textSecondary} />
+                  <Text style={[styles.toggleOptionText, { color: assetTab === 'nfts' ? colors.background : colors.textSecondary }]}>NFTs</Text>
+                </TouchableOpacity>
+                <TouchableOpacity 
+                  style={[styles.toggleOption, assetTab === 'receipts' && { backgroundColor: colors.primary }]}
+                  onPress={() => setAssetTab('receipts')}
+                >
+                  <FileText size={14} color={assetTab === 'receipts' ? colors.background : colors.textSecondary} />
+                  <Text style={[styles.toggleOptionText, { color: assetTab === 'receipts' ? colors.background : colors.textSecondary }]}>Receipts</Text>
+                </TouchableOpacity>
+              </View>
             </View>
-            <Text style={[styles.sectionCount, { color: colors.textSecondary }]}>{showNFTs ? '0 NFTs' : `${userTokens.length} tokens`}</Text>
+            <Text style={[styles.sectionCount, { color: colors.textSecondary }]}>{assetTab === 'assets' ? `${userTokens.length} tokens` : assetTab === 'nfts' ? '0 NFTs' : '0 Receipts'}</Text>
           </View>
-          {showNFTs ? (
+          {assetTab === 'assets' ? (
+            userTokens.map(token => (
+              <TokenCard key={token.id} token={token} />
+            ))
+          ) : assetTab === 'nfts' ? (
             <View style={[styles.emptyNfts, { backgroundColor: colors.surface }]}>
               <Image size={48} color={colors.textTertiary} />
               <Text style={[styles.emptyNftsText, { color: colors.text }]}>No NFTs yet</Text>
               <Text style={[styles.emptyNftsSubtext, { color: colors.textSecondary }]}>Your NFT collection will appear here</Text>
             </View>
           ) : (
-            userTokens.map(token => (
-              <TokenCard key={token.id} token={token} />
-            ))
+            <View style={[styles.emptyNfts, { backgroundColor: colors.surface }]}>
+              <FileText size={48} color={colors.textTertiary} />
+              <Text style={[styles.emptyNftsText, { color: colors.text }]}>No NFT Receipts</Text>
+              <Text style={[styles.emptyNftsSubtext, { color: colors.textSecondary }]}>Your transaction receipts as NFTs will appear here</Text>
+            </View>
           )}
         </View>
 
