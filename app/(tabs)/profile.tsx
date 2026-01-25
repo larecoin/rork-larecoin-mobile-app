@@ -7,7 +7,8 @@ import {
   Share2, Star, LogOut, Copy, CheckCircle, Edit2, Users, Heart,
   Compass, MessageCircle, Rss, UserPlus, ThumbsUp, Send, Bookmark,
   MoreHorizontal, Globe, Palette, Video, FolderOpen, FileUser, Calendar,
-  Contact, Code, Link, Mic, PenTool, Camera, Newspaper, Menu
+  Contact, Code, Link, Mic, PenTool, Camera, Newspaper, Menu,
+  DollarSign, Wallet, TrendingUp, CreditCard, Coins, ToggleLeft, ToggleRight, Clock
 } from 'lucide-react-native';
 import Colors from '@/constants/colors';
 import { useApp } from '@/contexts/AppContext';
@@ -91,6 +92,10 @@ export default function ProfileScreen() {
   const [likedPosts, setLikedPosts] = useState<string[]>([]);
   const [savedPosts, setSavedPosts] = useState<string[]>([]);
   const [showNavMenu, setShowNavMenu] = useState(false);
+  const [monetizationEnabled, setMonetizationEnabled] = useState(true);
+  const [tipsEnabled, setTipsEnabled] = useState(true);
+  const [subscriptionsEnabled, setSubscriptionsEnabled] = useState(false);
+  const [payPerViewEnabled, setPayPerViewEnabled] = useState(true);
 
   const handleCopyAddress = () => {
     setCopied(true);
@@ -331,6 +336,153 @@ export default function ProfileScreen() {
                   <Text style={styles.quickStatValue}>156</Text>
                   <Text style={styles.quickStatLabel}>Saves</Text>
                 </View>
+              </View>
+            </View>
+
+            <View style={styles.monetizationSection}>
+              <View style={styles.monetizationHeader}>
+                <View style={styles.monetizationTitleRow}>
+                  <View style={[styles.monetizationIconBg, { backgroundColor: '#10B981' + '20' }]}>
+                    <DollarSign size={20} color="#10B981" />
+                  </View>
+                  <Text style={styles.monetizationTitle}>Content Monetization</Text>
+                </View>
+                <TouchableOpacity 
+                  style={styles.mainToggle}
+                  onPress={() => setMonetizationEnabled(!monetizationEnabled)}
+                >
+                  {monetizationEnabled ? (
+                    <ToggleRight size={28} color={Colors.primary} />
+                  ) : (
+                    <ToggleLeft size={28} color={Colors.textTertiary} />
+                  )}
+                </TouchableOpacity>
+              </View>
+
+              <View style={styles.earningsCard}>
+                <View style={styles.earningsRow}>
+                  <View style={styles.earningItem}>
+                    <Text style={styles.earningLabel}>Total Earned</Text>
+                    <View style={styles.earningValueRow}>
+                      <Coins size={16} color="#F59E0B" />
+                      <Text style={styles.earningValue}>2,450.00</Text>
+                      <Text style={styles.earningCurrency}>LARE</Text>
+                    </View>
+                  </View>
+                  <View style={styles.earningDivider} />
+                  <View style={styles.earningItem}>
+                    <Text style={styles.earningLabel}>Available</Text>
+                    <View style={styles.earningValueRow}>
+                      <Coins size={16} color="#10B981" />
+                      <Text style={[styles.earningValue, { color: '#10B981' }]}>1,280.50</Text>
+                      <Text style={styles.earningCurrency}>LARE</Text>
+                    </View>
+                  </View>
+                </View>
+                <View style={styles.pendingRow}>
+                  <Clock size={14} color={Colors.textSecondary} />
+                  <Text style={styles.pendingText}>Pending: 320.00 LARE (processing)</Text>
+                </View>
+              </View>
+
+              <TouchableOpacity style={styles.payoutButton}>
+                <Wallet size={18} color="#FFF" />
+                <Text style={styles.payoutButtonText}>Collect Payout in LARE</Text>
+              </TouchableOpacity>
+
+              <View style={styles.monetizationOptions}>
+                <Text style={styles.monetizationOptionsTitle}>Revenue Streams</Text>
+                
+                <TouchableOpacity 
+                  style={styles.monetizationOption}
+                  onPress={() => setTipsEnabled(!tipsEnabled)}
+                >
+                  <View style={[styles.optionIconBg, { backgroundColor: '#EC4899' + '15' }]}>
+                    <Heart size={18} color="#EC4899" />
+                  </View>
+                  <View style={styles.optionContent}>
+                    <Text style={styles.optionTitle}>Tips & Donations</Text>
+                    <Text style={styles.optionDesc}>Receive tips from supporters</Text>
+                  </View>
+                  {tipsEnabled ? (
+                    <ToggleRight size={24} color={Colors.primary} />
+                  ) : (
+                    <ToggleLeft size={24} color={Colors.textTertiary} />
+                  )}
+                </TouchableOpacity>
+
+                <TouchableOpacity 
+                  style={styles.monetizationOption}
+                  onPress={() => setSubscriptionsEnabled(!subscriptionsEnabled)}
+                >
+                  <View style={[styles.optionIconBg, { backgroundColor: '#8B5CF6' + '15' }]}>
+                    <Users size={18} color="#8B5CF6" />
+                  </View>
+                  <View style={styles.optionContent}>
+                    <Text style={styles.optionTitle}>Subscriptions</Text>
+                    <Text style={styles.optionDesc}>Monthly supporter memberships</Text>
+                  </View>
+                  {subscriptionsEnabled ? (
+                    <ToggleRight size={24} color={Colors.primary} />
+                  ) : (
+                    <ToggleLeft size={24} color={Colors.textTertiary} />
+                  )}
+                </TouchableOpacity>
+
+                <TouchableOpacity 
+                  style={styles.monetizationOption}
+                  onPress={() => setPayPerViewEnabled(!payPerViewEnabled)}
+                >
+                  <View style={[styles.optionIconBg, { backgroundColor: '#0EA5E9' + '15' }]}>
+                    <CreditCard size={18} color="#0EA5E9" />
+                  </View>
+                  <View style={styles.optionContent}>
+                    <Text style={styles.optionTitle}>Pay-Per-View</Text>
+                    <Text style={styles.optionDesc}>Charge for premium content</Text>
+                  </View>
+                  {payPerViewEnabled ? (
+                    <ToggleRight size={24} color={Colors.primary} />
+                  ) : (
+                    <ToggleLeft size={24} color={Colors.textTertiary} />
+                  )}
+                </TouchableOpacity>
+              </View>
+
+              <View style={styles.payoutSettings}>
+                <Text style={styles.payoutSettingsTitle}>Payout Settings</Text>
+                
+                <TouchableOpacity style={styles.payoutSettingItem}>
+                  <View style={[styles.optionIconBg, { backgroundColor: Colors.primary + '15' }]}>
+                    <Wallet size={18} color={Colors.primary} />
+                  </View>
+                  <View style={styles.optionContent}>
+                    <Text style={styles.optionTitle}>Payout Wallet</Text>
+                    <Text style={styles.optionDesc}>0x7a3f...8e2d (LARE Network)</Text>
+                  </View>
+                  <ChevronRight size={18} color={Colors.textTertiary} />
+                </TouchableOpacity>
+
+                <TouchableOpacity style={styles.payoutSettingItem}>
+                  <View style={[styles.optionIconBg, { backgroundColor: '#F59E0B' + '15' }]}>
+                    <TrendingUp size={18} color="#F59E0B" />
+                  </View>
+                  <View style={styles.optionContent}>
+                    <Text style={styles.optionTitle}>Auto-Payout Threshold</Text>
+                    <Text style={styles.optionDesc}>500 LARE minimum</Text>
+                  </View>
+                  <ChevronRight size={18} color={Colors.textTertiary} />
+                </TouchableOpacity>
+
+                <TouchableOpacity style={styles.payoutSettingItem}>
+                  <View style={[styles.optionIconBg, { backgroundColor: '#10B981' + '15' }]}>
+                    <Clock size={18} color="#10B981" />
+                  </View>
+                  <View style={styles.optionContent}>
+                    <Text style={styles.optionTitle}>Payout Schedule</Text>
+                    <Text style={styles.optionDesc}>Weekly (every Friday)</Text>
+                  </View>
+                  <ChevronRight size={18} color={Colors.textTertiary} />
+                </TouchableOpacity>
               </View>
             </View>
           </>
@@ -815,5 +967,161 @@ const styles = StyleSheet.create({
     fontSize: 11,
     color: Colors.textSecondary,
     fontWeight: '500' as const,
+  },
+  monetizationSection: {
+    marginHorizontal: 20,
+    marginBottom: 20,
+  },
+  monetizationHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  monetizationTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  monetizationIconBg: {
+    width: 36,
+    height: 36,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  monetizationTitle: {
+    fontSize: 18,
+    fontWeight: '700' as const,
+    color: Colors.text,
+  },
+  mainToggle: {
+    padding: 4,
+  },
+  earningsCard: {
+    backgroundColor: Colors.surface,
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 12,
+  },
+  earningsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  earningItem: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  earningDivider: {
+    width: 1,
+    height: 40,
+    backgroundColor: Colors.border,
+  },
+  earningLabel: {
+    fontSize: 12,
+    color: Colors.textSecondary,
+    marginBottom: 6,
+  },
+  earningValueRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  earningValue: {
+    fontSize: 18,
+    fontWeight: '700' as const,
+    color: Colors.text,
+  },
+  earningCurrency: {
+    fontSize: 12,
+    fontWeight: '600' as const,
+    color: Colors.textSecondary,
+  },
+  pendingRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    marginTop: 12,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: Colors.border,
+  },
+  pendingText: {
+    fontSize: 12,
+    color: Colors.textSecondary,
+  },
+  payoutButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    backgroundColor: '#10B981',
+    borderRadius: 14,
+    paddingVertical: 14,
+    marginBottom: 16,
+  },
+  payoutButtonText: {
+    fontSize: 15,
+    fontWeight: '600' as const,
+    color: '#FFF',
+  },
+  monetizationOptions: {
+    backgroundColor: Colors.surface,
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 12,
+  },
+  monetizationOptionsTitle: {
+    fontSize: 14,
+    fontWeight: '600' as const,
+    color: Colors.textSecondary,
+    marginBottom: 12,
+  },
+  monetizationOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.border,
+  },
+  optionIconBg: {
+    width: 36,
+    height: 36,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  optionContent: {
+    flex: 1,
+    marginLeft: 12,
+  },
+  optionTitle: {
+    fontSize: 14,
+    fontWeight: '600' as const,
+    color: Colors.text,
+  },
+  optionDesc: {
+    fontSize: 12,
+    color: Colors.textSecondary,
+    marginTop: 2,
+  },
+  payoutSettings: {
+    backgroundColor: Colors.surface,
+    borderRadius: 16,
+    padding: 16,
+  },
+  payoutSettingsTitle: {
+    fontSize: 14,
+    fontWeight: '600' as const,
+    color: Colors.textSecondary,
+    marginBottom: 12,
+  },
+  payoutSettingItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.border,
   },
 });
