@@ -6,7 +6,8 @@ import {
   Settings, ChevronRight, Shield, Bell, HelpCircle, FileText, 
   Share2, Star, LogOut, Copy, CheckCircle, Edit2, Users, Heart,
   Compass, MessageCircle, Rss, UserPlus, ThumbsUp, Send, Bookmark,
-  MoreHorizontal, Globe
+  MoreHorizontal, Globe, Palette, Video, FolderOpen, FileUser, Calendar,
+  Contact, Code, Link, Mic, PenTool, Camera, Newspaper
 } from 'lucide-react-native';
 import Colors from '@/constants/colors';
 import { useApp } from '@/contexts/AppContext';
@@ -27,6 +28,21 @@ const socialFeatures = [
   { id: 'explore', title: 'Explore', icon: Compass, color: '#45B7D1', route: '/menu/explore' },
   { id: 'spaces', title: 'Spaces', icon: Globe, color: '#A78BFA', route: '/menu/social-spaces' },
   { id: 'messages', title: 'Messages', icon: MessageCircle, color: '#10B981', route: '/menu/messages' },
+];
+
+const contentToolsFeatures = [
+  { id: 'creator', title: 'Creator Tools', icon: Palette, color: '#F472B6', route: '/menu/creator-tools' },
+  { id: 'media', title: 'Media', icon: Video, color: '#8B5CF6', route: '/menu/media' },
+  { id: 'files', title: 'File Storage', icon: FolderOpen, color: '#06B6D4', route: '/menu/file-storage' },
+  { id: 'resume', title: 'Resume', icon: FileUser, color: '#14B8A6', route: '/menu/resume' },
+  { id: 'calendar', title: 'Calendar', icon: Calendar, color: '#F59E0B', route: '/menu/calendar' },
+  { id: 'contacts', title: 'Contacts', icon: Contact, color: '#3B82F6', route: '/menu/contacts' },
+  { id: 'developers', title: 'Developers', icon: Code, color: '#22C55E', route: '/menu/developers' },
+  { id: 'apis', title: 'APIs & Hooks', icon: Link, color: '#EF4444', route: '/menu/apis-hooks' },
+  { id: 'podcast', title: 'Podcast', icon: Mic, color: '#EC4899', route: null },
+  { id: 'blog', title: 'Blog', icon: PenTool, color: '#6366F1', route: null },
+  { id: 'photos', title: 'Photos', icon: Camera, color: '#0EA5E9', route: null },
+  { id: 'articles', title: 'Articles', icon: Newspaper, color: '#84CC16', route: null },
 ];
 
 const feedPosts = [
@@ -70,7 +86,7 @@ export default function ProfileScreen() {
   const router = useRouter();
   const { activeWallet } = useApp();
   const [copied, setCopied] = useState(false);
-  const [activeTab, setActiveTab] = useState<'social' | 'settings'>('social');
+  const [activeTab, setActiveTab] = useState<'social' | 'content' | 'settings'>('social');
   const [likedPosts, setLikedPosts] = useState<string[]>([]);
   const [savedPosts, setSavedPosts] = useState<string[]>([]);
 
@@ -157,19 +173,26 @@ export default function ProfileScreen() {
             style={[styles.tab, activeTab === 'social' && styles.tabActive]}
             onPress={() => setActiveTab('social')}
           >
-            <Users size={18} color={activeTab === 'social' ? Colors.primary : Colors.textSecondary} />
+            <Users size={16} color={activeTab === 'social' ? Colors.primary : Colors.textSecondary} />
             <Text style={[styles.tabText, activeTab === 'social' && styles.tabTextActive]}>Social</Text>
+          </TouchableOpacity>
+          <TouchableOpacity 
+            style={[styles.tab, activeTab === 'content' && styles.tabActive]}
+            onPress={() => setActiveTab('content')}
+          >
+            <Palette size={16} color={activeTab === 'content' ? Colors.primary : Colors.textSecondary} />
+            <Text style={[styles.tabText, activeTab === 'content' && styles.tabTextActive]}>Content</Text>
           </TouchableOpacity>
           <TouchableOpacity 
             style={[styles.tab, activeTab === 'settings' && styles.tabActive]}
             onPress={() => setActiveTab('settings')}
           >
-            <Settings size={18} color={activeTab === 'settings' ? Colors.primary : Colors.textSecondary} />
+            <Settings size={16} color={activeTab === 'settings' ? Colors.primary : Colors.textSecondary} />
             <Text style={[styles.tabText, activeTab === 'settings' && styles.tabTextActive]}>Settings</Text>
           </TouchableOpacity>
         </View>
 
-        {activeTab === 'social' ? (
+        {activeTab === 'social' && (
           <>
             <View style={styles.socialGrid}>
               {socialFeatures.map((feature) => (
@@ -262,7 +285,50 @@ export default function ProfileScreen() {
               ))}
             </View>
           </>
-        ) : (
+        )}
+
+        {activeTab === 'content' && (
+          <>
+            <View style={styles.contentToolsGrid}>
+              {contentToolsFeatures.map((feature) => (
+                <TouchableOpacity 
+                  key={feature.id} 
+                  style={styles.contentToolCard}
+                  onPress={() => handleSocialFeature(feature.route)}
+                >
+                  <View style={[styles.contentToolIcon, { backgroundColor: feature.color + '15' }]}>
+                    <feature.icon size={22} color={feature.color} />
+                  </View>
+                  <Text style={styles.contentToolTitle}>{feature.title}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            <View style={styles.quickStatsSection}>
+              <Text style={styles.quickStatsTitle}>Your Content Stats</Text>
+              <View style={styles.quickStatsGrid}>
+                <View style={styles.quickStatCard}>
+                  <Text style={styles.quickStatValue}>12</Text>
+                  <Text style={styles.quickStatLabel}>Posts</Text>
+                </View>
+                <View style={styles.quickStatCard}>
+                  <Text style={styles.quickStatValue}>48</Text>
+                  <Text style={styles.quickStatLabel}>Files</Text>
+                </View>
+                <View style={styles.quickStatCard}>
+                  <Text style={styles.quickStatValue}>2.4K</Text>
+                  <Text style={styles.quickStatLabel}>Views</Text>
+                </View>
+                <View style={styles.quickStatCard}>
+                  <Text style={styles.quickStatValue}>156</Text>
+                  <Text style={styles.quickStatLabel}>Saves</Text>
+                </View>
+              </View>
+            </View>
+          </>
+        )}
+
+        {activeTab === 'settings' && (
           <>
             <View style={styles.infoCard}>
           <View style={styles.infoRow}>
@@ -670,5 +736,65 @@ const styles = StyleSheet.create({
   },
   postActionRight: {
     marginLeft: 'auto',
+  },
+  contentToolsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    paddingHorizontal: 16,
+    gap: 10,
+    marginBottom: 20,
+  },
+  contentToolCard: {
+    width: '23%',
+    backgroundColor: Colors.surface,
+    borderRadius: 14,
+    padding: 12,
+    alignItems: 'center',
+  },
+  contentToolIcon: {
+    width: 44,
+    height: 44,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 6,
+  },
+  contentToolTitle: {
+    fontSize: 10,
+    fontWeight: '600' as const,
+    color: Colors.text,
+    textAlign: 'center',
+  },
+  quickStatsSection: {
+    paddingHorizontal: 20,
+    marginBottom: 20,
+  },
+  quickStatsTitle: {
+    fontSize: 16,
+    fontWeight: '700' as const,
+    color: Colors.text,
+    marginBottom: 12,
+  },
+  quickStatsGrid: {
+    flexDirection: 'row',
+    gap: 10,
+  },
+  quickStatCard: {
+    flex: 1,
+    backgroundColor: Colors.surface,
+    borderRadius: 14,
+    padding: 16,
+    alignItems: 'center',
+  },
+  quickStatValue: {
+    fontSize: 20,
+    fontWeight: '700' as const,
+    color: Colors.primary,
+    marginBottom: 4,
+  },
+  quickStatLabel: {
+    fontSize: 11,
+    color: Colors.textSecondary,
+    fontWeight: '500' as const,
   },
 });
