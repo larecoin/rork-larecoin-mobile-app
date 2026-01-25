@@ -11,7 +11,8 @@ interface LinkedCard {
   spentThisMonth: number;
   status: 'active' | 'frozen' | 'pending';
 }
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, RefreshControl, TextInput } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, RefreshControl, TextInput, Dimensions } from 'react-native';
+import Svg, { Path, Defs, LinearGradient, Stop } from 'react-native-svg';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { ArrowUpRight, ArrowDownLeft, RefreshCw, Eye, EyeOff, ChevronRight, Plus, ChevronDown, Image, Coins, Droplets, Wallet, Check, Trash2, Edit3, Menu, Search, ArrowLeftRight, Clover, Receipt, GitBranch, Users, ShoppingCart, DollarSign, ShieldCheck, HandCoins, Send, FileText, CreditCard, Lock, Smartphone, Bell, AlertCircle, Shield, Settings } from 'lucide-react-native';
@@ -171,6 +172,25 @@ export default function WalletDashboard() {
   const balanceCardTextPrimary = isDark ? '#E8F6FA' : '#0D3B54';
   const balanceCardTextSecondary = isDark ? '#A8D4E6' : '#1A5276';
 
+  const chartData = [18500, 19200, 18800, 19800, 19400, 20100, 19600, 20500, 20200, 21000, 20800, totalBalance];
+  const chartWidth = Dimensions.get('window').width - 88;
+  const chartHeight = 80;
+  const maxValue = Math.max(...chartData) * 1.1;
+  const minValue = Math.min(...chartData) * 0.9;
+  const range = maxValue - minValue;
+
+  const getY = (value: number) => {
+    return chartHeight - ((value - minValue) / range) * chartHeight;
+  };
+
+  const linePath = chartData.map((value, index) => {
+    const x = (index / (chartData.length - 1)) * chartWidth;
+    const y = getY(value);
+    return `${index === 0 ? 'M' : 'L'} ${x} ${y}`;
+  }).join(' ');
+
+  const areaPath = `${linePath} L ${chartWidth} ${chartHeight} L 0 ${chartHeight} Z`;
+
   return (
     <View style={[styles.container, { paddingTop: insets.top, backgroundColor: colors.background }]}>
       <ScrollView 
@@ -281,6 +301,18 @@ export default function WalletDashboard() {
             <TouchableOpacity onPress={() => router.push('/menu/account-settings')}>
               <Settings size={20} color={balanceCardTextSecondary} />
             </TouchableOpacity>
+          </View>
+          <View style={styles.chartContainer}>
+            <Svg width={chartWidth} height={chartHeight}>
+              <Defs>
+                <LinearGradient id="chartGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <Stop offset="0%" stopColor={balanceCardTextPrimary} stopOpacity={0.3} />
+                  <Stop offset="100%" stopColor={balanceCardTextPrimary} stopOpacity={0.05} />
+                </LinearGradient>
+              </Defs>
+              <Path d={areaPath} fill="url(#chartGradient)" />
+              <Path d={linePath} stroke={balanceCardTextPrimary} strokeWidth={2.5} fill="none" strokeLinecap="round" strokeLinejoin="round" />
+            </Svg>
           </View>
           <Text style={[styles.balanceAmount, { color: balanceCardTextPrimary }]}>
             {balanceVisible 
@@ -898,7 +930,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: 12,
+  },
+  chartContainer: {
+    marginBottom: 12,
+    alignItems: 'center',
   },
   balanceLabel: {
     fontSize: 14,
