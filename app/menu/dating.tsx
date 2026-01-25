@@ -6,7 +6,8 @@ import {
   Heart, X, Star, MapPin, Briefcase, Filter, Settings, 
   Calendar, Clock, Phone, Video, Users, Check, MessageCircle,
   ChevronRight, ArrowLeft, Coffee, MapPinned, Sparkles, Shield,
-  AlertCircle, ThumbsUp, ThumbsDown, Crown, Lock, Flame
+  AlertCircle, ThumbsUp, ThumbsDown, Crown, Lock, Flame,
+  Building2, User, UserCircle, Sparkle, Hand, ShoppingBag, Wine, MoreHorizontal
 } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 import { useApp } from '@/contexts/AppContext';
@@ -93,6 +94,26 @@ export default function DatingScreen() {
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedTime, setSelectedTime] = useState('');
   const [selectedVenue, setSelectedVenue] = useState('');
+  const [showAdultClassifieds, setShowAdultClassifieds] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+
+  const adultCategories = [
+    { id: 'strip-clubs', name: 'Strip Clubs', icon: Building2, color: '#E91E63', count: 45 },
+    { id: 'gogo-bars', name: 'GoGo Bars', icon: Wine, color: '#9C27B0', count: 32 },
+    { id: 'female-escorts', name: 'Female Escorts', icon: User, color: '#F44336', count: 128 },
+    { id: 'male-escorts', name: 'Male Escorts', icon: UserCircle, color: '#2196F3', count: 67 },
+    { id: 'transgender', name: 'Transgender', icon: Sparkle, color: '#00BCD4', count: 54 },
+    { id: 'body-rubs', name: 'Body Rubs & Massage', icon: Hand, color: '#FF9800', count: 89 },
+    { id: 'adult-shops', name: 'Adult Shops', icon: ShoppingBag, color: '#673AB7', count: 23 },
+    { id: 'more', name: 'More Categories', icon: MoreHorizontal, color: '#607D8B', count: 156 },
+  ];
+
+  const mockListings = [
+    { id: '1', name: 'Club Paradise', location: '2.3 mi away', rating: 4.8, reviews: 234, verified: true, image: 'https://images.unsplash.com/photo-1566417713940-fe7c737a9ef2?w=400&h=300&fit=crop', premium: true },
+    { id: '2', name: 'Velvet Lounge', location: '3.1 mi away', rating: 4.6, reviews: 156, verified: true, image: 'https://images.unsplash.com/photo-1514933651103-005eec06c04b?w=400&h=300&fit=crop', premium: false },
+    { id: '3', name: 'Sapphire Room', location: '4.5 mi away', rating: 4.9, reviews: 312, verified: true, image: 'https://images.unsplash.com/photo-1572116469696-31de0f17cc34?w=400&h=300&fit=crop', premium: true },
+    { id: '4', name: 'Diamond Club', location: '5.2 mi away', rating: 4.5, reviews: 98, verified: false, image: 'https://images.unsplash.com/photo-1578736641330-3155e606cd40?w=400&h=300&fit=crop', premium: false },
+  ];
 
   const currentProfile = profiles[currentIndex];
 
@@ -259,7 +280,7 @@ export default function DatingScreen() {
             'You are about to access Adult Classifieds. This section contains mature content for adults 18+ only. By continuing, you confirm you are of legal age.',
             [
               { text: 'Cancel', style: 'cancel' },
-              { text: 'Continue', onPress: () => console.log('Navigate to Adult Classifieds') }
+              { text: 'Continue', onPress: () => setShowAdultClassifieds(true) }
             ]
           )}
         >
@@ -897,6 +918,179 @@ export default function DatingScreen() {
               </View>
             )}
           </View>
+        </View>
+      </Modal>
+
+      {/* Adult Classifieds Modal */}
+      <Modal visible={showAdultClassifieds} animationType="slide">
+        <View style={[styles.adultContainer, { backgroundColor: '#0D0D0D', paddingTop: insets.top }]}>
+          <View style={styles.adultHeader}>
+            <TouchableOpacity 
+              onPress={() => {
+                if (selectedCategory) {
+                  setSelectedCategory(null);
+                } else {
+                  setShowAdultClassifieds(false);
+                }
+              }}
+              style={styles.adultBackBtn}
+            >
+              <ArrowLeft size={24} color="#FFF" />
+            </TouchableOpacity>
+            <Text style={styles.adultHeaderTitle}>
+              {selectedCategory 
+                ? adultCategories.find(c => c.id === selectedCategory)?.name 
+                : 'Adult Classifieds'}
+            </Text>
+            <TouchableOpacity style={styles.adultFilterBtn}>
+              <Filter size={20} color="#FFF" />
+            </TouchableOpacity>
+          </View>
+
+          {!selectedCategory ? (
+            <ScrollView 
+              style={styles.adultContent}
+              contentContainerStyle={{ paddingBottom: insets.bottom + 20 }}
+              showsVerticalScrollIndicator={false}
+            >
+              <View style={styles.adultWarningBanner}>
+                <AlertCircle size={18} color="#FF6B6B" />
+                <Text style={styles.adultWarningText}>
+                  18+ Only • Verify age before meeting • Stay safe
+                </Text>
+              </View>
+
+              <Text style={styles.adultSectionTitle}>Browse Categories</Text>
+              
+              <View style={styles.categoryGrid}>
+                {adultCategories.map(category => {
+                  const IconComponent = category.icon;
+                  return (
+                    <TouchableOpacity
+                      key={category.id}
+                      style={[styles.categoryCard, { borderColor: category.color + '40' }]}
+                      onPress={() => setSelectedCategory(category.id)}
+                    >
+                      <View style={[styles.categoryIconWrap, { backgroundColor: category.color + '20' }]}>
+                        <IconComponent size={28} color={category.color} />
+                      </View>
+                      <Text style={styles.categoryName}>{category.name}</Text>
+                      <Text style={styles.categoryCount}>{category.count} listings</Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+
+              <Text style={[styles.adultSectionTitle, { marginTop: 24 }]}>Featured</Text>
+              
+              {mockListings.slice(0, 2).map(listing => (
+                <TouchableOpacity key={listing.id} style={styles.featuredCard}>
+                  <Image source={{ uri: listing.image }} style={styles.featuredImage} />
+                  <View style={styles.featuredOverlay}>
+                    {listing.premium && (
+                      <View style={styles.premiumBadge}>
+                        <Crown size={12} color="#FFD700" />
+                        <Text style={styles.premiumText}>Premium</Text>
+                      </View>
+                    )}
+                  </View>
+                  <View style={styles.featuredInfo}>
+                    <View style={styles.featuredHeader}>
+                      <Text style={styles.featuredName}>{listing.name}</Text>
+                      {listing.verified && (
+                        <View style={styles.verifiedBadge}>
+                          <Check size={10} color="#FFF" />
+                        </View>
+                      )}
+                    </View>
+                    <Text style={styles.featuredLocation}>{listing.location}</Text>
+                    <View style={styles.featuredRating}>
+                      <Star size={14} color="#FFD700" fill="#FFD700" />
+                      <Text style={styles.featuredRatingText}>{listing.rating}</Text>
+                      <Text style={styles.featuredReviews}>({listing.reviews} reviews)</Text>
+                    </View>
+                  </View>
+                </TouchableOpacity>
+              ))}
+
+              <View style={styles.safetyCard}>
+                <Shield size={24} color="#FF6B6B" />
+                <View style={styles.safetyContent}>
+                  <Text style={styles.safetyTitle}>Stay Safe</Text>
+                  <Text style={styles.safetyText}>
+                    • Always meet in public places first{"\n"}
+                    • Tell someone where you're going{"\n"}
+                    • Trust your instincts{"\n"}
+                    • Report suspicious activity
+                  </Text>
+                </View>
+              </View>
+            </ScrollView>
+          ) : (
+            <ScrollView 
+              style={styles.adultContent}
+              contentContainerStyle={{ paddingBottom: insets.bottom + 20 }}
+              showsVerticalScrollIndicator={false}
+            >
+              <View style={styles.listingFilters}>
+                <TouchableOpacity style={[styles.filterChip, styles.filterChipActive]}>
+                  <Text style={styles.filterChipTextActive}>Nearby</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.filterChip}>
+                  <Text style={styles.filterChipText}>Top Rated</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.filterChip}>
+                  <Text style={styles.filterChipText}>Verified</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.filterChip}>
+                  <Text style={styles.filterChipText}>Open Now</Text>
+                </TouchableOpacity>
+              </View>
+
+              {mockListings.map(listing => (
+                <TouchableOpacity key={listing.id} style={styles.listingCard}>
+                  <Image source={{ uri: listing.image }} style={styles.listingImage} />
+                  <View style={styles.listingContent}>
+                    <View style={styles.listingHeader}>
+                      <Text style={styles.listingName}>{listing.name}</Text>
+                      {listing.premium && (
+                        <Crown size={14} color="#FFD700" />
+                      )}
+                    </View>
+                    <View style={styles.listingMeta}>
+                      <MapPin size={12} color="#888" />
+                      <Text style={styles.listingLocation}>{listing.location}</Text>
+                    </View>
+                    <View style={styles.listingRating}>
+                      <Star size={12} color="#FFD700" fill="#FFD700" />
+                      <Text style={styles.listingRatingText}>{listing.rating}</Text>
+                      <Text style={styles.listingReviews}>({listing.reviews})</Text>
+                      {listing.verified && (
+                        <View style={styles.listingVerified}>
+                          <Check size={10} color="#4CAF50" />
+                          <Text style={styles.listingVerifiedText}>Verified</Text>
+                        </View>
+                      )}
+                    </View>
+                    <View style={styles.listingActions}>
+                      <TouchableOpacity style={styles.listingActionBtn}>
+                        <Phone size={14} color="#FF1744" />
+                        <Text style={styles.listingActionText}>Call</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity style={styles.listingActionBtn}>
+                        <MessageCircle size={14} color="#FF1744" />
+                        <Text style={styles.listingActionText}>Message</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity style={styles.listingActionBtn}>
+                        <MapPinned size={14} color="#FF1744" />
+                        <Text style={styles.listingActionText}>Directions</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          )}
         </View>
       </Modal>
     </View>
@@ -1544,5 +1738,289 @@ const styles = StyleSheet.create({
   adultClassifiedsSubtitle: {
     fontSize: 13,
     color: 'rgba(255,255,255,0.85)',
+  },
+  adultContainer: {
+    flex: 1,
+  },
+  adultHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255,255,255,0.1)',
+  },
+  adultBackBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  adultHeaderTitle: {
+    fontSize: 18,
+    fontWeight: '700' as const,
+    color: '#FFF',
+  },
+  adultFilterBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  adultContent: {
+    flex: 1,
+    paddingHorizontal: 16,
+  },
+  adultWarningBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255,107,107,0.15)',
+    padding: 12,
+    borderRadius: 12,
+    marginTop: 16,
+    gap: 10,
+  },
+  adultWarningText: {
+    flex: 1,
+    fontSize: 13,
+    color: '#FF6B6B',
+  },
+  adultSectionTitle: {
+    fontSize: 18,
+    fontWeight: '700' as const,
+    color: '#FFF',
+    marginTop: 20,
+    marginBottom: 16,
+  },
+  categoryGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+  },
+  categoryCard: {
+    width: (width - 44) / 2,
+    backgroundColor: 'rgba(255,255,255,0.05)',
+    borderRadius: 16,
+    padding: 16,
+    borderWidth: 1,
+  },
+  categoryIconWrap: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 12,
+  },
+  categoryName: {
+    fontSize: 15,
+    fontWeight: '600' as const,
+    color: '#FFF',
+    marginBottom: 4,
+  },
+  categoryCount: {
+    fontSize: 13,
+    color: 'rgba(255,255,255,0.5)',
+  },
+  featuredCard: {
+    backgroundColor: 'rgba(255,255,255,0.05)',
+    borderRadius: 16,
+    overflow: 'hidden',
+    marginBottom: 16,
+  },
+  featuredImage: {
+    width: '100%',
+    height: 160,
+  },
+  featuredOverlay: {
+    position: 'absolute',
+    top: 12,
+    right: 12,
+  },
+  premiumBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.7)',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 12,
+    gap: 4,
+  },
+  premiumText: {
+    fontSize: 11,
+    fontWeight: '600' as const,
+    color: '#FFD700',
+  },
+  featuredInfo: {
+    padding: 14,
+  },
+  featuredHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  featuredName: {
+    fontSize: 17,
+    fontWeight: '600' as const,
+    color: '#FFF',
+  },
+  verifiedBadge: {
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    backgroundColor: '#4CAF50',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  featuredLocation: {
+    fontSize: 13,
+    color: 'rgba(255,255,255,0.6)',
+    marginTop: 4,
+  },
+  featuredRating: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 8,
+    gap: 4,
+  },
+  featuredRatingText: {
+    fontSize: 14,
+    fontWeight: '600' as const,
+    color: '#FFF',
+  },
+  featuredReviews: {
+    fontSize: 13,
+    color: 'rgba(255,255,255,0.5)',
+  },
+  safetyCard: {
+    flexDirection: 'row',
+    backgroundColor: 'rgba(255,107,107,0.1)',
+    padding: 16,
+    borderRadius: 16,
+    marginTop: 8,
+    gap: 14,
+  },
+  safetyContent: {
+    flex: 1,
+  },
+  safetyTitle: {
+    fontSize: 16,
+    fontWeight: '600' as const,
+    color: '#FF6B6B',
+    marginBottom: 8,
+  },
+  safetyText: {
+    fontSize: 13,
+    color: 'rgba(255,255,255,0.7)',
+    lineHeight: 20,
+  },
+  listingFilters: {
+    flexDirection: 'row',
+    marginTop: 16,
+    marginBottom: 16,
+    gap: 8,
+  },
+  filterChip: {
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255,255,255,0.08)',
+  },
+  filterChipActive: {
+    backgroundColor: '#FF1744',
+  },
+  filterChipText: {
+    fontSize: 13,
+    color: 'rgba(255,255,255,0.7)',
+  },
+  filterChipTextActive: {
+    fontSize: 13,
+    fontWeight: '600' as const,
+    color: '#FFF',
+  },
+  listingCard: {
+    flexDirection: 'row',
+    backgroundColor: 'rgba(255,255,255,0.05)',
+    borderRadius: 16,
+    overflow: 'hidden',
+    marginBottom: 12,
+  },
+  listingImage: {
+    width: 110,
+    height: 140,
+  },
+  listingContent: {
+    flex: 1,
+    padding: 12,
+  },
+  listingHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  listingName: {
+    fontSize: 16,
+    fontWeight: '600' as const,
+    color: '#FFF',
+    flex: 1,
+  },
+  listingMeta: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 6,
+    gap: 4,
+  },
+  listingLocation: {
+    fontSize: 12,
+    color: 'rgba(255,255,255,0.5)',
+  },
+  listingRating: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 6,
+    gap: 4,
+  },
+  listingRatingText: {
+    fontSize: 13,
+    fontWeight: '600' as const,
+    color: '#FFF',
+  },
+  listingReviews: {
+    fontSize: 12,
+    color: 'rgba(255,255,255,0.5)',
+  },
+  listingVerified: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginLeft: 8,
+    gap: 3,
+  },
+  listingVerifiedText: {
+    fontSize: 11,
+    color: '#4CAF50',
+  },
+  listingActions: {
+    flexDirection: 'row',
+    marginTop: 10,
+    gap: 8,
+  },
+  listingActionBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255,23,68,0.15)',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 12,
+    gap: 4,
+  },
+  listingActionText: {
+    fontSize: 12,
+    fontWeight: '500' as const,
+    color: '#FF1744',
   },
 });
