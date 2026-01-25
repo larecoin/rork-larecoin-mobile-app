@@ -32,7 +32,7 @@ const menuSections: MenuSection[] = [
   {
     title: 'Account',
     items: [
-      { id: 'account-settings', label: 'John Doe / Account Settings', icon: UserCircle },
+      { id: 'account-settings', label: 'Account Settings', icon: UserCircle },
       { id: 'customer-service', label: 'Customer Service Chat', icon: Headphones },
       { id: 'invite-friends', label: 'Invite Friends', icon: Share2 },
     ],
