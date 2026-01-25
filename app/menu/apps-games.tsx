@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from 'react-native';
 import { Stack } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Search, Download, Star, Gamepad2, Smartphone, TrendingUp } from 'lucide-react-native';
+import { Search, Play, Star, Gamepad2, Smartphone, TrendingUp } from 'lucide-react-native';
 import { useApp } from '@/contexts/AppContext';
 
 const featuredApps = [
@@ -80,7 +80,7 @@ export default function AppsGamesScreen() {
                 </View>
               </View>
               <TouchableOpacity style={[styles.downloadButton, { backgroundColor: colors.primary }]}>
-                <Download size={16} color="#FFF" />
+                <Play size={16} color="#FFF" fill="#FFF" />
               </TouchableOpacity>
             </TouchableOpacity>
           ))}
@@ -111,7 +111,7 @@ export default function AppsGamesScreen() {
                 </View>
               </View>
               <TouchableOpacity style={[styles.downloadButton, { backgroundColor: colors.primary }]}>
-                <Download size={16} color="#FFF" />
+                <Play size={16} color="#FFF" fill="#FFF" />
               </TouchableOpacity>
             </TouchableOpacity>
           ))}
