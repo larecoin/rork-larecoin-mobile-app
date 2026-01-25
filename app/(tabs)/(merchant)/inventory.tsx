@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, RefreshControl } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, RefreshControl, Modal, KeyboardAvoidingView, Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { 
@@ -16,9 +16,31 @@ import {
   Trash2,
   Box,
   Tag,
-  Layers
+  Layers,
+  X,
+  ChevronDown,
+  Palette,
+  Ruler,
+  DollarSign,
+  Settings2,
+  PlusCircle,
+  Minus
 } from 'lucide-react-native';
 import Colors from '@/constants/colors';
+
+interface CustomAttribute {
+  id: string;
+  name: string;
+  type: 'size' | 'color' | 'material' | 'style' | 'custom';
+  values: AttributeValue[];
+}
+
+interface AttributeValue {
+  id: string;
+  value: string;
+  priceModifier: number;
+  stockQuantity: number;
+}
 
 interface InventoryItem {
   id: string;
@@ -30,6 +52,7 @@ interface InventoryItem {
   price: number;
   cost: number;
   lastUpdated: string;
+  attributes?: CustomAttribute[];
 }
 
 const mockInventory: InventoryItem[] = [
@@ -47,6 +70,23 @@ export default function InventoryManager() {
   const [searchQuery, setSearchQuery] = useState('');
   const [refreshing, setRefreshing] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState('All');
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [newItem, setNewItem] = useState({
+    name: '',
+    sku: '',
+    category: 'Coffee',
+    quantity: 0,
+    minStock: 0,
+    price: 0,
+    cost: 0,
+  });
+  const [customAttributes, setCustomAttributes] = useState<CustomAttribute[]>([]);
+  const [showAttributeModal, setShowAttributeModal] = useState(false);
+  const [newAttribute, setNewAttribute] = useState<{
+    name: string;
+    type: 'size' | 'color' | 'material' | 'style' | 'custom';
+  }>({ name: '', type: 'custom' });
+  const [editingAttributeId, setEditingAttributeId] = useState<string | null>(null);
 
   const categories = ['All', 'Coffee', 'Dairy Alt', 'Bakery', 'Syrups', 'Supplies'];
 
@@ -66,6 +106,94 @@ export default function InventoryManager() {
     setTimeout(() => setRefreshing(false), 1500);
   }, []);
 
+  const attributeTypes = [
+    { id: 'size', label: 'Size', icon: Ruler, examples: 'S, M, L, XL' },
+    { id: 'color', label: 'Color', icon: Palette, examples: 'Red, Blue, Green' },
+    { id: 'material', label: 'Material', icon: Layers, examples: 'Cotton, Polyester' },
+    { id: 'style', label: 'Style', icon: Settings2, examples: 'Classic, Modern' },
+    { id: 'custom', label: 'Custom', icon: Tag, examples: 'Any attribute' },
+  ];
+
+  const addAttribute = () => {
+    if (!newAttribute.name.trim()) return;
+    const attr: CustomAttribute = {
+      id: Date.now().toString(),
+      name: newAttribute.name,
+      type: newAttribute.type,
+      values: [],
+    };
+    setCustomAttributes([...customAttributes, attr]);
+    setNewAttribute({ name: '', type: 'custom' });
+    setShowAttributeModal(false);
+  };
+
+  const removeAttribute = (attrId: string) => {
+    setCustomAttributes(customAttributes.filter(a => a.id !== attrId));
+  };
+
+  const addAttributeValue = (attrId: string) => {
+    setCustomAttributes(customAttributes.map(attr => {
+      if (attr.id === attrId) {
+        return {
+          ...attr,
+          values: [...attr.values, {
+            id: Date.now().toString(),
+            value: '',
+            priceModifier: 0,
+            stockQuantity: 0,
+          }],
+        };
+      }
+      return attr;
+    }));
+  };
+
+  const updateAttributeValue = (attrId: string, valueId: string, field: keyof AttributeValue, val: string | number) => {
+    setCustomAttributes(customAttributes.map(attr => {
+      if (attr.id === attrId) {
+        return {
+          ...attr,
+          values: attr.values.map(v => {
+            if (v.id === valueId) {
+              return { ...v, [field]: val };
+            }
+            return v;
+          }),
+        };
+      }
+      return attr;
+    }));
+  };
+
+  const removeAttributeValue = (attrId: string, valueId: string) => {
+    setCustomAttributes(customAttributes.map(attr => {
+      if (attr.id === attrId) {
+        return {
+          ...attr,
+          values: attr.values.filter(v => v.id !== valueId),
+        };
+      }
+      return attr;
+    }));
+  };
+
+  const handleAddItem = () => {
+    console.log('Adding item:', { ...newItem, attributes: customAttributes });
+    setShowAddModal(false);
+    setNewItem({ name: '', sku: '', category: 'Coffee', quantity: 0, minStock: 0, price: 0, cost: 0 });
+    setCustomAttributes([]);
+  };
+
+  const getAttributeIcon = (type: string) => {
+    switch (type) {
+      case 'size': return Ruler;
+      case 'color': return Palette;
+      case 'material': return Layers;
+      case 'style': return Settings2;
+      default: return Tag;
+    }
+  };
+
   const getStockStatus = (item: InventoryItem) => {
     if (item.quantity <= item.minStock * 0.5) return 'critical';
     if (item.quantity <= item.minStock) return 'low';
@@ -79,7 +207,7 @@ export default function InventoryManager() {
           <ArrowLeft size={24} color={Colors.text} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Inventory Manager</Text>
-        <TouchableOpacity style={styles.addButton}>
+        <TouchableOpacity style={styles.addButton} onPress={() => setShowAddModal(true)}>
           <Plus size={20} color={Colors.background} />
         </TouchableOpacity>
       </View>
@@ -239,7 +367,7 @@ export default function InventoryManager() {
         </View>
 
         <View style={styles.quickActions}>
-          <TouchableOpacity style={styles.quickActionCard}>
+          <TouchableOpacity style={styles.quickActionCard} onPress={() => setShowAddModal(true)}>
             <Box size={20} color={Colors.primary} />
             <Text style={styles.quickActionText}>Add Item</Text>
           </TouchableOpacity>
@@ -255,6 +383,251 @@ export default function InventoryManager() {
 
         <View style={{ height: 100 }} />
       </ScrollView>
+
+      <Modal visible={showAddModal} animationType="slide" presentationStyle="pageSheet">
+        <KeyboardAvoidingView 
+          style={styles.modalContainer} 
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        >
+          <View style={[styles.modalHeader, { paddingTop: insets.top + 8 }]}>
+            <TouchableOpacity onPress={() => setShowAddModal(false)}>
+              <X size={24} color={Colors.text} />
+            </TouchableOpacity>
+            <Text style={styles.modalTitle}>Add Inventory Item</Text>
+            <TouchableOpacity onPress={handleAddItem}>
+              <Text style={styles.saveButton}>Save</Text>
+            </TouchableOpacity>
+          </View>
+
+          <ScrollView style={styles.modalContent} showsVerticalScrollIndicator={false}>
+            <View style={styles.formSection}>
+              <Text style={styles.sectionTitle}>Basic Information</Text>
+              
+              <View style={styles.inputGroup}>
+                <Text style={styles.inputLabel}>Product Name</Text>
+                <TextInput
+                  style={styles.formInput}
+                  placeholder="Enter product name"
+                  placeholderTextColor={Colors.textSecondary}
+                  value={newItem.name}
+                  onChangeText={(text) => setNewItem({ ...newItem, name: text })}
+                />
+              </View>
+
+              <View style={styles.inputRow}>
+                <View style={[styles.inputGroup, { flex: 1 }]}>
+                  <Text style={styles.inputLabel}>SKU</Text>
+                  <TextInput
+                    style={styles.formInput}
+                    placeholder="SKU-001"
+                    placeholderTextColor={Colors.textSecondary}
+                    value={newItem.sku}
+                    onChangeText={(text) => setNewItem({ ...newItem, sku: text })}
+                  />
+                </View>
+                <View style={[styles.inputGroup, { flex: 1 }]}>
+                  <Text style={styles.inputLabel}>Category</Text>
+                  <TouchableOpacity style={styles.selectInput}>
+                    <Text style={styles.selectText}>{newItem.category}</Text>
+                    <ChevronDown size={18} color={Colors.textSecondary} />
+                  </TouchableOpacity>
+                </View>
+              </View>
+
+              <View style={styles.inputRow}>
+                <View style={[styles.inputGroup, { flex: 1 }]}>
+                  <Text style={styles.inputLabel}>Base Price ($)</Text>
+                  <TextInput
+                    style={styles.formInput}
+                    placeholder="0.00"
+                    placeholderTextColor={Colors.textSecondary}
+                    keyboardType="decimal-pad"
+                    value={newItem.price > 0 ? newItem.price.toString() : ''}
+                    onChangeText={(text) => setNewItem({ ...newItem, price: parseFloat(text) || 0 })}
+                  />
+                </View>
+                <View style={[styles.inputGroup, { flex: 1 }]}>
+                  <Text style={styles.inputLabel}>Cost ($)</Text>
+                  <TextInput
+                    style={styles.formInput}
+                    placeholder="0.00"
+                    placeholderTextColor={Colors.textSecondary}
+                    keyboardType="decimal-pad"
+                    value={newItem.cost > 0 ? newItem.cost.toString() : ''}
+                    onChangeText={(text) => setNewItem({ ...newItem, cost: parseFloat(text) || 0 })}
+                  />
+                </View>
+              </View>
+
+              <View style={styles.inputRow}>
+                <View style={[styles.inputGroup, { flex: 1 }]}>
+                  <Text style={styles.inputLabel}>Quantity</Text>
+                  <TextInput
+                    style={styles.formInput}
+                    placeholder="0"
+                    placeholderTextColor={Colors.textSecondary}
+                    keyboardType="number-pad"
+                    value={newItem.quantity > 0 ? newItem.quantity.toString() : ''}
+                    onChangeText={(text) => setNewItem({ ...newItem, quantity: parseInt(text) || 0 })}
+                  />
+                </View>
+                <View style={[styles.inputGroup, { flex: 1 }]}>
+                  <Text style={styles.inputLabel}>Min Stock</Text>
+                  <TextInput
+                    style={styles.formInput}
+                    placeholder="0"
+                    placeholderTextColor={Colors.textSecondary}
+                    keyboardType="number-pad"
+                    value={newItem.minStock > 0 ? newItem.minStock.toString() : ''}
+                    onChangeText={(text) => setNewItem({ ...newItem, minStock: parseInt(text) || 0 })}
+                  />
+                </View>
+              </View>
+            </View>
+
+            <View style={styles.formSection}>
+              <View style={styles.sectionHeader}>
+                <Text style={styles.sectionTitle}>Custom Attributes</Text>
+                <TouchableOpacity 
+                  style={styles.addAttributeBtn}
+                  onPress={() => setShowAttributeModal(true)}
+                >
+                  <PlusCircle size={18} color={Colors.primary} />
+                  <Text style={styles.addAttributeText}>Add</Text>
+                </TouchableOpacity>
+              </View>
+              <Text style={styles.sectionSubtitle}>Add sizes, colors, materials, or custom variations</Text>
+
+              {customAttributes.length === 0 ? (
+                <TouchableOpacity 
+                  style={styles.emptyAttributeCard}
+                  onPress={() => setShowAttributeModal(true)}
+                >
+                  <Settings2 size={32} color={Colors.textSecondary} />
+                  <Text style={styles.emptyAttributeTitle}>No Attributes Added</Text>
+                  <Text style={styles.emptyAttributeText}>Tap to add size, color, or custom attributes</Text>
+                </TouchableOpacity>
+              ) : (
+                customAttributes.map(attr => {
+                  const AttrIcon = getAttributeIcon(attr.type);
+                  return (
+                    <View key={attr.id} style={styles.attributeCard}>
+                      <View style={styles.attributeHeader}>
+                        <View style={styles.attributeInfo}>
+                          <View style={[styles.attributeIcon, { backgroundColor: Colors.primary + '20' }]}>
+                            <AttrIcon size={16} color={Colors.primary} />
+                          </View>
+                          <View>
+                            <Text style={styles.attributeName}>{attr.name}</Text>
+                            <Text style={styles.attributeType}>{attr.type.charAt(0).toUpperCase() + attr.type.slice(1)}</Text>
+                          </View>
+                        </View>
+                        <TouchableOpacity onPress={() => removeAttribute(attr.id)}>
+                          <X size={18} color={Colors.textSecondary} />
+                        </TouchableOpacity>
+                      </View>
+
+                      {attr.values.map((val, idx) => (
+                        <View key={val.id} style={styles.valueRow}>
+                          <TextInput
+                            style={[styles.valueInput, { flex: 2 }]}
+                            placeholder="Value (e.g., Large)"
+                            placeholderTextColor={Colors.textSecondary}
+                            value={val.value}
+                            onChangeText={(text) => updateAttributeValue(attr.id, val.id, 'value', text)}
+                          />
+                          <View style={styles.priceModifierInput}>
+                            <DollarSign size={14} color={Colors.textSecondary} />
+                            <TextInput
+                              style={styles.priceInput}
+                              placeholder="+0"
+                              placeholderTextColor={Colors.textSecondary}
+                              keyboardType="decimal-pad"
+                              value={val.priceModifier !== 0 ? val.priceModifier.toString() : ''}
+                              onChangeText={(text) => updateAttributeValue(attr.id, val.id, 'priceModifier', parseFloat(text) || 0)}
+                            />
+                          </View>
+                          <TextInput
+                            style={[styles.valueInput, { flex: 1 }]}
+                            placeholder="Qty"
+                            placeholderTextColor={Colors.textSecondary}
+                            keyboardType="number-pad"
+                            value={val.stockQuantity > 0 ? val.stockQuantity.toString() : ''}
+                            onChangeText={(text) => updateAttributeValue(attr.id, val.id, 'stockQuantity', parseInt(text) || 0)}
+                          />
+                          <TouchableOpacity 
+                            style={styles.removeValueBtn}
+                            onPress={() => removeAttributeValue(attr.id, val.id)}
+                          >
+                            <Minus size={14} color={Colors.error} />
+                          </TouchableOpacity>
+                        </View>
+                      ))}
+
+                      <TouchableOpacity 
+                        style={styles.addValueBtn}
+                        onPress={() => addAttributeValue(attr.id)}
+                      >
+                        <Plus size={14} color={Colors.primary} />
+                        <Text style={styles.addValueText}>Add Value</Text>
+                      </TouchableOpacity>
+                    </View>
+                  );
+                })
+              )}
+            </View>
+
+            <View style={{ height: 100 }} />
+          </ScrollView>
+        </KeyboardAvoidingView>
+      </Modal>
+
+      <Modal visible={showAttributeModal} animationType="fade" transparent>
+        <View style={styles.attributeModalOverlay}>
+          <View style={styles.attributeModalContent}>
+            <View style={styles.attributeModalHeader}>
+              <Text style={styles.attributeModalTitle}>Add Attribute</Text>
+              <TouchableOpacity onPress={() => setShowAttributeModal(false)}>
+                <X size={22} color={Colors.text} />
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.inputGroup}>
+              <Text style={styles.inputLabel}>Attribute Name</Text>
+              <TextInput
+                style={styles.formInput}
+                placeholder="e.g., Size, Color, Weight"
+                placeholderTextColor={Colors.textSecondary}
+                value={newAttribute.name}
+                onChangeText={(text) => setNewAttribute({ ...newAttribute, name: text })}
+              />
+            </View>
+
+            <Text style={styles.inputLabel}>Attribute Type</Text>
+            <View style={styles.typeGrid}>
+              {attributeTypes.map(type => {
+                const TypeIcon = type.icon;
+                const isSelected = newAttribute.type === type.id;
+                return (
+                  <TouchableOpacity
+                    key={type.id}
+                    style={[styles.typeCard, isSelected && styles.typeCardActive]}
+                    onPress={() => setNewAttribute({ ...newAttribute, type: type.id as typeof newAttribute.type })}
+                  >
+                    <TypeIcon size={20} color={isSelected ? Colors.primary : Colors.textSecondary} />
+                    <Text style={[styles.typeLabel, isSelected && styles.typeLabelActive]}>{type.label}</Text>
+                    <Text style={styles.typeExamples}>{type.examples}</Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+
+            <TouchableOpacity style={styles.createAttributeBtn} onPress={addAttribute}>
+              <Text style={styles.createAttributeBtnText}>Create Attribute</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -555,5 +928,268 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '600',
     color: Colors.text,
+  },
+  modalContainer: {
+    flex: 1,
+    backgroundColor: Colors.background,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingBottom: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.border,
+  },
+  modalTitle: {
+    fontSize: 17,
+    fontWeight: '600',
+    color: Colors.text,
+  },
+  saveButton: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: Colors.primary,
+  },
+  modalContent: {
+    flex: 1,
+    paddingHorizontal: 16,
+  },
+  formSection: {
+    marginTop: 20,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: Colors.text,
+    marginBottom: 4,
+  },
+  sectionSubtitle: {
+    fontSize: 13,
+    color: Colors.textSecondary,
+    marginBottom: 14,
+  },
+  inputGroup: {
+    marginBottom: 14,
+  },
+  inputLabel: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: Colors.textSecondary,
+    marginBottom: 6,
+  },
+  formInput: {
+    backgroundColor: Colors.surface,
+    borderRadius: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    fontSize: 15,
+    color: Colors.text,
+  },
+  inputRow: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  selectInput: {
+    backgroundColor: Colors.surface,
+    borderRadius: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  selectText: {
+    fontSize: 15,
+    color: Colors.text,
+  },
+  addAttributeBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  addAttributeText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: Colors.primary,
+  },
+  emptyAttributeCard: {
+    backgroundColor: Colors.surface,
+    borderRadius: 16,
+    padding: 24,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: Colors.border,
+    borderStyle: 'dashed',
+  },
+  emptyAttributeTitle: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: Colors.text,
+    marginTop: 12,
+  },
+  emptyAttributeText: {
+    fontSize: 13,
+    color: Colors.textSecondary,
+    marginTop: 4,
+  },
+  attributeCard: {
+    backgroundColor: Colors.surface,
+    borderRadius: 14,
+    padding: 14,
+    marginBottom: 12,
+  },
+  attributeHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  attributeInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  attributeIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  attributeName: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: Colors.text,
+  },
+  attributeType: {
+    fontSize: 12,
+    color: Colors.textSecondary,
+  },
+  valueRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 8,
+  },
+  valueInput: {
+    backgroundColor: Colors.background,
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    fontSize: 14,
+    color: Colors.text,
+  },
+  priceModifierInput: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: Colors.background,
+    borderRadius: 10,
+    paddingHorizontal: 10,
+  },
+  priceInput: {
+    flex: 1,
+    paddingVertical: 10,
+    fontSize: 14,
+    color: Colors.text,
+  },
+  removeValueBtn: {
+    width: 32,
+    height: 32,
+    borderRadius: 8,
+    backgroundColor: Colors.error + '15',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  addValueBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    paddingVertical: 10,
+    borderRadius: 10,
+    backgroundColor: Colors.primary + '10',
+    marginTop: 4,
+  },
+  addValueText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: Colors.primary,
+  },
+  attributeModalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+  },
+  attributeModalContent: {
+    width: '100%',
+    backgroundColor: Colors.background,
+    borderRadius: 20,
+    padding: 20,
+  },
+  attributeModalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  attributeModalTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: Colors.text,
+  },
+  typeGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 10,
+    marginBottom: 20,
+  },
+  typeCard: {
+    width: '47%',
+    backgroundColor: Colors.surface,
+    borderRadius: 12,
+    padding: 12,
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: 'transparent',
+  },
+  typeCardActive: {
+    borderColor: Colors.primary,
+    backgroundColor: Colors.primary + '10',
+  },
+  typeLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: Colors.text,
+    marginTop: 6,
+  },
+  typeLabelActive: {
+    color: Colors.primary,
+  },
+  typeExamples: {
+    fontSize: 11,
+    color: Colors.textSecondary,
+    marginTop: 2,
+    textAlign: 'center',
+  },
+  createAttributeBtn: {
+    backgroundColor: Colors.primary,
+    borderRadius: 12,
+    paddingVertical: 14,
+    alignItems: 'center',
+  },
+  createAttributeBtnText: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: Colors.background,
   },
 });
