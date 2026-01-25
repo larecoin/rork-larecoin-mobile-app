@@ -75,6 +75,21 @@ export default function WalletDashboard() {
   const [contractAddress, setContractAddress] = React.useState('');
   const [showChainPicker, setShowChainPicker] = React.useState(false);
   const [tradeTab, setTradeTab] = React.useState<'basic' | 'advanced'>('basic');
+  const [showWalletSettingsModal, setShowWalletSettingsModal] = React.useState(false);
+  const [showSeedPhrase, setShowSeedPhrase] = React.useState(false);
+  const [showPrivateKey, setShowPrivateKey] = React.useState(false);
+  const [seedPhraseRevealed, setSeedPhraseRevealed] = React.useState(false);
+  const [privateKeyRevealed, setPrivateKeyRevealed] = React.useState(false);
+  const [walletSettingsTab, setWalletSettingsTab] = React.useState<'settings' | 'backup' | 'accounts'>('settings');
+
+  const mockSeedPhrase = ['abandon', 'ability', 'able', 'about', 'above', 'absent', 'absorb', 'abstract', 'absurd', 'abuse', 'access', 'accident'];
+  const mockPrivateKey = '0x7c852118294e51e653712a81e05800f419141751be58f605c371e15141b007a6';
+
+  const linkedAccounts = [
+    { id: '1', type: 'google', email: 'john.doe@gmail.com', linked: true },
+    { id: '2', type: 'apple', email: 'john.doe@icloud.com', linked: false },
+    { id: '3', type: 'cloud', name: 'iCloud Backup', linked: true },
+  ];
 
   const chains = [
     { id: 'ethereum', name: 'Ethereum', symbol: 'ETH' },
@@ -323,7 +338,7 @@ export default function WalletDashboard() {
         <View style={[styles.balanceCard, { backgroundColor: balanceCardBg }]}>
           <View style={styles.balanceHeader}>
             <Text style={[styles.balanceLabel, { color: balanceCardTextSecondary }]}>Total Balance</Text>
-            <TouchableOpacity onPress={() => router.push('/menu/account-settings')}>
+            <TouchableOpacity onPress={() => setShowWalletSettingsModal(true)}>
               <Settings size={20} color={balanceCardTextSecondary} />
             </TouchableOpacity>
           </View>
@@ -1053,6 +1068,281 @@ export default function WalletDashboard() {
                 <Text style={styles.customTokenConfirmText}>Import Token</Text>
               </TouchableOpacity>
             </View>
+          </View>
+        </View>
+      )}
+
+      {showWalletSettingsModal && (
+        <View style={styles.walletSettingsModalOverlay}>
+          <View style={[styles.walletSettingsModalContent, { backgroundColor: colors.surface }]}>
+            <View style={styles.walletSettingsModalHeader}>
+              <Text style={[styles.walletSettingsModalTitle, { color: colors.text }]}>Wallet Settings</Text>
+              <TouchableOpacity onPress={() => {
+                setShowWalletSettingsModal(false);
+                setShowSeedPhrase(false);
+                setShowPrivateKey(false);
+                setSeedPhraseRevealed(false);
+                setPrivateKeyRevealed(false);
+                setWalletSettingsTab('settings');
+              }}>
+                <Text style={[styles.walletSettingsCloseText, { color: colors.primary }]}>Done</Text>
+              </TouchableOpacity>
+            </View>
+
+            <View style={[styles.walletSettingsTabBar, { backgroundColor: colors.background }]}>
+              <TouchableOpacity
+                style={[styles.walletSettingsTabItem, walletSettingsTab === 'settings' && { backgroundColor: colors.primary }]}
+                onPress={() => setWalletSettingsTab('settings')}
+              >
+                <Settings size={16} color={walletSettingsTab === 'settings' ? '#FFFFFF' : colors.textSecondary} />
+                <Text style={[styles.walletSettingsTabText, { color: walletSettingsTab === 'settings' ? '#FFFFFF' : colors.textSecondary }]}>Settings</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.walletSettingsTabItem, walletSettingsTab === 'backup' && { backgroundColor: colors.primary }]}
+                onPress={() => setWalletSettingsTab('backup')}
+              >
+                <Shield size={16} color={walletSettingsTab === 'backup' ? '#FFFFFF' : colors.textSecondary} />
+                <Text style={[styles.walletSettingsTabText, { color: walletSettingsTab === 'backup' ? '#FFFFFF' : colors.textSecondary }]}>Backup</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.walletSettingsTabItem, walletSettingsTab === 'accounts' && { backgroundColor: colors.primary }]}
+                onPress={() => setWalletSettingsTab('accounts')}
+              >
+                <Link size={16} color={walletSettingsTab === 'accounts' ? '#FFFFFF' : colors.textSecondary} />
+                <Text style={[styles.walletSettingsTabText, { color: walletSettingsTab === 'accounts' ? '#FFFFFF' : colors.textSecondary }]}>Accounts</Text>
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView style={styles.walletSettingsScrollView} showsVerticalScrollIndicator={false}>
+              {walletSettingsTab === 'settings' && (
+                <View style={styles.walletSettingsSection}>
+                  <TouchableOpacity style={[styles.walletSettingsItem, { backgroundColor: colors.background }]}>
+                    <View style={[styles.walletSettingsItemIcon, { backgroundColor: colors.primary + '20' }]}>
+                      <Wallet size={18} color={colors.primary} />
+                    </View>
+                    <View style={styles.walletSettingsItemContent}>
+                      <Text style={[styles.walletSettingsItemTitle, { color: colors.text }]}>Wallet Name</Text>
+                      <Text style={[styles.walletSettingsItemValue, { color: colors.textSecondary }]}>{activeWallet?.label || 'Main Wallet'}</Text>
+                    </View>
+                    <ChevronRight size={18} color={colors.textTertiary} />
+                  </TouchableOpacity>
+
+                  <TouchableOpacity style={[styles.walletSettingsItem, { backgroundColor: colors.background }]}>
+                    <View style={[styles.walletSettingsItemIcon, { backgroundColor: '#10B981' + '20' }]}>
+                      <Globe size={18} color="#10B981" />
+                    </View>
+                    <View style={styles.walletSettingsItemContent}>
+                      <Text style={[styles.walletSettingsItemTitle, { color: colors.text }]}>Default Network</Text>
+                      <Text style={[styles.walletSettingsItemValue, { color: colors.textSecondary }]}>Ethereum Mainnet</Text>
+                    </View>
+                    <ChevronRight size={18} color={colors.textTertiary} />
+                  </TouchableOpacity>
+
+                  <TouchableOpacity style={[styles.walletSettingsItem, { backgroundColor: colors.background }]}>
+                    <View style={[styles.walletSettingsItemIcon, { backgroundColor: '#F59E0B' + '20' }]}>
+                      <Bell size={18} color="#F59E0B" />
+                    </View>
+                    <View style={styles.walletSettingsItemContent}>
+                      <Text style={[styles.walletSettingsItemTitle, { color: colors.text }]}>Transaction Alerts</Text>
+                      <Text style={[styles.walletSettingsItemValue, { color: colors.textSecondary }]}>Enabled</Text>
+                    </View>
+                    <ChevronRight size={18} color={colors.textTertiary} />
+                  </TouchableOpacity>
+
+                  <TouchableOpacity style={[styles.walletSettingsItem, { backgroundColor: colors.background }]}>
+                    <View style={[styles.walletSettingsItemIcon, { backgroundColor: '#6366F1' + '20' }]}>
+                      <Lock size={18} color="#6366F1" />
+                    </View>
+                    <View style={styles.walletSettingsItemContent}>
+                      <Text style={[styles.walletSettingsItemTitle, { color: colors.text }]}>Auto-Lock</Text>
+                      <Text style={[styles.walletSettingsItemValue, { color: colors.textSecondary }]}>After 5 minutes</Text>
+                    </View>
+                    <ChevronRight size={18} color={colors.textTertiary} />
+                  </TouchableOpacity>
+
+                  <TouchableOpacity style={[styles.walletSettingsItem, { backgroundColor: colors.background }]}>
+                    <View style={[styles.walletSettingsItemIcon, { backgroundColor: '#EC4899' + '20' }]}>
+                      <DollarSign size={18} color="#EC4899" />
+                    </View>
+                    <View style={styles.walletSettingsItemContent}>
+                      <Text style={[styles.walletSettingsItemTitle, { color: colors.text }]}>Currency Display</Text>
+                      <Text style={[styles.walletSettingsItemValue, { color: colors.textSecondary }]}>USD ($)</Text>
+                    </View>
+                    <ChevronRight size={18} color={colors.textTertiary} />
+                  </TouchableOpacity>
+
+                  <TouchableOpacity style={[styles.walletSettingsItem, { backgroundColor: colors.background }]}>
+                    <View style={[styles.walletSettingsItemIcon, { backgroundColor: '#14B8A6' + '20' }]}>
+                      <Smartphone size={18} color="#14B8A6" />
+                    </View>
+                    <View style={styles.walletSettingsItemContent}>
+                      <Text style={[styles.walletSettingsItemTitle, { color: colors.text }]}>Connected dApps</Text>
+                      <Text style={[styles.walletSettingsItemValue, { color: colors.textSecondary }]}>3 connected</Text>
+                    </View>
+                    <ChevronRight size={18} color={colors.textTertiary} />
+                  </TouchableOpacity>
+                </View>
+              )}
+
+              {walletSettingsTab === 'backup' && (
+                <View style={styles.walletSettingsSection}>
+                  <View style={[styles.backupWarningBanner, { backgroundColor: '#FEF3C7' }]}>
+                    <AlertCircle size={20} color="#D97706" />
+                    <Text style={styles.backupWarningText}>Never share your seed phrase or private keys. Anyone with access can steal your funds.</Text>
+                  </View>
+
+                  <TouchableOpacity
+                    style={[styles.walletSettingsItem, { backgroundColor: colors.background }]}
+                    onPress={() => setShowSeedPhrase(!showSeedPhrase)}
+                  >
+                    <View style={[styles.walletSettingsItemIcon, { backgroundColor: '#EF4444' + '20' }]}>
+                      <FileText size={18} color="#EF4444" />
+                    </View>
+                    <View style={styles.walletSettingsItemContent}>
+                      <Text style={[styles.walletSettingsItemTitle, { color: colors.text }]}>Secret Recovery Phrase</Text>
+                      <Text style={[styles.walletSettingsItemValue, { color: colors.textSecondary }]}>12 words to recover your wallet</Text>
+                    </View>
+                    <ChevronDown size={18} color={colors.textTertiary} style={{ transform: [{ rotate: showSeedPhrase ? '180deg' : '0deg' }] }} />
+                  </TouchableOpacity>
+
+                  {showSeedPhrase && (
+                    <View style={[styles.secretRevealSection, { backgroundColor: colors.background }]}>
+                      {!seedPhraseRevealed ? (
+                        <TouchableOpacity
+                          style={[styles.revealButton, { backgroundColor: colors.primary }]}
+                          onPress={() => setSeedPhraseRevealed(true)}
+                        >
+                          <Eye size={18} color="#FFFFFF" />
+                          <Text style={styles.revealButtonText}>Tap to Reveal Seed Phrase</Text>
+                        </TouchableOpacity>
+                      ) : (
+                        <>
+                          <View style={styles.seedPhraseGrid}>
+                            {mockSeedPhrase.map((word, index) => (
+                              <View key={index} style={[styles.seedWordItem, { backgroundColor: colors.surface }]}>
+                                <Text style={[styles.seedWordNumber, { color: colors.textTertiary }]}>{index + 1}</Text>
+                                <Text style={[styles.seedWordText, { color: colors.text }]}>{word}</Text>
+                              </View>
+                            ))}
+                          </View>
+                          <TouchableOpacity style={[styles.copyButton, { borderColor: colors.border }]}>
+                            <Copy size={16} color={colors.primary} />
+                            <Text style={[styles.copyButtonText, { color: colors.primary }]}>Copy to Clipboard</Text>
+                          </TouchableOpacity>
+                        </>
+                      )}
+                    </View>
+                  )}
+
+                  <TouchableOpacity
+                    style={[styles.walletSettingsItem, { backgroundColor: colors.background }]}
+                    onPress={() => setShowPrivateKey(!showPrivateKey)}
+                  >
+                    <View style={[styles.walletSettingsItemIcon, { backgroundColor: '#8B5CF6' + '20' }]}>
+                      <Lock size={18} color="#8B5CF6" />
+                    </View>
+                    <View style={styles.walletSettingsItemContent}>
+                      <Text style={[styles.walletSettingsItemTitle, { color: colors.text }]}>Private Key</Text>
+                      <Text style={[styles.walletSettingsItemValue, { color: colors.textSecondary }]}>Export wallet private key</Text>
+                    </View>
+                    <ChevronDown size={18} color={colors.textTertiary} style={{ transform: [{ rotate: showPrivateKey ? '180deg' : '0deg' }] }} />
+                  </TouchableOpacity>
+
+                  {showPrivateKey && (
+                    <View style={[styles.secretRevealSection, { backgroundColor: colors.background }]}>
+                      {!privateKeyRevealed ? (
+                        <TouchableOpacity
+                          style={[styles.revealButton, { backgroundColor: colors.primary }]}
+                          onPress={() => setPrivateKeyRevealed(true)}
+                        >
+                          <Eye size={18} color="#FFFFFF" />
+                          <Text style={styles.revealButtonText}>Tap to Reveal Private Key</Text>
+                        </TouchableOpacity>
+                      ) : (
+                        <>
+                          <View style={[styles.privateKeyContainer, { backgroundColor: colors.surface }]}>
+                            <Text style={[styles.privateKeyText, { color: colors.text }]} selectable>{mockPrivateKey}</Text>
+                          </View>
+                          <TouchableOpacity style={[styles.copyButton, { borderColor: colors.border }]}>
+                            <Copy size={16} color={colors.primary} />
+                            <Text style={[styles.copyButtonText, { color: colors.primary }]}>Copy to Clipboard</Text>
+                          </TouchableOpacity>
+                        </>
+                      )}
+                    </View>
+                  )}
+
+                  <View style={[styles.backupTipCard, { backgroundColor: colors.primary + '10' }]}>
+                    <Shield size={20} color={colors.primary} />
+                    <View style={styles.backupTipContent}>
+                      <Text style={[styles.backupTipTitle, { color: colors.text }]}>Backup Tips</Text>
+                      <Text style={[styles.backupTipText, { color: colors.textSecondary }]}>• Write down your seed phrase on paper{"\n"}• Store in a secure, offline location{"\n"}• Never store digitally or screenshot</Text>
+                    </View>
+                  </View>
+                </View>
+              )}
+
+              {walletSettingsTab === 'accounts' && (
+                <View style={styles.walletSettingsSection}>
+                  <Text style={[styles.linkedAccountsTitle, { color: colors.text }]}>Linked Accounts for Backup & Recovery</Text>
+                  <Text style={[styles.linkedAccountsSubtitle, { color: colors.textSecondary }]}>Connect accounts to enable additional recovery options</Text>
+
+                  {linkedAccounts.map(account => (
+                    <View key={account.id} style={[styles.linkedAccountItem, { backgroundColor: colors.background }]}>
+                      <View style={[styles.linkedAccountIcon, {
+                        backgroundColor: account.type === 'google' ? '#EA4335' + '20' :
+                          account.type === 'apple' ? colors.text + '20' : '#0EA5E9' + '20'
+                      }]}>
+                        {account.type === 'google' && <Globe size={20} color="#EA4335" />}
+                        {account.type === 'apple' && <Smartphone size={20} color={colors.text} />}
+                        {account.type === 'cloud' && <RefreshCw size={20} color="#0EA5E9" />}
+                      </View>
+                      <View style={styles.linkedAccountInfo}>
+                        <Text style={[styles.linkedAccountName, { color: colors.text }]}>
+                          {account.type === 'google' ? 'Google Account' :
+                            account.type === 'apple' ? 'Apple ID' : account.name}
+                        </Text>
+                        {account.email && (
+                          <Text style={[styles.linkedAccountEmail, { color: colors.textSecondary }]}>{account.email}</Text>
+                        )}
+                      </View>
+                      <TouchableOpacity
+                        style={[styles.linkedAccountButton, {
+                          backgroundColor: account.linked ? colors.primary + '15' : colors.primary,
+                        }]}
+                      >
+                        <Text style={[styles.linkedAccountButtonText, {
+                          color: account.linked ? colors.primary : '#FFFFFF'
+                        }]}>
+                          {account.linked ? 'Linked' : 'Link'}
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
+                  ))}
+
+                  <TouchableOpacity style={[styles.addLinkedAccountBtn, { borderColor: colors.border }]}>
+                    <Plus size={18} color={colors.primary} />
+                    <Text style={[styles.addLinkedAccountText, { color: colors.primary }]}>Add Another Account</Text>
+                  </TouchableOpacity>
+
+                  <View style={[styles.recoveryOptionsCard, { backgroundColor: colors.background }]}>
+                    <Text style={[styles.recoveryOptionsTitle, { color: colors.text }]}>Recovery Options</Text>
+                    <View style={styles.recoveryOptionItem}>
+                      <Check size={16} color="#10B981" />
+                      <Text style={[styles.recoveryOptionText, { color: colors.textSecondary }]}>Seed phrase backup available</Text>
+                    </View>
+                    <View style={styles.recoveryOptionItem}>
+                      <Check size={16} color="#10B981" />
+                      <Text style={[styles.recoveryOptionText, { color: colors.textSecondary }]}>Google account linked</Text>
+                    </View>
+                    <View style={styles.recoveryOptionItem}>
+                      <Check size={16} color="#10B981" />
+                      <Text style={[styles.recoveryOptionText, { color: colors.textSecondary }]}>Cloud backup enabled</Text>
+                    </View>
+                  </View>
+                </View>
+              )}
+            </ScrollView>
           </View>
         </View>
       )}
@@ -2017,5 +2307,261 @@ const styles = StyleSheet.create({
   tradeItemLabel: {
     fontSize: 11,
     fontWeight: '500' as const,
+  },
+  walletSettingsModalOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    justifyContent: 'flex-end',
+  },
+  walletSettingsModalContent: {
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    maxHeight: '85%',
+  },
+  walletSettingsModalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 20,
+    paddingBottom: 12,
+  },
+  walletSettingsModalTitle: {
+    fontSize: 20,
+    fontWeight: '700' as const,
+  },
+  walletSettingsCloseText: {
+    fontSize: 16,
+    fontWeight: '600' as const,
+  },
+  walletSettingsTabBar: {
+    flexDirection: 'row',
+    marginHorizontal: 20,
+    borderRadius: 12,
+    padding: 4,
+    marginBottom: 16,
+  },
+  walletSettingsTabItem: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 10,
+    borderRadius: 10,
+    gap: 6,
+  },
+  walletSettingsTabText: {
+    fontSize: 13,
+    fontWeight: '600' as const,
+  },
+  walletSettingsScrollView: {
+    paddingHorizontal: 20,
+  },
+  walletSettingsSection: {
+    gap: 10,
+    paddingBottom: 24,
+  },
+  walletSettingsItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 14,
+    borderRadius: 14,
+    gap: 12,
+  },
+  walletSettingsItemIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  walletSettingsItemContent: {
+    flex: 1,
+  },
+  walletSettingsItemTitle: {
+    fontSize: 15,
+    fontWeight: '600' as const,
+    marginBottom: 2,
+  },
+  walletSettingsItemValue: {
+    fontSize: 13,
+  },
+  backupWarningBanner: {
+    flexDirection: 'row',
+    padding: 14,
+    borderRadius: 12,
+    gap: 12,
+    alignItems: 'flex-start',
+    marginBottom: 6,
+  },
+  backupWarningText: {
+    flex: 1,
+    fontSize: 13,
+    color: '#92400E',
+    lineHeight: 18,
+  },
+  secretRevealSection: {
+    padding: 16,
+    borderRadius: 14,
+    marginTop: -6,
+  },
+  revealButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 14,
+    borderRadius: 12,
+    gap: 8,
+  },
+  revealButtonText: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: '600' as const,
+  },
+  seedPhraseGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginBottom: 16,
+  },
+  seedWordItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 10,
+    width: '31%',
+    gap: 6,
+  },
+  seedWordNumber: {
+    fontSize: 11,
+    fontWeight: '600' as const,
+    minWidth: 16,
+  },
+  seedWordText: {
+    fontSize: 13,
+    fontWeight: '500' as const,
+  },
+  copyButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 12,
+    borderRadius: 10,
+    borderWidth: 1,
+    gap: 8,
+  },
+  copyButtonText: {
+    fontSize: 14,
+    fontWeight: '600' as const,
+  },
+  privateKeyContainer: {
+    padding: 14,
+    borderRadius: 10,
+    marginBottom: 12,
+  },
+  privateKeyText: {
+    fontSize: 12,
+    fontFamily: 'monospace',
+    lineHeight: 18,
+  },
+  backupTipCard: {
+    flexDirection: 'row',
+    padding: 16,
+    borderRadius: 14,
+    gap: 14,
+    marginTop: 10,
+  },
+  backupTipContent: {
+    flex: 1,
+  },
+  backupTipTitle: {
+    fontSize: 14,
+    fontWeight: '600' as const,
+    marginBottom: 6,
+  },
+  backupTipText: {
+    fontSize: 12,
+    lineHeight: 20,
+  },
+  linkedAccountsTitle: {
+    fontSize: 16,
+    fontWeight: '700' as const,
+    marginBottom: 4,
+  },
+  linkedAccountsSubtitle: {
+    fontSize: 13,
+    marginBottom: 16,
+  },
+  linkedAccountItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 14,
+    borderRadius: 14,
+    gap: 12,
+  },
+  linkedAccountIcon: {
+    width: 44,
+    height: 44,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  linkedAccountInfo: {
+    flex: 1,
+  },
+  linkedAccountName: {
+    fontSize: 15,
+    fontWeight: '600' as const,
+    marginBottom: 2,
+  },
+  linkedAccountEmail: {
+    fontSize: 12,
+  },
+  linkedAccountButton: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+  },
+  linkedAccountButtonText: {
+    fontSize: 13,
+    fontWeight: '600' as const,
+  },
+  addLinkedAccountBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 14,
+    borderRadius: 14,
+    borderWidth: 1.5,
+    borderStyle: 'dashed',
+    gap: 8,
+    marginTop: 4,
+  },
+  addLinkedAccountText: {
+    fontSize: 14,
+    fontWeight: '600' as const,
+  },
+  recoveryOptionsCard: {
+    padding: 16,
+    borderRadius: 14,
+    marginTop: 16,
+  },
+  recoveryOptionsTitle: {
+    fontSize: 15,
+    fontWeight: '700' as const,
+    marginBottom: 14,
+  },
+  recoveryOptionItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginBottom: 10,
+  },
+  recoveryOptionText: {
+    fontSize: 13,
   },
 });
