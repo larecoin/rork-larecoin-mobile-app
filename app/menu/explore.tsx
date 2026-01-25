@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, TextInput } from 'react-native';
-import { Stack } from 'expo-router';
+import { Stack, useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Search, TrendingUp, Star, MapPin, Filter } from 'lucide-react-native';
+import { Search, TrendingUp, MapPin, Filter } from 'lucide-react-native';
 import { useApp } from '@/contexts/AppContext';
 
 const featuredItems = [
@@ -29,7 +29,14 @@ const discoveries = [
 export default function ExploreScreen() {
   const insets = useSafeAreaInsets();
   const { colors } = useApp();
+  const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
+
+  const handleDiscoverPress = (itemId: string) => {
+    if (itemId === '4') {
+      router.push('/menu/gaming-hub');
+    }
+  };
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
@@ -102,6 +109,7 @@ export default function ExploreScreen() {
               <TouchableOpacity
                 key={item.id}
                 style={[styles.discoverCard, { backgroundColor: colors.surface }]}
+                onPress={() => handleDiscoverPress(item.id)}
               >
                 <View style={[styles.discoverIcon, { backgroundColor: item.color + '20' }]}>
                   <Text style={styles.discoverEmoji}>{item.icon}</Text>
