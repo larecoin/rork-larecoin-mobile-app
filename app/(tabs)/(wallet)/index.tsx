@@ -545,7 +545,10 @@ export default function WalletDashboard() {
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <View style={styles.sectionTitleRow}>
-              <Text style={[styles.sectionTitle, { color: colors.text }]}>{assetTab === 'assets' ? 'Assets' : assetTab === 'nfts' ? 'NFTs' : 'NFT Receipts'}</Text>
+              <View style={styles.sectionTitleColumn}>
+                <Text style={[styles.sectionTitle, { color: colors.text }]}>{assetTab === 'assets' ? 'Assets' : assetTab === 'nfts' ? 'NFTs' : 'NFT Receipts'}</Text>
+                <Text style={[styles.sectionCount, { color: colors.textSecondary }]}>{assetTab === 'assets' ? `${userTokens.length} tokens` : assetTab === 'nfts' ? '0 NFTs' : '0 Receipts'}</Text>
+              </View>
               <View style={[styles.assetNftToggle, { backgroundColor: colors.surface }]}>
                 <TouchableOpacity 
                   style={[styles.toggleOption, assetTab === 'assets' && { backgroundColor: colors.primary }]}
@@ -570,7 +573,6 @@ export default function WalletDashboard() {
                 </TouchableOpacity>
               </View>
             </View>
-            <Text style={[styles.sectionCount, { color: colors.textSecondary }]}>{assetTab === 'assets' ? `${userTokens.length} tokens` : assetTab === 'nfts' ? '0 NFTs' : '0 Receipts'}</Text>
           </View>
           {assetTab === 'assets' ? (
             userTokens.map(token => (
@@ -967,7 +969,12 @@ const styles = StyleSheet.create({
   sectionTitleRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    justifyContent: 'space-between',
+    flex: 1,
+  },
+  sectionTitleColumn: {
+    flexDirection: 'column',
+    gap: 2,
   },
   assetNftToggle: {
     flexDirection: 'row',
