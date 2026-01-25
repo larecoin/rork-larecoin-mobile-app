@@ -129,6 +129,153 @@ export default function WalletLayout() {
           headerStyle: { backgroundColor: Colors.backgroundSecondary },
         }} 
       />
+      <Stack.Screen 
+        name="spot-trading" 
+        options={{ 
+          title: 'Spot Trading',
+          headerStyle: { backgroundColor: Colors.backgroundSecondary },
+        }} 
+      />
+      <Stack.Screen 
+        name="crypto-to-crypto" 
+        options={{ 
+          title: 'Crypto to Crypto',
+          headerStyle: { backgroundColor: Colors.backgroundSecondary },
+        }} 
+      />
+      <Stack.Screen 
+        name="fiat-exchange" 
+        options={{ 
+          title: 'Fiat Exchange',
+          headerStyle: { backgroundColor: Colors.backgroundSecondary },
+        }} 
+      />
+      <Stack.Screen 
+        name="dex-swap" 
+        options={{ 
+          title: 'DEX Swap',
+          headerStyle: { backgroundColor: Colors.backgroundSecondary },
+        }} 
+      />
+      <Stack.Screen 
+        name="liquidity-mining" 
+        options={{ 
+          title: 'Liquidity Mining',
+          headerStyle: { backgroundColor: Colors.backgroundSecondary },
+        }} 
+      />
+      <Stack.Screen 
+        name="yield-farming" 
+        options={{ 
+          title: 'Yield Farming',
+          headerStyle: { backgroundColor: Colors.backgroundSecondary },
+        }} 
+      />
+      <Stack.Screen 
+        name="nft-trading" 
+        options={{ 
+          title: 'NFT Trading',
+          headerStyle: { backgroundColor: Colors.backgroundSecondary },
+        }} 
+      />
+      <Stack.Screen 
+        name="arbitrage" 
+        options={{ 
+          title: 'Arbitrage',
+          headerStyle: { backgroundColor: Colors.backgroundSecondary },
+        }} 
+      />
+      <Stack.Screen 
+        name="ido-ieo" 
+        options={{ 
+          title: 'IDO / IEO',
+          headerStyle: { backgroundColor: Colors.backgroundSecondary },
+        }} 
+      />
+      <Stack.Screen 
+        name="margin-trading" 
+        options={{ 
+          title: 'Margin Trading',
+          headerStyle: { backgroundColor: Colors.backgroundSecondary },
+        }} 
+      />
+      <Stack.Screen 
+        name="futures" 
+        options={{ 
+          title: 'Futures',
+          headerStyle: { backgroundColor: Colors.backgroundSecondary },
+        }} 
+      />
+      <Stack.Screen 
+        name="perpetuals" 
+        options={{ 
+          title: 'Perpetuals',
+          headerStyle: { backgroundColor: Colors.backgroundSecondary },
+        }} 
+      />
+      <Stack.Screen 
+        name="options" 
+        options={{ 
+          title: 'Options',
+          headerStyle: { backgroundColor: Colors.backgroundSecondary },
+        }} 
+      />
+      <Stack.Screen 
+        name="cfds" 
+        options={{ 
+          title: 'CFDs',
+          headerStyle: { backgroundColor: Colors.backgroundSecondary },
+        }} 
+      />
+      <Stack.Screen 
+        name="leveraged-tokens" 
+        options={{ 
+          title: 'Leveraged Tokens',
+          headerStyle: { backgroundColor: Colors.backgroundSecondary },
+        }} 
+      />
+      <Stack.Screen 
+        name="copy-trading" 
+        options={{ 
+          title: 'Copy Trading',
+          headerStyle: { backgroundColor: Colors.backgroundSecondary },
+        }} 
+      />
+      <Stack.Screen 
+        name="grid-bots" 
+        options={{ 
+          title: 'Grid Bots',
+          headerStyle: { backgroundColor: Colors.backgroundSecondary },
+        }} 
+      />
+      <Stack.Screen 
+        name="dca-bots" 
+        options={{ 
+          title: 'DCA Bots',
+          headerStyle: { backgroundColor: Colors.backgroundSecondary },
+        }} 
+      />
+      <Stack.Screen 
+        name="prediction-markets" 
+        options={{ 
+          title: 'Prediction Markets',
+          headerStyle: { backgroundColor: Colors.backgroundSecondary },
+        }} 
+      />
+      <Stack.Screen 
+        name="event-trading" 
+        options={{ 
+          title: 'Event Trading',
+          headerStyle: { backgroundColor: Colors.backgroundSecondary },
+        }} 
+      />
+      <Stack.Screen 
+        name="flash-loans" 
+        options={{ 
+          title: 'Flash Loans',
+          headerStyle: { backgroundColor: Colors.backgroundSecondary },
+        }} 
+      />
     </Stack>
   );
 }
