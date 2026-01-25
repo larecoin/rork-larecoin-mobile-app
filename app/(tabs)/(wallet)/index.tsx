@@ -88,6 +88,12 @@ export default function WalletDashboard() {
   const [seedPhraseRevealed, setSeedPhraseRevealed] = React.useState(false);
   const [privateKeyRevealed, setPrivateKeyRevealed] = React.useState(false);
   const [walletSettingsTab, setWalletSettingsTab] = React.useState<'settings' | 'backup' | 'accounts'>('settings');
+  const [showDebitCardModal, setShowDebitCardModal] = React.useState(false);
+  const [debitCardVerified, setDebitCardVerified] = React.useState(false);
+  const [debitCardLocked, setDebitCardLocked] = React.useState(false);
+  const [twoFACode, setTwoFACode] = React.useState('');
+  const [showReportModal, setShowReportModal] = React.useState(false);
+  const [reportType, setReportType] = React.useState<'lost' | 'stolen' | null>(null);
 
   const mockSeedPhrase = ['abandon', 'ability', 'able', 'about', 'above', 'absent', 'absorb', 'abstract', 'absurd', 'abuse', 'access', 'accident'];
   const mockPrivateKey = '0x7c852118294e51e653712a81e05800f419141751be58f605c371e15141b007a6';
@@ -549,9 +555,12 @@ export default function WalletDashboard() {
                 <Text style={styles.cardManagerBalance}>${lusdBalance.toLocaleString()}</Text>
                 <Text style={styles.cardManagerSubtext}>Available for card spending</Text>
               </View>
-              <View style={[styles.cardManagerBadge, { backgroundColor: 'rgba(30,136,229,0.15)' }]}>
+              <TouchableOpacity 
+                style={[styles.cardManagerBadge, { backgroundColor: 'rgba(30,136,229,0.15)' }]}
+                onPress={() => setShowDebitCardModal(true)}
+              >
                 <CreditCard size={20} color="#1E88E5" />
-              </View>
+              </TouchableOpacity>
             </View>
           </View>
 
@@ -1488,6 +1497,311 @@ export default function WalletDashboard() {
                 </View>
               )}
             </ScrollView>
+          </View>
+        </View>
+      )}
+
+      {showDebitCardModal && (
+        <View style={styles.debitCardModalOverlay}>
+          <View style={[styles.debitCardModalContent, { backgroundColor: colors.surface }]}>
+            <View style={styles.debitCardModalHeader}>
+              <Text style={[styles.debitCardModalTitle, { color: colors.text }]}>LUSD Debit Card</Text>
+              <TouchableOpacity onPress={() => {
+                setShowDebitCardModal(false);
+                setDebitCardVerified(false);
+                setTwoFACode('');
+                setShowReportModal(false);
+                setReportType(null);
+              }}>
+                <Text style={[styles.debitCardCloseText, { color: colors.primary }]}>Done</Text>
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView style={styles.debitCardModalScroll} showsVerticalScrollIndicator={false}>
+              {/* Virtual Card Display */}
+              <View style={[styles.virtualCardContainer, { backgroundColor: debitCardLocked ? '#6B7280' : '#1E3A5F' }]}>
+                {debitCardLocked && (
+                  <View style={styles.cardLockedOverlay}>
+                    <Lock size={32} color="#FFFFFF" />
+                    <Text style={styles.cardLockedText}>Card Locked</Text>
+                  </View>
+                )}
+                <View style={styles.virtualCardTop}>
+                  <View style={styles.virtualCardChip}>
+                    <View style={[styles.chipLine, { backgroundColor: '#FFD700' }]} />
+                    <View style={[styles.chipLine, { backgroundColor: '#FFD700' }]} />
+                    <View style={[styles.chipLine, { backgroundColor: '#FFD700' }]} />
+                  </View>
+                  <Text style={styles.virtualCardBrand}>LUSD</Text>
+                </View>
+                <View style={styles.virtualCardNumberSection}>
+                  <Text style={styles.virtualCardNumber}>
+                    {debitCardVerified ? '4521 8745 3698 4521' : '•••• •••• •••• ••••'}
+                  </Text>
+                </View>
+                <View style={styles.virtualCardBottom}>
+                  <View>
+                    <Text style={styles.virtualCardLabel}>CARD HOLDER</Text>
+                    <Text style={styles.virtualCardValue}>
+                      {debitCardVerified ? 'JOHN DOE' : '••••••••••'}
+                    </Text>
+                  </View>
+                  <View>
+                    <Text style={styles.virtualCardLabel}>EXPIRES</Text>
+                    <Text style={styles.virtualCardValue}>
+                      {debitCardVerified ? '12/27' : '••/••'}
+                    </Text>
+                  </View>
+                  <View>
+                    <Text style={styles.virtualCardLabel}>CVV</Text>
+                    <Text style={styles.virtualCardValue}>
+                      {debitCardVerified ? '847' : '•••'}
+                    </Text>
+                  </View>
+                </View>
+                <View style={styles.virtualCardWatermark}>
+                  <CreditCard size={80} color="rgba(255,255,255,0.05)" />
+                </View>
+              </View>
+
+              {/* 2FA Verification Section */}
+              {!debitCardVerified ? (
+                <View style={[styles.twoFASection, { backgroundColor: colors.background }]}>
+                  <View style={styles.twoFAHeader}>
+                    <Shield size={20} color={colors.primary} />
+                    <Text style={[styles.twoFASectionTitle, { color: colors.text }]}>Verify to View Card Details</Text>
+                  </View>
+                  <Text style={[styles.twoFADescription, { color: colors.textSecondary }]}>
+                    Enter your 2FA code to reveal your card details securely
+                  </Text>
+                  <View style={styles.twoFAInputContainer}>
+                    <TextInput
+                      style={[styles.twoFAInput, { backgroundColor: colors.surface, color: colors.text, borderColor: colors.border }]}
+                      placeholder="Enter 6-digit code"
+                      placeholderTextColor={colors.textTertiary}
+                      value={twoFACode}
+                      onChangeText={setTwoFACode}
+                      keyboardType="numeric"
+                      maxLength={6}
+                    />
+                  </View>
+                  <TouchableOpacity
+                    style={[styles.verifyButton, { backgroundColor: colors.primary }, twoFACode.length !== 6 && styles.verifyButtonDisabled]}
+                    onPress={() => {
+                      if (twoFACode.length === 6) {
+                        setDebitCardVerified(true);
+                      }
+                    }}
+                    disabled={twoFACode.length !== 6}
+                  >
+                    <Eye size={18} color="#FFFFFF" />
+                    <Text style={styles.verifyButtonText}>Verify & Reveal</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.resendCodeBtn}>
+                    <Text style={[styles.resendCodeText, { color: colors.primary }]}>Resend Code</Text>
+                  </TouchableOpacity>
+                </View>
+              ) : (
+                <View style={[styles.cardVerifiedBadge, { backgroundColor: '#10B981' + '20' }]}>
+                  <Check size={16} color="#10B981" />
+                  <Text style={[styles.cardVerifiedText, { color: '#10B981' }]}>Card details verified and visible</Text>
+                </View>
+              )}
+
+              {/* Card Management Actions */}
+              <View style={styles.cardManagementSection}>
+                <Text style={[styles.cardManagementTitle, { color: colors.text }]}>Card Management</Text>
+                
+                {/* Lock/Unlock Card */}
+                <TouchableOpacity
+                  style={[styles.cardManagementItem, { backgroundColor: colors.background }]}
+                  onPress={() => setDebitCardLocked(!debitCardLocked)}
+                >
+                  <View style={[styles.cardManagementIcon, { backgroundColor: debitCardLocked ? '#10B981' + '20' : '#F59E0B' + '20' }]}>
+                    {debitCardLocked ? (
+                      <Lock size={20} color="#10B981" />
+                    ) : (
+                      <Lock size={20} color="#F59E0B" />
+                    )}
+                  </View>
+                  <View style={styles.cardManagementContent}>
+                    <Text style={[styles.cardManagementItemTitle, { color: colors.text }]}>
+                      {debitCardLocked ? 'Unlock Card' : 'Lock Card'}
+                    </Text>
+                    <Text style={[styles.cardManagementItemSubtitle, { color: colors.textSecondary }]}>
+                      {debitCardLocked ? 'Enable transactions on your card' : 'Temporarily disable all transactions'}
+                    </Text>
+                  </View>
+                  <View style={[styles.lockToggle, { backgroundColor: debitCardLocked ? '#10B981' : colors.border }]}>
+                    <View style={[styles.lockToggleKnob, { transform: [{ translateX: debitCardLocked ? 20 : 2 }] }]} />
+                  </View>
+                </TouchableOpacity>
+
+                {/* Report Lost/Stolen */}
+                <TouchableOpacity
+                  style={[styles.cardManagementItem, { backgroundColor: colors.background }]}
+                  onPress={() => setShowReportModal(true)}
+                >
+                  <View style={[styles.cardManagementIcon, { backgroundColor: '#EF4444' + '20' }]}>
+                    <AlertCircle size={20} color="#EF4444" />
+                  </View>
+                  <View style={styles.cardManagementContent}>
+                    <Text style={[styles.cardManagementItemTitle, { color: colors.text }]}>Report Lost or Stolen</Text>
+                    <Text style={[styles.cardManagementItemSubtitle, { color: colors.textSecondary }]}>
+                      Block card immediately and report issue
+                    </Text>
+                  </View>
+                  <ChevronRight size={18} color={colors.textTertiary} />
+                </TouchableOpacity>
+
+                {/* Get Replacement */}
+                <TouchableOpacity
+                  style={[styles.cardManagementItem, { backgroundColor: colors.background }]}
+                  onPress={() => console.log('Request replacement card')}
+                >
+                  <View style={[styles.cardManagementIcon, { backgroundColor: '#6366F1' + '20' }]}>
+                    <RefreshCw size={20} color="#6366F1" />
+                  </View>
+                  <View style={styles.cardManagementContent}>
+                    <Text style={[styles.cardManagementItemTitle, { color: colors.text }]}>Get Replacement Card</Text>
+                    <Text style={[styles.cardManagementItemSubtitle, { color: colors.textSecondary }]}>
+                      Order a new card (fee may apply)
+                    </Text>
+                  </View>
+                  <ChevronRight size={18} color={colors.textTertiary} />
+                </TouchableOpacity>
+
+                {/* Change PIN */}
+                <TouchableOpacity
+                  style={[styles.cardManagementItem, { backgroundColor: colors.background }]}
+                  onPress={() => console.log('Change PIN')}
+                >
+                  <View style={[styles.cardManagementIcon, { backgroundColor: '#8B5CF6' + '20' }]}>
+                    <Shield size={20} color="#8B5CF6" />
+                  </View>
+                  <View style={styles.cardManagementContent}>
+                    <Text style={[styles.cardManagementItemTitle, { color: colors.text }]}>Change PIN</Text>
+                    <Text style={[styles.cardManagementItemSubtitle, { color: colors.textSecondary }]}>
+                      Update your card PIN securely
+                    </Text>
+                  </View>
+                  <ChevronRight size={18} color={colors.textTertiary} />
+                </TouchableOpacity>
+
+                {/* Spending Limits */}
+                <TouchableOpacity
+                  style={[styles.cardManagementItem, { backgroundColor: colors.background }]}
+                  onPress={() => console.log('Spending limits')}
+                >
+                  <View style={[styles.cardManagementIcon, { backgroundColor: '#14B8A6' + '20' }]}>
+                    <DollarSign size={20} color="#14B8A6" />
+                  </View>
+                  <View style={styles.cardManagementContent}>
+                    <Text style={[styles.cardManagementItemTitle, { color: colors.text }]}>Spending Limits</Text>
+                    <Text style={[styles.cardManagementItemSubtitle, { color: colors.textSecondary }]}>
+                      Set daily and monthly limits
+                    </Text>
+                  </View>
+                  <ChevronRight size={18} color={colors.textTertiary} />
+                </TouchableOpacity>
+              </View>
+
+              {/* Card Info */}
+              <View style={[styles.cardInfoSection, { backgroundColor: colors.background }]}>
+                <View style={styles.cardInfoRow}>
+                  <Text style={[styles.cardInfoLabel, { color: colors.textSecondary }]}>Card Status</Text>
+                  <View style={[styles.cardInfoStatusBadge, { backgroundColor: debitCardLocked ? '#F59E0B' + '20' : '#10B981' + '20' }]}>
+                    <View style={[styles.cardInfoStatusDot, { backgroundColor: debitCardLocked ? '#F59E0B' : '#10B981' }]} />
+                    <Text style={[styles.cardInfoStatusText, { color: debitCardLocked ? '#F59E0B' : '#10B981' }]}>
+                      {debitCardLocked ? 'Locked' : 'Active'}
+                    </Text>
+                  </View>
+                </View>
+                <View style={styles.cardInfoRow}>
+                  <Text style={[styles.cardInfoLabel, { color: colors.textSecondary }]}>Card Type</Text>
+                  <Text style={[styles.cardInfoValue, { color: colors.text }]}>Virtual Debit</Text>
+                </View>
+                <View style={styles.cardInfoRow}>
+                  <Text style={[styles.cardInfoLabel, { color: colors.textSecondary }]}>Linked Balance</Text>
+                  <Text style={[styles.cardInfoValue, { color: colors.text }]}>${lusdBalance.toLocaleString()} LUSD</Text>
+                </View>
+              </View>
+
+              <View style={{ height: 30 }} />
+            </ScrollView>
+
+            {/* Report Lost/Stolen Sub-Modal */}
+            {showReportModal && (
+              <View style={styles.reportModalOverlay}>
+                <View style={[styles.reportModalContent, { backgroundColor: colors.surface }]}>
+                  <Text style={[styles.reportModalTitle, { color: colors.text }]}>Report Card Issue</Text>
+                  <Text style={[styles.reportModalSubtitle, { color: colors.textSecondary }]}>
+                    Select the reason for reporting your card
+                  </Text>
+
+                  <TouchableOpacity
+                    style={[styles.reportOption, { backgroundColor: colors.background }, reportType === 'lost' && { borderColor: colors.primary, borderWidth: 2 }]}
+                    onPress={() => setReportType('lost')}
+                  >
+                    <View style={[styles.reportOptionIcon, { backgroundColor: '#F59E0B' + '20' }]}>
+                      <AlertCircle size={22} color="#F59E0B" />
+                    </View>
+                    <View style={styles.reportOptionContent}>
+                      <Text style={[styles.reportOptionTitle, { color: colors.text }]}>Lost Card</Text>
+                      <Text style={[styles.reportOptionDesc, { color: colors.textSecondary }]}>I cannot find my card</Text>
+                    </View>
+                    {reportType === 'lost' && <Check size={20} color={colors.primary} />}
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    style={[styles.reportOption, { backgroundColor: colors.background }, reportType === 'stolen' && { borderColor: colors.primary, borderWidth: 2 }]}
+                    onPress={() => setReportType('stolen')}
+                  >
+                    <View style={[styles.reportOptionIcon, { backgroundColor: '#EF4444' + '20' }]}>
+                      <Shield size={22} color="#EF4444" />
+                    </View>
+                    <View style={styles.reportOptionContent}>
+                      <Text style={[styles.reportOptionTitle, { color: colors.text }]}>Stolen Card</Text>
+                      <Text style={[styles.reportOptionDesc, { color: colors.textSecondary }]}>My card was stolen</Text>
+                    </View>
+                    {reportType === 'stolen' && <Check size={20} color={colors.primary} />}
+                  </TouchableOpacity>
+
+                  <View style={[styles.reportWarning, { backgroundColor: '#FEF3C7' }]}>
+                    <AlertCircle size={16} color="#D97706" />
+                    <Text style={styles.reportWarningText}>
+                      Reporting will immediately block your card. A replacement can be ordered.
+                    </Text>
+                  </View>
+
+                  <View style={styles.reportModalActions}>
+                    <TouchableOpacity
+                      style={[styles.reportCancelBtn, { backgroundColor: colors.background }]}
+                      onPress={() => {
+                        setShowReportModal(false);
+                        setReportType(null);
+                      }}
+                    >
+                      <Text style={[styles.reportCancelText, { color: colors.textSecondary }]}>Cancel</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={[styles.reportConfirmBtn, { backgroundColor: '#EF4444' }, !reportType && styles.reportConfirmBtnDisabled]}
+                      onPress={() => {
+                        if (reportType) {
+                          setDebitCardLocked(true);
+                          setShowReportModal(false);
+                          setReportType(null);
+                          console.log('Card reported as:', reportType);
+                        }
+                      }}
+                      disabled={!reportType}
+                    >
+                      <Text style={styles.reportConfirmText}>Report & Block Card</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </View>
+            )}
           </View>
         </View>
       )}
@@ -2793,5 +3107,360 @@ const styles = StyleSheet.create({
   },
   recoveryOptionText: {
     fontSize: 13,
+  },
+  debitCardModalOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    justifyContent: 'flex-end',
+  },
+  debitCardModalContent: {
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    maxHeight: '90%',
+  },
+  debitCardModalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 20,
+    paddingBottom: 12,
+  },
+  debitCardModalTitle: {
+    fontSize: 20,
+    fontWeight: '700' as const,
+  },
+  debitCardCloseText: {
+    fontSize: 16,
+    fontWeight: '600' as const,
+  },
+  debitCardModalScroll: {
+    paddingHorizontal: 20,
+  },
+  virtualCardContainer: {
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 16,
+    position: 'relative',
+    overflow: 'hidden',
+  },
+  cardLockedOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    zIndex: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 16,
+  },
+  cardLockedText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '700' as const,
+    marginTop: 8,
+  },
+  virtualCardTop: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+  virtualCardChip: {
+    width: 40,
+    height: 30,
+    backgroundColor: '#D4AF37',
+    borderRadius: 6,
+    padding: 4,
+    justifyContent: 'space-between',
+  },
+  chipLine: {
+    height: 3,
+    borderRadius: 1,
+  },
+  virtualCardBrand: {
+    color: '#FFFFFF',
+    fontSize: 20,
+    fontWeight: '800' as const,
+    letterSpacing: 2,
+  },
+  virtualCardNumberSection: {
+    marginBottom: 20,
+  },
+  virtualCardNumber: {
+    color: '#FFFFFF',
+    fontSize: 22,
+    fontWeight: '600' as const,
+    letterSpacing: 3,
+    textAlign: 'center' as const,
+  },
+  virtualCardBottom: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  virtualCardLabel: {
+    color: 'rgba(255,255,255,0.6)',
+    fontSize: 9,
+    fontWeight: '600' as const,
+    marginBottom: 4,
+    letterSpacing: 1,
+  },
+  virtualCardValue: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: '600' as const,
+  },
+  virtualCardWatermark: {
+    position: 'absolute',
+    right: -10,
+    bottom: -10,
+  },
+  twoFASection: {
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 16,
+  },
+  twoFAHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginBottom: 8,
+  },
+  twoFASectionTitle: {
+    fontSize: 16,
+    fontWeight: '700' as const,
+  },
+  twoFADescription: {
+    fontSize: 13,
+    marginBottom: 16,
+    lineHeight: 19,
+  },
+  twoFAInputContainer: {
+    marginBottom: 16,
+  },
+  twoFAInput: {
+    borderRadius: 12,
+    padding: 16,
+    fontSize: 18,
+    textAlign: 'center' as const,
+    letterSpacing: 8,
+    borderWidth: 1,
+  },
+  verifyButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 16,
+    borderRadius: 12,
+    gap: 10,
+  },
+  verifyButtonDisabled: {
+    opacity: 0.5,
+  },
+  verifyButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600' as const,
+  },
+  resendCodeBtn: {
+    alignItems: 'center',
+    marginTop: 14,
+  },
+  resendCodeText: {
+    fontSize: 14,
+    fontWeight: '600' as const,
+  },
+  cardVerifiedBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 12,
+    borderRadius: 12,
+    gap: 8,
+    marginBottom: 16,
+  },
+  cardVerifiedText: {
+    fontSize: 14,
+    fontWeight: '600' as const,
+  },
+  cardManagementSection: {
+    marginBottom: 16,
+  },
+  cardManagementTitle: {
+    fontSize: 16,
+    fontWeight: '700' as const,
+    marginBottom: 12,
+  },
+  cardManagementItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 14,
+    borderRadius: 14,
+    marginBottom: 10,
+    gap: 12,
+  },
+  cardManagementIcon: {
+    width: 44,
+    height: 44,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  cardManagementContent: {
+    flex: 1,
+  },
+  cardManagementItemTitle: {
+    fontSize: 15,
+    fontWeight: '600' as const,
+    marginBottom: 2,
+  },
+  cardManagementItemSubtitle: {
+    fontSize: 12,
+  },
+  lockToggle: {
+    width: 44,
+    height: 24,
+    borderRadius: 12,
+    justifyContent: 'center',
+  },
+  lockToggleKnob: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    backgroundColor: '#FFFFFF',
+  },
+  cardInfoSection: {
+    borderRadius: 14,
+    padding: 16,
+  },
+  cardInfoRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 10,
+  },
+  cardInfoLabel: {
+    fontSize: 14,
+  },
+  cardInfoValue: {
+    fontSize: 14,
+    fontWeight: '600' as const,
+  },
+  cardInfoStatusBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+    gap: 6,
+  },
+  cardInfoStatusDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+  },
+  cardInfoStatusText: {
+    fontSize: 13,
+    fontWeight: '600' as const,
+  },
+  reportModalOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+  },
+  reportModalContent: {
+    borderRadius: 20,
+    padding: 22,
+    width: '100%',
+    maxWidth: 380,
+  },
+  reportModalTitle: {
+    fontSize: 18,
+    fontWeight: '700' as const,
+    marginBottom: 6,
+  },
+  reportModalSubtitle: {
+    fontSize: 13,
+    marginBottom: 20,
+  },
+  reportOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 14,
+    borderRadius: 14,
+    marginBottom: 10,
+    gap: 12,
+  },
+  reportOptionIcon: {
+    width: 44,
+    height: 44,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  reportOptionContent: {
+    flex: 1,
+  },
+  reportOptionTitle: {
+    fontSize: 15,
+    fontWeight: '600' as const,
+    marginBottom: 2,
+  },
+  reportOptionDesc: {
+    fontSize: 12,
+  },
+  reportWarning: {
+    flexDirection: 'row',
+    padding: 12,
+    borderRadius: 10,
+    gap: 10,
+    alignItems: 'flex-start',
+    marginTop: 6,
+    marginBottom: 18,
+  },
+  reportWarningText: {
+    flex: 1,
+    fontSize: 12,
+    color: '#92400E',
+    lineHeight: 17,
+  },
+  reportModalActions: {
+    flexDirection: 'row',
+    gap: 10,
+  },
+  reportCancelBtn: {
+    flex: 1,
+    padding: 14,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  reportCancelText: {
+    fontSize: 15,
+    fontWeight: '600' as const,
+  },
+  reportConfirmBtn: {
+    flex: 1,
+    padding: 14,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  reportConfirmBtnDisabled: {
+    opacity: 0.5,
+  },
+  reportConfirmText: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: '600' as const,
   },
 });
