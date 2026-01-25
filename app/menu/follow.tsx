@@ -148,17 +148,18 @@ const styles = StyleSheet.create({
     fontSize: 15,
   },
   categoriesScroll: {
-    paddingHorizontal: 16,
+    paddingHorizontal: 12,
     marginBottom: 8,
+    maxHeight: 36,
   },
   categoryChip: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-    marginRight: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+    marginRight: 6,
   },
   categoryText: {
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: '500' as const,
   },
   content: {
