@@ -105,6 +105,30 @@ export default function WalletLayout() {
           headerStyle: { backgroundColor: Colors.backgroundSecondary },
         }} 
       />
+      <Stack.Screen 
+        name="buy" 
+        options={{ 
+          title: 'Buy Crypto',
+          presentation: 'modal',
+          headerStyle: { backgroundColor: Colors.backgroundSecondary },
+        }} 
+      />
+      <Stack.Screen 
+        name="sell" 
+        options={{ 
+          title: 'Sell Crypto',
+          presentation: 'modal',
+          headerStyle: { backgroundColor: Colors.backgroundSecondary },
+        }} 
+      />
+      <Stack.Screen 
+        name="swap" 
+        options={{ 
+          title: 'Swap Tokens',
+          presentation: 'modal',
+          headerStyle: { backgroundColor: Colors.backgroundSecondary },
+        }} 
+      />
     </Stack>
   );
 }

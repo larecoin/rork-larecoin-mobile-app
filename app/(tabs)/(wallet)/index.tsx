@@ -234,13 +234,13 @@ export default function WalletDashboard() {
           <ActionButton 
             icon={ShoppingCart} 
             label="Buy" 
-            onPress={() => console.log('Buy')}
+            onPress={() => router.push('/(tabs)/(wallet)/buy')}
             variant="primary"
           />
           <ActionButton 
             icon={DollarSign} 
             label="Sell" 
-            onPress={() => console.log('Sell')}
+            onPress={() => router.push('/(tabs)/(wallet)/sell')}
             variant="accent"
           />
           <ActionButton 
@@ -258,7 +258,7 @@ export default function WalletDashboard() {
           <ActionButton 
             icon={RefreshCw} 
             label="Swap" 
-            onPress={() => console.log('Swap')}
+            onPress={() => router.push('/(tabs)/(wallet)/swap')}
             variant="accent"
           />
         </View>
