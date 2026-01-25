@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput } from 'react-native';
 import { Stack } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { CreditCard, Building2, Smartphone, ChevronDown, ArrowRight, Info } from 'lucide-react-native';
+import { CreditCard, Building2, Smartphone, ChevronDown, ArrowRight, Info, RefreshCw, Clock } from 'lucide-react-native';
 import { useApp } from '@/contexts/AppContext';
 
 const cryptoOptions = [
@@ -18,12 +18,22 @@ const paymentMethods = [
   { id: 'apple', name: 'Apple Pay', icon: Smartphone, fee: '2.0%' },
 ];
 
+const recurringSchedules = [
+  { id: 'hourly', label: 'Hourly', description: 'Every hour' },
+  { id: 'daily', label: 'Daily', description: 'Once a day' },
+  { id: 'weekly', label: 'Weekly', description: 'Once a week' },
+  { id: 'biweekly', label: 'Bi-weekly', description: 'Every 2 weeks' },
+  { id: 'monthly', label: 'Monthly', description: 'Once a month' },
+];
+
 export default function BuyCryptoScreen() {
   const insets = useSafeAreaInsets();
   const { colors } = useApp();
   const [amount, setAmount] = useState('100');
   const [selectedCrypto, setSelectedCrypto] = useState(cryptoOptions[2]);
   const [selectedPayment, setSelectedPayment] = useState(paymentMethods[0]);
+  const [isRecurring, setIsRecurring] = useState(false);
+  const [selectedSchedule, setSelectedSchedule] = useState(recurringSchedules[1]);
 
   const quickAmounts = ['50', '100', '250', '500', '1000'];
 
@@ -132,6 +142,71 @@ export default function BuyCryptoScreen() {
           </View>
         </View>
 
+        <View style={styles.section}>
+          <Text style={[styles.sectionTitle, { color: colors.textTertiary }]}>Recurring Buy</Text>
+          <View style={[styles.recurringCard, { backgroundColor: colors.surface }]}>
+            <TouchableOpacity 
+              style={styles.recurringToggle}
+              onPress={() => setIsRecurring(!isRecurring)}
+            >
+              <View style={[styles.recurringIcon, { backgroundColor: colors.primary + '15' }]}>
+                <RefreshCw size={20} color={colors.primary} />
+              </View>
+              <View style={styles.recurringInfo}>
+                <Text style={[styles.recurringTitle, { color: colors.text }]}>Set as Recurring Buy</Text>
+                <Text style={[styles.recurringDesc, { color: colors.textTertiary }]}>
+                  Automatically buy on a schedule
+                </Text>
+              </View>
+              <View style={[
+                styles.toggle,
+                { backgroundColor: isRecurring ? colors.primary : colors.border }
+              ]}>
+                <View style={[
+                  styles.toggleKnob,
+                  { transform: [{ translateX: isRecurring ? 18 : 2 }] }
+                ]} />
+              </View>
+            </TouchableOpacity>
+
+            {isRecurring && (
+              <View style={[styles.scheduleContainer, { borderTopColor: colors.border }]}>
+                <View style={styles.scheduleHeader}>
+                  <Clock size={14} color={colors.textTertiary} />
+                  <Text style={[styles.scheduleLabel, { color: colors.textTertiary }]}>Select Schedule</Text>
+                </View>
+                <View style={styles.scheduleOptions}>
+                  {recurringSchedules.map((schedule) => (
+                    <TouchableOpacity
+                      key={schedule.id}
+                      style={[
+                        styles.scheduleOption,
+                        { 
+                          backgroundColor: selectedSchedule.id === schedule.id ? colors.primary : colors.background,
+                          borderColor: selectedSchedule.id === schedule.id ? colors.primary : colors.border,
+                        }
+                      ]}
+                      onPress={() => setSelectedSchedule(schedule)}
+                    >
+                      <Text style={[
+                        styles.scheduleOptionText,
+                        { color: selectedSchedule.id === schedule.id ? '#FFF' : colors.text }
+                      ]}>
+                        {schedule.label}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+                <View style={[styles.scheduleNote, { backgroundColor: colors.background }]}>
+                  <Text style={[styles.scheduleNoteText, { color: colors.textTertiary }]}>
+                    {selectedSchedule.description} • Next charge: ${amount || '0'} USD
+                  </Text>
+                </View>
+              </View>
+            )}
+          </View>
+        </View>
+
         <View style={[styles.summaryCard, { backgroundColor: colors.surface }]}>
           <View style={styles.summaryRow}>
             <Text style={[styles.summaryLabel, { color: colors.textTertiary }]}>Subtotal</Text>
@@ -159,7 +234,9 @@ export default function BuyCryptoScreen() {
         </View>
 
         <TouchableOpacity style={[styles.buyButton, { backgroundColor: colors.primary }]}>
-          <Text style={styles.buyButtonText}>Buy {selectedCrypto.symbol}</Text>
+          <Text style={styles.buyButtonText}>
+            {isRecurring ? `Set ${selectedSchedule.label} Buy` : `Buy ${selectedCrypto.symbol}`}
+          </Text>
         </TouchableOpacity>
       </ScrollView>
     </View>
@@ -371,5 +448,86 @@ const styles = StyleSheet.create({
     color: '#FFF',
     fontSize: 16,
     fontWeight: '600' as const,
+  },
+  recurringCard: {
+    borderRadius: 16,
+    overflow: 'hidden',
+  },
+  recurringToggle: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+  },
+  recurringIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+  },
+  recurringInfo: {
+    flex: 1,
+  },
+  recurringTitle: {
+    fontSize: 15,
+    fontWeight: '500' as const,
+  },
+  recurringDesc: {
+    fontSize: 12,
+    marginTop: 2,
+  },
+  toggle: {
+    width: 44,
+    height: 26,
+    borderRadius: 13,
+    justifyContent: 'center',
+  },
+  toggleKnob: {
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    backgroundColor: '#FFF',
+  },
+  scheduleContainer: {
+    padding: 16,
+    paddingTop: 12,
+    borderTopWidth: 1,
+  },
+  scheduleHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginBottom: 12,
+  },
+  scheduleLabel: {
+    fontSize: 12,
+    fontWeight: '600' as const,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  scheduleOptions: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  scheduleOption: {
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 10,
+    borderWidth: 1,
+  },
+  scheduleOptionText: {
+    fontSize: 13,
+    fontWeight: '600' as const,
+  },
+  scheduleNote: {
+    marginTop: 12,
+    padding: 10,
+    borderRadius: 8,
+  },
+  scheduleNoteText: {
+    fontSize: 12,
+    textAlign: 'center',
   },
 });
