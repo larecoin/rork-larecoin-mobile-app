@@ -24,7 +24,10 @@ import {
   DollarSign,
   Settings2,
   PlusCircle,
-  Minus
+  Minus,
+  FolderOpen,
+  MoreVertical,
+  Check
 } from 'lucide-react-native';
 import Colors from '@/constants/colors';
 
@@ -54,6 +57,21 @@ interface InventoryItem {
   lastUpdated: string;
   attributes?: CustomAttribute[];
 }
+
+interface Category {
+  id: string;
+  name: string;
+  color: string;
+  itemCount: number;
+}
+
+const defaultCategories: Category[] = [
+  { id: '1', name: 'Coffee', color: '#8B4513', itemCount: 1 },
+  { id: '2', name: 'Dairy Alt', color: '#87CEEB', itemCount: 2 },
+  { id: '3', name: 'Bakery', color: '#DEB887', itemCount: 1 },
+  { id: '4', name: 'Syrups', color: '#FFD700', itemCount: 1 },
+  { id: '5', name: 'Supplies', color: '#708090', itemCount: 1 },
+];
 
 const mockInventory: InventoryItem[] = [
   { id: '1', name: 'Espresso Beans (1kg)', sku: 'COF-001', category: 'Coffee', quantity: 45, minStock: 20, price: 24.99, cost: 15.00, lastUpdated: '2h ago' },
@@ -87,8 +105,18 @@ export default function InventoryManager() {
     type: 'size' | 'color' | 'material' | 'style' | 'custom';
   }>({ name: '', type: 'custom' });
   const [editingAttributeId, setEditingAttributeId] = useState<string | null>(null);
+  const [categories, setCategories] = useState<Category[]>(defaultCategories);
+  const [showCategoryModal, setShowCategoryModal] = useState(false);
+  const [editingCategory, setEditingCategory] = useState<Category | null>(null);
+  const [newCategory, setNewCategory] = useState({ name: '', color: '#6366F1' });
+  const [showCategoryMenu, setShowCategoryMenu] = useState<string | null>(null);
 
-  const categories = ['All', 'Coffee', 'Dairy Alt', 'Bakery', 'Syrups', 'Supplies'];
+  const categoryColors = [
+    '#EF4444', '#F97316', '#F59E0B', '#84CC16', '#22C55E', '#14B8A6',
+    '#06B6D4', '#3B82F6', '#6366F1', '#8B5CF6', '#A855F7', '#EC4899',
+  ];
+
+  const categoryNames = ['All', ...categories.map(c => c.name)];
 
   const lowStockItems = mockInventory.filter(item => item.quantity <= item.minStock);
   const totalValue = mockInventory.reduce((sum, item) => sum + (item.quantity * item.cost), 0);
@@ -100,6 +128,49 @@ export default function InventoryManager() {
     const matchesCategory = selectedCategory === 'All' || item.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
+
+  const handleAddCategory = () => {
+    if (!newCategory.name.trim()) return;
+    const category: Category = {
+      id: Date.now().toString(),
+      name: newCategory.name.trim(),
+      color: newCategory.color,
+      itemCount: 0,
+    };
+    setCategories([...categories, category]);
+    setNewCategory({ name: '', color: '#6366F1' });
+    setShowCategoryModal(false);
+    console.log('Category added:', category);
+  };
+
+  const handleUpdateCategory = () => {
+    if (!editingCategory || !newCategory.name.trim()) return;
+    setCategories(categories.map(c => 
+      c.id === editingCategory.id 
+        ? { ...c, name: newCategory.name.trim(), color: newCategory.color }
+        : c
+    ));
+    setEditingCategory(null);
+    setNewCategory({ name: '', color: '#6366F1' });
+    setShowCategoryModal(false);
+    console.log('Category updated:', editingCategory.id);
+  };
+
+  const handleDeleteCategory = (categoryId: string) => {
+    setCategories(categories.filter(c => c.id !== categoryId));
+    setShowCategoryMenu(null);
+    if (selectedCategory === categories.find(c => c.id === categoryId)?.name) {
+      setSelectedCategory('All');
+    }
+    console.log('Category deleted:', categoryId);
+  };
+
+  const openEditCategory = (category: Category) => {
+    setEditingCategory(category);
+    setNewCategory({ name: category.name, color: category.color });
+    setShowCategoryModal(true);
+    setShowCategoryMenu(null);
+  };
 
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
@@ -259,7 +330,7 @@ export default function InventoryManager() {
         </View>
 
         <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.categoryScroll}>
-          {categories.map(cat => (
+          {categoryNames.map(cat => (
             <TouchableOpacity
               key={cat}
               style={[styles.categoryChip, selectedCategory === cat && styles.categoryChipActive]}
@@ -364,6 +435,68 @@ export default function InventoryManager() {
               </TouchableOpacity>
             );
           })}
+        </View>
+
+        <View style={styles.categoriesSection}>
+          <View style={styles.categoriesSectionHeader}>
+            <Text style={styles.categoriesSectionTitle}>Categories</Text>
+            <TouchableOpacity 
+              style={styles.manageCategoriesBtn}
+              onPress={() => {
+                setEditingCategory(null);
+                setNewCategory({ name: '', color: '#6366F1' });
+                setShowCategoryModal(true);
+              }}
+            >
+              <Plus size={16} color={Colors.primary} />
+              <Text style={styles.manageCategoriesText}>Add</Text>
+            </TouchableOpacity>
+          </View>
+          
+          {categories.length === 0 ? (
+            <View style={styles.emptyCategoriesCard}>
+              <FolderOpen size={32} color={Colors.textSecondary} />
+              <Text style={styles.emptyCategoriesTitle}>No Categories</Text>
+              <Text style={styles.emptyCategoriesText}>Create categories to organize your inventory</Text>
+            </View>
+          ) : (
+            <View style={styles.categoriesGrid}>
+              {categories.map(category => (
+                <View key={category.id} style={styles.categoryCard}>
+                  <View style={styles.categoryCardHeader}>
+                    <View style={[styles.categoryColorDot, { backgroundColor: category.color }]} />
+                    <Text style={styles.categoryCardName} numberOfLines={1}>{category.name}</Text>
+                    <TouchableOpacity 
+                      style={styles.categoryMenuBtn}
+                      onPress={() => setShowCategoryMenu(showCategoryMenu === category.id ? null : category.id)}
+                    >
+                      <MoreVertical size={16} color={Colors.textSecondary} />
+                    </TouchableOpacity>
+                  </View>
+                  <Text style={styles.categoryItemCount}>{category.itemCount} items</Text>
+                  
+                  {showCategoryMenu === category.id && (
+                    <View style={styles.categoryMenuDropdown}>
+                      <TouchableOpacity 
+                        style={styles.categoryMenuItem}
+                        onPress={() => openEditCategory(category)}
+                      >
+                        <Edit2 size={14} color={Colors.text} />
+                        <Text style={styles.categoryMenuItemText}>Edit</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity 
+                        style={[styles.categoryMenuItem, styles.categoryMenuItemDelete]}
+                        onPress={() => handleDeleteCategory(category.id)}
+                      >
+                        <Trash2 size={14} color={Colors.error} />
+                        <Text style={[styles.categoryMenuItemText, { color: Colors.error }]}>Delete</Text>
+                      </TouchableOpacity>
+                    </View>
+                  )}
+                </View>
+              ))}
+            </View>
+          )}
         </View>
 
         <View style={styles.quickActions}>
@@ -625,6 +758,87 @@ export default function InventoryManager() {
             <TouchableOpacity style={styles.createAttributeBtn} onPress={addAttribute}>
               <Text style={styles.createAttributeBtnText}>Create Attribute</Text>
             </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+      <Modal visible={showCategoryModal} animationType="fade" transparent>
+        <View style={styles.categoryModalOverlay}>
+          <View style={styles.categoryModalContent}>
+            <View style={styles.categoryModalHeader}>
+              <Text style={styles.categoryModalTitle}>
+                {editingCategory ? 'Edit Category' : 'New Category'}
+              </Text>
+              <TouchableOpacity onPress={() => {
+                setShowCategoryModal(false);
+                setEditingCategory(null);
+                setNewCategory({ name: '', color: '#6366F1' });
+              }}>
+                <X size={22} color={Colors.text} />
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.inputGroup}>
+              <Text style={styles.inputLabel}>Category Name</Text>
+              <TextInput
+                style={styles.formInput}
+                placeholder="e.g., Electronics, Clothing"
+                placeholderTextColor={Colors.textSecondary}
+                value={newCategory.name}
+                onChangeText={(text) => setNewCategory({ ...newCategory, name: text })}
+              />
+            </View>
+
+            <Text style={styles.inputLabel}>Color</Text>
+            <View style={styles.colorGrid}>
+              {categoryColors.map(color => (
+                <TouchableOpacity
+                  key={color}
+                  style={[
+                    styles.colorOption,
+                    { backgroundColor: color },
+                    newCategory.color === color && styles.colorOptionActive
+                  ]}
+                  onPress={() => setNewCategory({ ...newCategory, color })}
+                >
+                  {newCategory.color === color && (
+                    <Check size={16} color="#FFF" />
+                  )}
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            <View style={styles.categoryPreview}>
+              <View style={[styles.categoryColorDot, { backgroundColor: newCategory.color }]} />
+              <Text style={styles.categoryPreviewName}>
+                {newCategory.name || 'Category Name'}
+              </Text>
+            </View>
+
+            <View style={styles.categoryModalActions}>
+              {editingCategory && (
+                <TouchableOpacity 
+                  style={styles.deleteCategoryBtn}
+                  onPress={() => {
+                    handleDeleteCategory(editingCategory.id);
+                    setShowCategoryModal(false);
+                    setEditingCategory(null);
+                    setNewCategory({ name: '', color: '#6366F1' });
+                  }}
+                >
+                  <Trash2 size={18} color={Colors.error} />
+                </TouchableOpacity>
+              )}
+              <TouchableOpacity 
+                style={[styles.saveCategoryBtn, !newCategory.name.trim() && styles.saveCategoryBtnDisabled]}
+                onPress={editingCategory ? handleUpdateCategory : handleAddCategory}
+                disabled={!newCategory.name.trim()}
+              >
+                <Text style={styles.saveCategoryBtnText}>
+                  {editingCategory ? 'Update' : 'Create'}
+                </Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
       </Modal>
@@ -1188,6 +1402,212 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   createAttributeBtnText: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: Colors.background,
+  },
+  categoriesSection: {
+    marginTop: 20,
+    paddingHorizontal: 16,
+  },
+  categoriesSectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  categoriesSectionTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: Colors.text,
+  },
+  manageCategoriesBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    backgroundColor: Colors.primary + '15',
+    borderRadius: 8,
+  },
+  manageCategoriesText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: Colors.primary,
+  },
+  emptyCategoriesCard: {
+    backgroundColor: Colors.surface,
+    borderRadius: 16,
+    padding: 24,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: Colors.border,
+    borderStyle: 'dashed',
+  },
+  emptyCategoriesTitle: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: Colors.text,
+    marginTop: 12,
+  },
+  emptyCategoriesText: {
+    fontSize: 13,
+    color: Colors.textSecondary,
+    marginTop: 4,
+    textAlign: 'center',
+  },
+  categoriesGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 10,
+  },
+  categoryCard: {
+    width: '48%',
+    backgroundColor: Colors.surface,
+    borderRadius: 12,
+    padding: 12,
+    position: 'relative',
+  },
+  categoryCardHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  categoryColorDot: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+  },
+  categoryCardName: {
+    flex: 1,
+    fontSize: 14,
+    fontWeight: '600',
+    color: Colors.text,
+  },
+  categoryMenuBtn: {
+    padding: 4,
+  },
+  categoryItemCount: {
+    fontSize: 12,
+    color: Colors.textSecondary,
+    marginTop: 6,
+    marginLeft: 20,
+  },
+  categoryMenuDropdown: {
+    position: 'absolute',
+    top: 40,
+    right: 8,
+    backgroundColor: Colors.background,
+    borderRadius: 10,
+    padding: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 5,
+    zIndex: 100,
+  },
+  categoryMenuItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    borderRadius: 8,
+  },
+  categoryMenuItemDelete: {
+    borderTopWidth: 1,
+    borderTopColor: Colors.border,
+  },
+  categoryMenuItemText: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: Colors.text,
+  },
+  categoryModalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+  },
+  categoryModalContent: {
+    width: '100%',
+    backgroundColor: Colors.background,
+    borderRadius: 20,
+    padding: 20,
+  },
+  categoryModalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  categoryModalTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: Colors.text,
+  },
+  colorGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 10,
+    marginBottom: 16,
+  },
+  colorOption: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  colorOptionActive: {
+    borderWidth: 3,
+    borderColor: Colors.background,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 4,
+  },
+  categoryPreview: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    backgroundColor: Colors.surface,
+    borderRadius: 12,
+    padding: 14,
+    marginBottom: 16,
+  },
+  categoryPreviewName: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: Colors.text,
+  },
+  categoryModalActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  deleteCategoryBtn: {
+    width: 48,
+    height: 48,
+    borderRadius: 12,
+    backgroundColor: Colors.error + '15',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  saveCategoryBtn: {
+    flex: 1,
+    backgroundColor: Colors.primary,
+    borderRadius: 12,
+    paddingVertical: 14,
+    alignItems: 'center',
+  },
+  saveCategoryBtnDisabled: {
+    opacity: 0.5,
+  },
+  saveCategoryBtnText: {
     fontSize: 15,
     fontWeight: '600',
     color: Colors.background,
