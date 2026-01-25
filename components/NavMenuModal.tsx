@@ -48,8 +48,8 @@ const menuSections: MenuSection[] = [
     title: 'Social',
     items: [
       { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-      { id: 'social-spaces', label: 'Social Spaces', icon: Users },
       { id: 'explore', label: 'Explore & Discover', icon: Compass },
+      { id: 'social-spaces', label: 'Social Spaces', icon: Users },
       { id: 'profile', label: 'My Profile', icon: User },
       { id: 'messages', label: 'Messages', icon: MessageSquare },
       { id: 'resume', label: 'Resume / CV', icon: FileText },
