@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Modal } from 'react-native';
 import { Stack } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { CreditCard, Building2, Smartphone, ChevronDown, ArrowRight, Info, RefreshCw, Clock } from 'lucide-react-native';
+import { CreditCard, Building2, Smartphone, ChevronDown, ArrowRight, Info, RefreshCw, Clock, Calendar, X, Trash2, Play, Pause, ChevronRight } from 'lucide-react-native';
 import { useApp } from '@/contexts/AppContext';
 
 const cryptoOptions = [
@@ -26,6 +26,47 @@ const recurringSchedules = [
   { id: 'monthly', label: 'Monthly', description: 'Once a month' },
 ];
 
+const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+const timeSlots = ['12:00 AM', '6:00 AM', '9:00 AM', '12:00 PM', '3:00 PM', '6:00 PM', '9:00 PM'];
+
+interface RecurringOrder {
+  id: string;
+  crypto: typeof cryptoOptions[0];
+  amount: string;
+  schedule: typeof recurringSchedules[0];
+  dayOfWeek?: number;
+  time: string;
+  startDate: string;
+  endDate?: string;
+  isActive: boolean;
+  nextExecution: string;
+}
+
+const mockRecurringOrders: RecurringOrder[] = [
+  {
+    id: '1',
+    crypto: cryptoOptions[0],
+    amount: '50',
+    schedule: recurringSchedules[2],
+    dayOfWeek: 1,
+    time: '9:00 AM',
+    startDate: '2025-01-01',
+    isActive: true,
+    nextExecution: 'Mon, Jan 27 at 9:00 AM',
+  },
+  {
+    id: '2',
+    crypto: cryptoOptions[1],
+    amount: '100',
+    schedule: recurringSchedules[4],
+    time: '12:00 PM',
+    startDate: '2025-01-15',
+    endDate: '2025-12-31',
+    isActive: false,
+    nextExecution: 'Feb 1 at 12:00 PM',
+  },
+];
+
 export default function BuyCryptoScreen() {
   const insets = useSafeAreaInsets();
   const { colors } = useApp();
@@ -34,8 +75,38 @@ export default function BuyCryptoScreen() {
   const [selectedPayment, setSelectedPayment] = useState(paymentMethods[0]);
   const [isRecurring, setIsRecurring] = useState(false);
   const [selectedSchedule, setSelectedSchedule] = useState(recurringSchedules[1]);
+  const [selectedDay, setSelectedDay] = useState(1);
+  const [selectedTime, setSelectedTime] = useState('9:00 AM');
+  const [hasEndDate, setHasEndDate] = useState(false);
+  const [showRecurringModal, setShowRecurringModal] = useState(false);
+  const [recurringOrders, setRecurringOrders] = useState<RecurringOrder[]>(mockRecurringOrders);
 
   const quickAmounts = ['50', '100', '250', '500', '1000'];
+
+  const toggleOrderStatus = (orderId: string) => {
+    setRecurringOrders(prev => 
+      prev.map(order => 
+        order.id === orderId ? { ...order, isActive: !order.isActive } : order
+      )
+    );
+  };
+
+  const deleteOrder = (orderId: string) => {
+    setRecurringOrders(prev => prev.filter(order => order.id !== orderId));
+  };
+
+  const getScheduleDescription = () => {
+    if (selectedSchedule.id === 'weekly' || selectedSchedule.id === 'biweekly') {
+      return `Every ${selectedSchedule.id === 'biweekly' ? '2 ' : ''}${weekDays[selectedDay]} at ${selectedTime}`;
+    }
+    if (selectedSchedule.id === 'monthly') {
+      return `1st of every month at ${selectedTime}`;
+    }
+    if (selectedSchedule.id === 'daily') {
+      return `Every day at ${selectedTime}`;
+    }
+    return selectedSchedule.description;
+  };
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
@@ -173,7 +244,7 @@ export default function BuyCryptoScreen() {
               <View style={[styles.scheduleContainer, { borderTopColor: colors.border }]}>
                 <View style={styles.scheduleHeader}>
                   <Clock size={14} color={colors.textTertiary} />
-                  <Text style={[styles.scheduleLabel, { color: colors.textTertiary }]}>Select Schedule</Text>
+                  <Text style={[styles.scheduleLabel, { color: colors.textTertiary }]}>Frequency</Text>
                 </View>
                 <View style={styles.scheduleOptions}>
                   {recurringSchedules.map((schedule) => (
@@ -197,14 +268,120 @@ export default function BuyCryptoScreen() {
                     </TouchableOpacity>
                   ))}
                 </View>
+
+                {(selectedSchedule.id === 'weekly' || selectedSchedule.id === 'biweekly') && (
+                  <View style={styles.dayTimeSection}>
+                    <Text style={[styles.subLabel, { color: colors.textTertiary }]}>Day of Week</Text>
+                    <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.dayScroll}>
+                      <View style={styles.dayOptions}>
+                        {weekDays.map((day, index) => (
+                          <TouchableOpacity
+                            key={day}
+                            style={[
+                              styles.dayOption,
+                              { 
+                                backgroundColor: selectedDay === index ? colors.primary : colors.background,
+                                borderColor: selectedDay === index ? colors.primary : colors.border,
+                              }
+                            ]}
+                            onPress={() => setSelectedDay(index)}
+                          >
+                            <Text style={[
+                              styles.dayOptionText,
+                              { color: selectedDay === index ? '#FFF' : colors.text }
+                            ]}>
+                              {day}
+                            </Text>
+                          </TouchableOpacity>
+                        ))}
+                      </View>
+                    </ScrollView>
+                  </View>
+                )}
+
+                {selectedSchedule.id !== 'hourly' && (
+                  <View style={styles.dayTimeSection}>
+                    <Text style={[styles.subLabel, { color: colors.textTertiary }]}>Time</Text>
+                    <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.dayScroll}>
+                      <View style={styles.dayOptions}>
+                        {timeSlots.map((time) => (
+                          <TouchableOpacity
+                            key={time}
+                            style={[
+                              styles.timeOption,
+                              { 
+                                backgroundColor: selectedTime === time ? colors.primary : colors.background,
+                                borderColor: selectedTime === time ? colors.primary : colors.border,
+                              }
+                            ]}
+                            onPress={() => setSelectedTime(time)}
+                          >
+                            <Text style={[
+                              styles.timeOptionText,
+                              { color: selectedTime === time ? '#FFF' : colors.text }
+                            ]}>
+                              {time}
+                            </Text>
+                          </TouchableOpacity>
+                        ))}
+                      </View>
+                    </ScrollView>
+                  </View>
+                )}
+
+                <View style={[styles.endDateToggle, { borderTopColor: colors.border }]}>
+                  <View style={styles.endDateInfo}>
+                    <Calendar size={16} color={colors.textTertiary} />
+                    <Text style={[styles.endDateLabel, { color: colors.text }]}>Set End Date</Text>
+                  </View>
+                  <TouchableOpacity
+                    style={[
+                      styles.miniToggle,
+                      { backgroundColor: hasEndDate ? colors.primary : colors.border }
+                    ]}
+                    onPress={() => setHasEndDate(!hasEndDate)}
+                  >
+                    <View style={[
+                      styles.miniToggleKnob,
+                      { transform: [{ translateX: hasEndDate ? 12 : 2 }] }
+                    ]} />
+                  </TouchableOpacity>
+                </View>
+
+                {hasEndDate && (
+                  <View style={[styles.endDatePicker, { backgroundColor: colors.background }]}>
+                    <Text style={[styles.endDateText, { color: colors.textTertiary }]}>
+                      Recurring buy will end after 12 months (Jan 25, 2027)
+                    </Text>
+                  </View>
+                )}
+
                 <View style={[styles.scheduleNote, { backgroundColor: colors.background }]}>
-                  <Text style={[styles.scheduleNoteText, { color: colors.textTertiary }]}>
-                    {selectedSchedule.description} • Next charge: ${amount || '0'} USD
+                  <Text style={[styles.scheduleNoteText, { color: colors.text }]}>
+                    {getScheduleDescription()}
+                  </Text>
+                  <Text style={[styles.scheduleNoteAmount, { color: colors.primary }]}>
+                    ${amount || '0'} USD per execution
                   </Text>
                 </View>
               </View>
             )}
           </View>
+
+          {recurringOrders.length > 0 && (
+            <TouchableOpacity 
+              style={[styles.manageOrdersBtn, { backgroundColor: colors.background }]}
+              onPress={() => setShowRecurringModal(true)}
+            >
+              <View style={styles.manageOrdersLeft}>
+                <RefreshCw size={16} color={colors.primary} />
+                <Text style={[styles.manageOrdersText, { color: colors.text }]}>
+                  Manage Recurring Orders ({recurringOrders.length})
+                </Text>
+              </View>
+              <ChevronRight size={18} color={colors.textTertiary} />
+            </TouchableOpacity>
+          )}
         </View>
 
         <View style={[styles.summaryCard, { backgroundColor: colors.surface }]}>
@@ -239,6 +416,132 @@ export default function BuyCryptoScreen() {
           </Text>
         </TouchableOpacity>
       </ScrollView>
+
+      <Modal
+        visible={showRecurringModal}
+        animationType="slide"
+        presentationStyle="pageSheet"
+        onRequestClose={() => setShowRecurringModal(false)}
+      >
+        <View style={[styles.modalContainer, { backgroundColor: colors.background }]}>
+          <View style={[styles.modalHeader, { borderBottomColor: colors.border }]}>
+            <Text style={[styles.modalTitle, { color: colors.text }]}>Recurring Orders</Text>
+            <TouchableOpacity 
+              style={[styles.modalClose, { backgroundColor: colors.surface }]}
+              onPress={() => setShowRecurringModal(false)}
+            >
+              <X size={20} color={colors.text} />
+            </TouchableOpacity>
+          </View>
+
+          <ScrollView style={styles.modalContent}>
+            {recurringOrders.length === 0 ? (
+              <View style={styles.emptyState}>
+                <RefreshCw size={48} color={colors.textTertiary} />
+                <Text style={[styles.emptyTitle, { color: colors.text }]}>No Recurring Orders</Text>
+                <Text style={[styles.emptyDesc, { color: colors.textTertiary }]}>
+                  Set up automatic buys to dollar-cost average into your favorite assets.
+                </Text>
+              </View>
+            ) : (
+              recurringOrders.map((order) => (
+                <View 
+                  key={order.id} 
+                  style={[
+                    styles.orderCard, 
+                    { backgroundColor: colors.surface, opacity: order.isActive ? 1 : 0.6 }
+                  ]}
+                >
+                  <View style={styles.orderTop}>
+                    <View style={styles.orderCrypto}>
+                      <View style={[styles.orderCryptoIcon, { backgroundColor: colors.primary + '20' }]}>
+                        <Text style={[styles.orderCryptoIconText, { color: colors.primary }]}>
+                          {order.crypto.icon}
+                        </Text>
+                      </View>
+                      <View>
+                        <Text style={[styles.orderCryptoName, { color: colors.text }]}>
+                          {order.crypto.name}
+                        </Text>
+                        <Text style={[styles.orderAmount, { color: colors.primary }]}>
+                          ${order.amount} USD
+                        </Text>
+                      </View>
+                    </View>
+                    <View style={[
+                      styles.statusBadge, 
+                      { backgroundColor: order.isActive ? colors.success + '20' : colors.textTertiary + '20' }
+                    ]}>
+                      <View style={[
+                        styles.statusDot, 
+                        { backgroundColor: order.isActive ? colors.success : colors.textTertiary }
+                      ]} />
+                      <Text style={[
+                        styles.statusText, 
+                        { color: order.isActive ? colors.success : colors.textTertiary }
+                      ]}>
+                        {order.isActive ? 'Active' : 'Paused'}
+                      </Text>
+                    </View>
+                  </View>
+
+                  <View style={[styles.orderDetails, { borderTopColor: colors.border }]}>
+                    <View style={styles.orderDetailRow}>
+                      <Text style={[styles.orderDetailLabel, { color: colors.textTertiary }]}>Schedule</Text>
+                      <Text style={[styles.orderDetailValue, { color: colors.text }]}>
+                        {order.schedule.label}{order.dayOfWeek !== undefined ? ` (${weekDays[order.dayOfWeek]})` : ''}
+                      </Text>
+                    </View>
+                    <View style={styles.orderDetailRow}>
+                      <Text style={[styles.orderDetailLabel, { color: colors.textTertiary }]}>Time</Text>
+                      <Text style={[styles.orderDetailValue, { color: colors.text }]}>{order.time}</Text>
+                    </View>
+                    <View style={styles.orderDetailRow}>
+                      <Text style={[styles.orderDetailLabel, { color: colors.textTertiary }]}>Next Execution</Text>
+                      <Text style={[styles.orderDetailValue, { color: colors.text }]}>{order.nextExecution}</Text>
+                    </View>
+                    {order.endDate && (
+                      <View style={styles.orderDetailRow}>
+                        <Text style={[styles.orderDetailLabel, { color: colors.textTertiary }]}>Ends</Text>
+                        <Text style={[styles.orderDetailValue, { color: colors.text }]}>{order.endDate}</Text>
+                      </View>
+                    )}
+                  </View>
+
+                  <View style={styles.orderActions}>
+                    <TouchableOpacity 
+                      style={[
+                        styles.orderActionBtn, 
+                        { backgroundColor: order.isActive ? colors.warning + '15' : colors.success + '15' }
+                      ]}
+                      onPress={() => toggleOrderStatus(order.id)}
+                    >
+                      {order.isActive ? (
+                        <Pause size={16} color={colors.warning} />
+                      ) : (
+                        <Play size={16} color={colors.success} />
+                      )}
+                      <Text style={[
+                        styles.orderActionText, 
+                        { color: order.isActive ? colors.warning : colors.success }
+                      ]}>
+                        {order.isActive ? 'Pause' : 'Resume'}
+                      </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity 
+                      style={[styles.orderActionBtn, { backgroundColor: colors.error + '15' }]}
+                      onPress={() => deleteOrder(order.id)}
+                    >
+                      <Trash2 size={16} color={colors.error} />
+                      <Text style={[styles.orderActionText, { color: colors.error }]}>Delete</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              ))
+            )}
+          </ScrollView>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -527,7 +830,239 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   scheduleNoteText: {
+    fontSize: 13,
+    fontWeight: '500' as const,
+    textAlign: 'center',
+  },
+  scheduleNoteAmount: {
+    fontSize: 12,
+    marginTop: 4,
+    textAlign: 'center',
+  },
+  dayTimeSection: {
+    marginTop: 16,
+  },
+  subLabel: {
+    fontSize: 11,
+    fontWeight: '600' as const,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+    marginBottom: 8,
+  },
+  dayScroll: {
+    marginHorizontal: -16,
+    paddingHorizontal: 16,
+  },
+  dayOptions: {
+    flexDirection: 'row',
+    gap: 8,
+    paddingRight: 16,
+  },
+  dayOption: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+  },
+  dayOptionText: {
+    fontSize: 12,
+    fontWeight: '600' as const,
+  },
+  timeOption: {
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    borderRadius: 10,
+    borderWidth: 1,
+  },
+  timeOptionText: {
+    fontSize: 12,
+    fontWeight: '600' as const,
+  },
+  endDateToggle: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingTop: 16,
+    marginTop: 16,
+    borderTopWidth: 1,
+  },
+  endDateInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  endDateLabel: {
+    fontSize: 14,
+    fontWeight: '500' as const,
+  },
+  miniToggle: {
+    width: 32,
+    height: 20,
+    borderRadius: 10,
+    justifyContent: 'center',
+  },
+  miniToggleKnob: {
+    width: 16,
+    height: 16,
+    borderRadius: 8,
+    backgroundColor: '#FFF',
+  },
+  endDatePicker: {
+    marginTop: 12,
+    padding: 12,
+    borderRadius: 8,
+  },
+  endDateText: {
     fontSize: 12,
     textAlign: 'center',
+  },
+  manageOrdersBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: 14,
+    borderRadius: 12,
+    marginTop: 12,
+  },
+  manageOrdersLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  manageOrdersText: {
+    fontSize: 14,
+    fontWeight: '500' as const,
+  },
+  modalContainer: {
+    flex: 1,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: 16,
+    borderBottomWidth: 1,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: '600' as const,
+  },
+  modalClose: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  modalContent: {
+    flex: 1,
+    padding: 16,
+  },
+  emptyState: {
+    alignItems: 'center',
+    paddingVertical: 60,
+  },
+  emptyTitle: {
+    fontSize: 18,
+    fontWeight: '600' as const,
+    marginTop: 16,
+  },
+  emptyDesc: {
+    fontSize: 14,
+    textAlign: 'center',
+    marginTop: 8,
+    paddingHorizontal: 40,
+    lineHeight: 20,
+  },
+  orderCard: {
+    borderRadius: 16,
+    marginBottom: 12,
+    overflow: 'hidden',
+  },
+  orderTop: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: 16,
+  },
+  orderCrypto: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  orderCryptoIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  orderCryptoIconText: {
+    fontSize: 18,
+    fontWeight: '700' as const,
+  },
+  orderCryptoName: {
+    fontSize: 15,
+    fontWeight: '600' as const,
+  },
+  orderAmount: {
+    fontSize: 14,
+    fontWeight: '600' as const,
+    marginTop: 2,
+  },
+  statusBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    borderRadius: 20,
+    gap: 6,
+  },
+  statusDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+  },
+  statusText: {
+    fontSize: 12,
+    fontWeight: '600' as const,
+  },
+  orderDetails: {
+    padding: 16,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    gap: 8,
+  },
+  orderDetailRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  orderDetailLabel: {
+    fontSize: 13,
+  },
+  orderDetailValue: {
+    fontSize: 13,
+    fontWeight: '500' as const,
+  },
+  orderActions: {
+    flexDirection: 'row',
+    padding: 12,
+    paddingTop: 0,
+    gap: 10,
+  },
+  orderActionBtn: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 10,
+    borderRadius: 10,
+    gap: 6,
+  },
+  orderActionText: {
+    fontSize: 13,
+    fontWeight: '600' as const,
   },
 });
