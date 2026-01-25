@@ -5,7 +5,7 @@ import { useRouter } from 'expo-router';
 import { 
   X, QrCode, CreditCard, Users, Compass, User, MessageSquare, FileText, Calendar,
   Contact, UserPlus, Heart, FolderOpen, Wand2, Gamepad2, Layout, Bug, Gift, Settings,
-  Wallet, Image, Code, Globe, HardDrive, Package, Webhook, Store, ClipboardList,
+  Image, Code, Globe, HardDrive, Package, Webhook, Store, ClipboardList,
   Megaphone, PlusCircle, List, Award, ChevronRight, Coins, Banknote, Clover, HandCoins,
   ShoppingCart, ClipboardCheck, Shield, HelpCircle, FileSpreadsheet, Gem, TrendingUp, Boxes,
   UserCircle, Headphones, Share2
@@ -154,12 +154,66 @@ export default function NavMenuModal({ visible, onClose }: NavMenuModalProps) {
 
   const handleMenuPress = (id: string) => {
     console.log('Menu pressed:', id);
-    if (id === 'settings') {
-      onClose();
-      router.push('/(tabs)/settings');
-      return;
-    }
     onClose();
+    
+    const routes: Record<string, string> = {
+      'settings': '/(tabs)/settings',
+      'account-settings': '/menu/account-settings',
+      'customer-service': '/menu/customer-service',
+      'invite-friends': '/menu/invite-friends',
+      'scan-qr': '/menu/scan-qr',
+      'buy-crypto': '/menu/buy-crypto',
+      'social-spaces': '/menu/social-spaces',
+      'explore': '/menu/explore',
+      'profile': '/(tabs)/profile',
+      'messages': '/menu/messages',
+      'resume': '/menu/resume',
+      'calendar': '/menu/calendar',
+      'contacts': '/menu/contacts',
+      'follow': '/menu/follow',
+      'dating': '/menu/dating',
+      'media': '/menu/media',
+      'creator-tools': '/menu/creator-tools',
+      'apps-games': '/menu/apps-games',
+      'spaces': '/menu/spaces',
+      'bug-bounty': '/menu/bug-bounty',
+      'referrals': '/menu/referrals',
+      'wallet-nfts': '/menu/wallet-nfts',
+      'staking-rewards': '/menu/staking-rewards',
+      'payment-methods': '/menu/payment-methods',
+      'forex': '/menu/forex',
+      'lucky-draw': '/menu/lucky-draw',
+      'borrow-lend': '/(tabs)/(wallet)/borrow-lend',
+      'shopping': '/(tabs)/shop',
+      'my-orders': '/menu/my-orders',
+      'escrow-manager': '/menu/escrow-manager',
+      'advanced-trading': '/menu/advanced-trading',
+      'security-center': '/menu/security-center',
+      'helpdesk': '/menu/helpdesk',
+      'tax-reports': '/menu/tax-reports',
+      'tokenize-assets': '/menu/tokenize-assets',
+      'assets-market': '/menu/assets-market',
+      'my-tokenized-assets': '/menu/my-tokenized-assets',
+      'developers': '/menu/developers',
+      'domains': '/menu/domains',
+      'file-storage': '/menu/file-storage',
+      'products-services': '/menu/products-services',
+      'apis-hooks': '/menu/apis-hooks',
+      'merchant-portal': '/(tabs)/(merchant)/dashboard',
+      'register-merchant': '/menu/register-merchant',
+      'pos': '/menu/pos',
+      'business-listings': '/menu/business-listings',
+      'ad-manager': '/(tabs)/(merchant)/ads',
+      'post-ad': '/menu/post-ad',
+      'my-ads': '/menu/my-ads',
+      'reseller-program': '/menu/reseller-program',
+      'join-reseller': '/menu/join-reseller',
+    };
+    
+    const route = routes[id];
+    if (route) {
+      router.push(route as any);
+    }
   };
 
   return (

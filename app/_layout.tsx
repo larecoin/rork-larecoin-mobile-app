@@ -22,6 +22,7 @@ function RootLayoutNav() {
       }}
     >
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+      <Stack.Screen name="menu" options={{ headerShown: false }} />
     </Stack>
   );
 }
