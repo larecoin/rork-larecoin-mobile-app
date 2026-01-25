@@ -16,11 +16,34 @@ export interface Wallet {
   isDefault: boolean;
 }
 
-interface MerchantProfile {
+export type MerchantType = 'business' | 'charity';
+
+export interface MerchantProfile {
+  id: string;
   name: string;
   category: string;
   description: string;
   linkedWalletId: string | null;
+  type: MerchantType;
+  isActive: boolean;
+}
+
+export interface CharityGrant {
+  id: string;
+  donorName: string;
+  amount: number;
+  currency: string;
+  date: Date;
+  txHash: string;
+  nftCertificateId?: string;
+}
+
+export interface CharityStats {
+  totalDonations: number;
+  totalDonors: number;
+  countriesReached: number;
+  monthlyRecurring: number;
+  topDonors: { name: string; amount: number }[];
 }
 
 const generateWalletAddress = () => {
@@ -50,11 +73,33 @@ export const [AppProvider, useApp] = createContextHook(() => {
   const [merchantOrders, setMerchantOrders] = useState<Order[]>(orders);
   const [wallets, setWallets] = useState<Wallet[]>([defaultWallet]);
   const [activeWalletId, setActiveWalletId] = useState<string>('1');
-  const [merchantProfile, setMerchantProfile] = useState<MerchantProfile>({
-    name: 'Larecoin Café',
-    category: 'Food & Beverage',
-    description: 'Premium coffee and pastries, accepting crypto payments',
-    linkedWalletId: '1',
+  const [merchantProfiles, setMerchantProfiles] = useState<MerchantProfile[]>([
+    {
+      id: '1',
+      name: 'Larecoin Café',
+      category: 'Food & Beverage',
+      description: 'Premium coffee and pastries, accepting crypto payments',
+      linkedWalletId: '1',
+      type: 'business',
+      isActive: true,
+    },
+  ]);
+  const [activeMerchantId, setActiveMerchantId] = useState<string>('1');
+  const [charityGrants, setCharityGrants] = useState<CharityGrant[]>([
+    { id: '1', donorName: 'Anonymous Whale', amount: 5000, currency: 'USDC', date: new Date('2025-01-20'), txHash: '0xabc123...', nftCertificateId: 'NFT-001' },
+    { id: '2', donorName: 'CryptoPhilanthropy DAO', amount: 10000, currency: 'SOL', date: new Date('2025-01-18'), txHash: '0xdef456...', nftCertificateId: 'NFT-002' },
+    { id: '3', donorName: 'John D.', amount: 250, currency: 'LARE', date: new Date('2025-01-15'), txHash: '0xghi789...', nftCertificateId: 'NFT-003' },
+  ]);
+  const [charityStats] = useState<CharityStats>({
+    totalDonations: 45250,
+    totalDonors: 312,
+    countriesReached: 47,
+    monthlyRecurring: 2800,
+    topDonors: [
+      { name: 'CryptoPhilanthropy DAO', amount: 10000 },
+      { name: 'Anonymous Whale', amount: 5000 },
+      { name: 'GreenFuture Fund', amount: 3500 },
+    ],
   });
 
   useEffect(() => {
@@ -77,9 +122,13 @@ export const [AppProvider, useApp] = createContextHook(() => {
         if (savedActiveWallet) {
           setActiveWalletId(savedActiveWallet);
         }
-        const savedProfile = await AsyncStorage.getItem('merchantProfile');
-        if (savedProfile) {
-          setMerchantProfile(JSON.parse(savedProfile));
+        const savedProfiles = await AsyncStorage.getItem('merchantProfiles');
+        if (savedProfiles) {
+          setMerchantProfiles(JSON.parse(savedProfiles));
+        }
+        const savedActiveMerchant = await AsyncStorage.getItem('activeMerchantId');
+        if (savedActiveMerchant) {
+          setActiveMerchantId(savedActiveMerchant);
         }
       } catch (error) {
         console.log('Error loading data:', error);
@@ -189,17 +238,52 @@ export const [AppProvider, useApp] = createContextHook(() => {
   }, []);
 
   const linkWalletToMerchant = useCallback(async (walletId: string | null) => {
-    const updated = { ...merchantProfile, linkedWalletId: walletId };
-    setMerchantProfile(updated);
+    const updated = merchantProfiles.map(p => 
+      p.id === activeMerchantId ? { ...p, linkedWalletId: walletId } : p
+    );
+    setMerchantProfiles(updated);
     try {
-      await AsyncStorage.setItem('merchantProfile', JSON.stringify(updated));
+      await AsyncStorage.setItem('merchantProfiles', JSON.stringify(updated));
     } catch (error) {
       console.log('Error linking wallet:', error);
     }
-  }, [merchantProfile]);
+  }, [merchantProfiles, activeMerchantId]);
+
+  const addMerchantProfile = useCallback(async (profile: Omit<MerchantProfile, 'id' | 'isActive'>) => {
+    const newProfile: MerchantProfile = {
+      ...profile,
+      id: Date.now().toString(),
+      isActive: false,
+    };
+    const updated = [...merchantProfiles, newProfile];
+    setMerchantProfiles(updated);
+    try {
+      await AsyncStorage.setItem('merchantProfiles', JSON.stringify(updated));
+    } catch (error) {
+      console.log('Error adding merchant profile:', error);
+    }
+    return newProfile;
+  }, [merchantProfiles]);
+
+  const switchMerchantProfile = useCallback(async (profileId: string) => {
+    const updated = merchantProfiles.map(p => ({
+      ...p,
+      isActive: p.id === profileId,
+    }));
+    setMerchantProfiles(updated);
+    setActiveMerchantId(profileId);
+    try {
+      await AsyncStorage.setItem('merchantProfiles', JSON.stringify(updated));
+      await AsyncStorage.setItem('activeMerchantId', profileId);
+    } catch (error) {
+      console.log('Error switching merchant profile:', error);
+    }
+  }, [merchantProfiles]);
 
   const activeWallet = wallets.find(w => w.id === activeWalletId) || wallets[0];
-  const linkedMerchantWallet = wallets.find(w => w.id === merchantProfile.linkedWalletId);
+  const activeMerchantProfile = merchantProfiles.find(p => p.id === activeMerchantId) || merchantProfiles[0];
+  const isCharityMode = activeMerchantProfile?.type === 'charity';
+  const linkedMerchantWallet = wallets.find(w => w.id === activeMerchantProfile?.linkedWalletId);
 
   return {
     mode,
@@ -214,9 +298,16 @@ export const [AppProvider, useApp] = createContextHook(() => {
     addTransaction,
     merchantProducts,
     merchantOrders,
-    merchantProfile,
+    merchantProfile: activeMerchantProfile,
+    merchantProfiles,
+    activeMerchantId,
+    isCharityMode,
     merchantStats,
+    charityStats,
+    charityGrants,
     completeOrder,
+    addMerchantProfile,
+    switchMerchantProfile,
     wallets,
     activeWallet,
     activeWalletId,
