@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Modal } from 'react-native';
 import { Stack } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { CreditCard, Building2, Smartphone, ChevronDown, ArrowRight, Info, RefreshCw, Clock, Calendar, X, Trash2, Play, Pause, ChevronRight } from 'lucide-react-native';
+import { CreditCard, Building2, Smartphone, ChevronDown, ArrowRight, Info, RefreshCw, Clock, Calendar, X, Trash2, Play, Pause, ChevronRight, ArrowLeftRight } from 'lucide-react-native';
+import { useRouter } from 'expo-router';
 import { useApp } from '@/contexts/AppContext';
 
 const cryptoOptions = [
@@ -70,6 +71,7 @@ const mockRecurringOrders: RecurringOrder[] = [
 export default function BuyCryptoScreen() {
   const insets = useSafeAreaInsets();
   const { colors } = useApp();
+  const router = useRouter();
   const [amount, setAmount] = useState('100');
   const [selectedCrypto, setSelectedCrypto] = useState(cryptoOptions[2]);
   const [selectedPayment, setSelectedPayment] = useState(paymentMethods[0]);
@@ -116,6 +118,21 @@ export default function BuyCryptoScreen() {
         contentContainerStyle={{ paddingBottom: insets.bottom + 20 }}
         showsVerticalScrollIndicator={false}
       >
+        <View style={styles.section}>
+          <Text style={[styles.sectionTitle, { color: colors.textTertiary }]}>Quick Actions</Text>
+          <View style={styles.quickActionsRow}>
+            <TouchableOpacity 
+              style={[styles.quickActionCard, { backgroundColor: colors.surface }]}
+              onPress={() => router.push('/menu/advanced-trading')}
+            >
+              <View style={[styles.quickActionIcon, { backgroundColor: colors.primary + '15' }]}>
+                <ArrowLeftRight size={20} color={colors.primary} />
+              </View>
+              <Text style={[styles.quickActionText, { color: colors.text }]}>Trade Crypto</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, { color: colors.textTertiary }]}>You Pay</Text>
           <View style={[styles.inputCard, { backgroundColor: colors.surface }]}>
@@ -553,6 +570,29 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     padding: 16,
+  },
+  quickActionsRow: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  quickActionCard: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 14,
+    borderRadius: 12,
+    gap: 12,
+  },
+  quickActionIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  quickActionText: {
+    fontSize: 14,
+    fontWeight: '600' as const,
   },
   section: {
     marginBottom: 8,
