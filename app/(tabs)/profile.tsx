@@ -1,9 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
 import { 
   Settings, ChevronRight, Shield, Bell, HelpCircle, FileText, 
-  Share2, Star, LogOut, Copy, CheckCircle, Edit2 
+  Share2, Star, LogOut, Copy, CheckCircle, Edit2, Users, Heart,
+  Compass, MessageCircle, Rss, UserPlus, ThumbsUp, Send, Bookmark,
+  MoreHorizontal, Globe
 } from 'lucide-react-native';
 import Colors from '@/constants/colors';
 import { useApp } from '@/contexts/AppContext';
@@ -17,14 +20,81 @@ const menuItems = [
   { id: 'rate', title: 'Rate Us', subtitle: 'On the App Store', icon: Star, color: '#F39C12' },
 ];
 
+const socialFeatures = [
+  { id: 'feed', title: 'News Feed', icon: Rss, color: '#FF6B6B', route: null },
+  { id: 'follow', title: 'Follow', icon: UserPlus, color: '#4ECDC4', route: '/menu/follow' },
+  { id: 'dating', title: 'Dating', icon: Heart, color: '#FF85A2', route: '/menu/dating' },
+  { id: 'explore', title: 'Explore', icon: Compass, color: '#45B7D1', route: '/menu/explore' },
+  { id: 'spaces', title: 'Spaces', icon: Globe, color: '#A78BFA', route: '/menu/social-spaces' },
+  { id: 'messages', title: 'Messages', icon: MessageCircle, color: '#10B981', route: '/menu/messages' },
+];
+
+const feedPosts = [
+  {
+    id: '1',
+    author: 'CryptoWhale',
+    avatar: 'https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=100',
+    time: '2h ago',
+    content: 'Just staked 10,000 LUSD for 12% APY! The passive income is real 🚀 #DeFi #Staking',
+    likes: 234,
+    comments: 45,
+    image: 'https://images.unsplash.com/photo-1621761191319-c6fb62004040?w=600',
+    verified: true,
+  },
+  {
+    id: '2',
+    author: 'NFT Artist',
+    avatar: 'https://images.unsplash.com/photo-1620321023374-d1a68fbc720d?w=100',
+    time: '4h ago',
+    content: 'New collection dropping next week! Get ready for some amazing digital art pieces 🎨✨',
+    likes: 512,
+    comments: 89,
+    image: null,
+    verified: false,
+  },
+  {
+    id: '3',
+    author: 'DeFi Master',
+    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100',
+    time: '6h ago',
+    content: 'Market analysis: Larecoin showing strong support at current levels. Bullish momentum building! 📊',
+    likes: 892,
+    comments: 156,
+    image: 'https://images.unsplash.com/photo-1642790106117-e829e14a795f?w=600',
+    verified: true,
+  },
+];
+
 export default function ProfileScreen() {
   const insets = useSafeAreaInsets();
+  const router = useRouter();
   const { activeWallet } = useApp();
-  const [copied, setCopied] = React.useState(false);
+  const [copied, setCopied] = useState(false);
+  const [activeTab, setActiveTab] = useState<'social' | 'settings'>('social');
+  const [likedPosts, setLikedPosts] = useState<string[]>([]);
+  const [savedPosts, setSavedPosts] = useState<string[]>([]);
 
   const handleCopyAddress = () => {
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleSocialFeature = (route: string | null) => {
+    if (route) {
+      router.push(route as any);
+    }
+  };
+
+  const toggleLike = (postId: string) => {
+    setLikedPosts(prev => 
+      prev.includes(postId) ? prev.filter(id => id !== postId) : [...prev, postId]
+    );
+  };
+
+  const toggleSave = (postId: string) => {
+    setSavedPosts(prev => 
+      prev.includes(postId) ? prev.filter(id => id !== postId) : [...prev, postId]
+    );
   };
 
   const memberSince = 'January 2024';
@@ -66,23 +136,135 @@ export default function ProfileScreen() {
 
           <View style={styles.statsRow}>
             <View style={styles.statItem}>
-              <Text style={styles.statValue}>$24,580</Text>
-              <Text style={styles.statLabel}>Portfolio</Text>
+              <Text style={styles.statValue}>1,234</Text>
+              <Text style={styles.statLabel}>Following</Text>
             </View>
             <View style={styles.statDivider} />
             <View style={styles.statItem}>
-              <Text style={styles.statValue}>142</Text>
-              <Text style={styles.statLabel}>Transactions</Text>
+              <Text style={styles.statValue}>5,678</Text>
+              <Text style={styles.statLabel}>Followers</Text>
             </View>
             <View style={styles.statDivider} />
             <View style={styles.statItem}>
-              <Text style={styles.statValue}>12</Text>
-              <Text style={styles.statLabel}>NFTs</Text>
+              <Text style={styles.statValue}>89</Text>
+              <Text style={styles.statLabel}>Posts</Text>
             </View>
           </View>
         </View>
 
-        <View style={styles.infoCard}>
+        <View style={styles.tabContainer}>
+          <TouchableOpacity 
+            style={[styles.tab, activeTab === 'social' && styles.tabActive]}
+            onPress={() => setActiveTab('social')}
+          >
+            <Users size={18} color={activeTab === 'social' ? Colors.primary : Colors.textSecondary} />
+            <Text style={[styles.tabText, activeTab === 'social' && styles.tabTextActive]}>Social</Text>
+          </TouchableOpacity>
+          <TouchableOpacity 
+            style={[styles.tab, activeTab === 'settings' && styles.tabActive]}
+            onPress={() => setActiveTab('settings')}
+          >
+            <Settings size={18} color={activeTab === 'settings' ? Colors.primary : Colors.textSecondary} />
+            <Text style={[styles.tabText, activeTab === 'settings' && styles.tabTextActive]}>Settings</Text>
+          </TouchableOpacity>
+        </View>
+
+        {activeTab === 'social' ? (
+          <>
+            <View style={styles.socialGrid}>
+              {socialFeatures.map((feature) => (
+                <TouchableOpacity 
+                  key={feature.id} 
+                  style={styles.socialCard}
+                  onPress={() => handleSocialFeature(feature.route)}
+                >
+                  <View style={[styles.socialIconContainer, { backgroundColor: feature.color + '15' }]}>
+                    <feature.icon size={22} color={feature.color} />
+                  </View>
+                  <Text style={styles.socialCardTitle}>{feature.title}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            <View style={styles.feedSection}>
+              <View style={styles.feedHeader}>
+                <Text style={styles.feedTitle}>News Feed</Text>
+                <TouchableOpacity>
+                  <Text style={styles.seeAllText}>See All</Text>
+                </TouchableOpacity>
+              </View>
+
+              {feedPosts.map((post) => (
+                <View key={post.id} style={styles.postCard}>
+                  <View style={styles.postHeader}>
+                    <Image source={{ uri: post.avatar }} style={styles.postAvatar} />
+                    <View style={styles.postAuthorInfo}>
+                      <View style={styles.authorNameRow}>
+                        <Text style={styles.postAuthor}>{post.author}</Text>
+                        {post.verified && (
+                          <View style={styles.verifiedBadgeSmall}>
+                            <CheckCircle size={12} color="#FFF" />
+                          </View>
+                        )}
+                      </View>
+                      <Text style={styles.postTime}>{post.time}</Text>
+                    </View>
+                    <TouchableOpacity style={styles.postMoreBtn}>
+                      <MoreHorizontal size={20} color={Colors.textSecondary} />
+                    </TouchableOpacity>
+                  </View>
+
+                  <Text style={styles.postContent}>{post.content}</Text>
+
+                  {post.image && (
+                    <Image source={{ uri: post.image }} style={styles.postImage} />
+                  )}
+
+                  <View style={styles.postActions}>
+                    <TouchableOpacity 
+                      style={styles.postAction}
+                      onPress={() => toggleLike(post.id)}
+                    >
+                      <ThumbsUp 
+                        size={20} 
+                        color={likedPosts.includes(post.id) ? Colors.primary : Colors.textSecondary} 
+                        fill={likedPosts.includes(post.id) ? Colors.primary : 'transparent'}
+                      />
+                      <Text style={[
+                        styles.postActionText,
+                        likedPosts.includes(post.id) && { color: Colors.primary }
+                      ]}>
+                        {likedPosts.includes(post.id) ? post.likes + 1 : post.likes}
+                      </Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity style={styles.postAction}>
+                      <MessageCircle size={20} color={Colors.textSecondary} />
+                      <Text style={styles.postActionText}>{post.comments}</Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity style={styles.postAction}>
+                      <Send size={20} color={Colors.textSecondary} />
+                    </TouchableOpacity>
+
+                    <TouchableOpacity 
+                      style={styles.postActionRight}
+                      onPress={() => toggleSave(post.id)}
+                    >
+                      <Bookmark 
+                        size={20} 
+                        color={savedPosts.includes(post.id) ? Colors.warning : Colors.textSecondary}
+                        fill={savedPosts.includes(post.id) ? Colors.warning : 'transparent'}
+                      />
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              ))}
+            </View>
+          </>
+        ) : (
+          <>
+            <View style={styles.infoCard}>
           <View style={styles.infoRow}>
             <Text style={styles.infoLabel}>Member Since</Text>
             <Text style={styles.infoValue}>{memberSince}</Text>
@@ -98,29 +280,31 @@ export default function ProfileScreen() {
         </View>
 
         <View style={styles.menuSection}>
-          {menuItems.map((item, index) => (
-            <TouchableOpacity 
-              key={item.id} 
-              style={[styles.menuItem, index === menuItems.length - 1 && styles.menuItemLast]}
-            >
-              <View style={[styles.menuIcon, { backgroundColor: item.color + '20' }]}>
-                <item.icon size={20} color={item.color} />
-              </View>
-              <View style={styles.menuContent}>
-                <Text style={styles.menuTitle}>{item.title}</Text>
-                <Text style={styles.menuSubtitle}>{item.subtitle}</Text>
-              </View>
-              <ChevronRight size={18} color={Colors.textTertiary} />
+              {menuItems.map((item, index) => (
+                <TouchableOpacity 
+                  key={item.id} 
+                  style={[styles.menuItem, index === menuItems.length - 1 && styles.menuItemLast]}
+                >
+                  <View style={[styles.menuIcon, { backgroundColor: item.color + '20' }]}>
+                    <item.icon size={20} color={item.color} />
+                  </View>
+                  <View style={styles.menuContent}>
+                    <Text style={styles.menuTitle}>{item.title}</Text>
+                    <Text style={styles.menuSubtitle}>{item.subtitle}</Text>
+                  </View>
+                  <ChevronRight size={18} color={Colors.textTertiary} />
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            <TouchableOpacity style={styles.logoutBtn}>
+              <LogOut size={20} color={Colors.error} />
+              <Text style={styles.logoutText}>Log Out</Text>
             </TouchableOpacity>
-          ))}
-        </View>
 
-        <TouchableOpacity style={styles.logoutBtn}>
-          <LogOut size={20} color={Colors.error} />
-          <Text style={styles.logoutText}>Log Out</Text>
-        </TouchableOpacity>
-
-        <Text style={styles.versionText}>Version 1.0.0</Text>
+            <Text style={styles.versionText}>Version 1.0.0</Text>
+          </>
+        )}
 
         <View style={{ height: 100 }} />
       </ScrollView>
@@ -331,5 +515,160 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: Colors.textTertiary,
     marginBottom: 20,
+  },
+  tabContainer: {
+    flexDirection: 'row',
+    marginHorizontal: 20,
+    marginBottom: 16,
+    backgroundColor: Colors.surface,
+    borderRadius: 14,
+    padding: 4,
+  },
+  tab: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 12,
+    borderRadius: 10,
+    gap: 6,
+  },
+  tabActive: {
+    backgroundColor: Colors.primary + '15',
+  },
+  tabText: {
+    fontSize: 14,
+    fontWeight: '500' as const,
+    color: Colors.textSecondary,
+  },
+  tabTextActive: {
+    color: Colors.primary,
+    fontWeight: '600' as const,
+  },
+  socialGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    paddingHorizontal: 16,
+    gap: 12,
+    marginBottom: 20,
+  },
+  socialCard: {
+    width: '30%',
+    backgroundColor: Colors.surface,
+    borderRadius: 16,
+    padding: 14,
+    alignItems: 'center',
+  },
+  socialIconContainer: {
+    width: 48,
+    height: 48,
+    borderRadius: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 8,
+  },
+  socialCardTitle: {
+    fontSize: 12,
+    fontWeight: '600' as const,
+    color: Colors.text,
+    textAlign: 'center',
+  },
+  feedSection: {
+    paddingHorizontal: 20,
+  },
+  feedHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  feedTitle: {
+    fontSize: 18,
+    fontWeight: '700' as const,
+    color: Colors.text,
+  },
+  seeAllText: {
+    fontSize: 14,
+    fontWeight: '600' as const,
+    color: Colors.primary,
+  },
+  postCard: {
+    backgroundColor: Colors.surface,
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 14,
+  },
+  postHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  postAvatar: {
+    width: 42,
+    height: 42,
+    borderRadius: 21,
+    marginRight: 12,
+  },
+  postAuthorInfo: {
+    flex: 1,
+  },
+  authorNameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  postAuthor: {
+    fontSize: 15,
+    fontWeight: '600' as const,
+    color: Colors.text,
+  },
+  verifiedBadgeSmall: {
+    width: 16,
+    height: 16,
+    borderRadius: 8,
+    backgroundColor: Colors.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  postTime: {
+    fontSize: 12,
+    color: Colors.textTertiary,
+    marginTop: 2,
+  },
+  postMoreBtn: {
+    padding: 4,
+  },
+  postContent: {
+    fontSize: 14,
+    lineHeight: 20,
+    color: Colors.text,
+    marginBottom: 12,
+  },
+  postImage: {
+    width: '100%',
+    height: 180,
+    borderRadius: 12,
+    marginBottom: 12,
+  },
+  postActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingTop: 8,
+    borderTopWidth: 1,
+    borderTopColor: Colors.border,
+  },
+  postAction: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginRight: 24,
+    gap: 6,
+  },
+  postActionText: {
+    fontSize: 13,
+    color: Colors.textSecondary,
+    fontWeight: '500' as const,
+  },
+  postActionRight: {
+    marginLeft: 'auto',
   },
 });
