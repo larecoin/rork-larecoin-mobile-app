@@ -39,8 +39,10 @@ import {
   Gift,
   X,
   Building2,
-  HandHeart
+  HandHeart,
+  Copy
 } from 'lucide-react-native';
+import * as Clipboard from 'expo-clipboard';
 import Colors from '@/constants/colors';
 import { useApp } from '@/contexts/AppContext';
 import ModeToggle from '@/components/ModeToggle';
@@ -237,7 +239,23 @@ export default function MerchantDashboard() {
           <View style={styles.linkedWalletInfo}>
             <Text style={styles.linkedWalletLabel}>{isCharityMode ? 'Donation Wallet' : 'Receiving Wallet'}</Text>
             {linkedMerchantWallet ? (
-              <Text style={styles.linkedWalletName}>{linkedMerchantWallet.label}</Text>
+              <>
+                <Text style={styles.linkedWalletName}>{linkedMerchantWallet.label}</Text>
+                <View style={styles.walletAddressRow}>
+                  <Text style={styles.walletAddressText}>
+                    {linkedMerchantWallet.address.slice(0, 12)}...{linkedMerchantWallet.address.slice(-8)}
+                  </Text>
+                  <TouchableOpacity 
+                    style={styles.copyAddressBtn}
+                    onPress={async (e) => {
+                      e.stopPropagation();
+                      await Clipboard.setStringAsync(linkedMerchantWallet.address);
+                    }}
+                  >
+                    <Copy size={14} color={Colors.primary} />
+                  </TouchableOpacity>
+                </View>
+              </>
             ) : (
               <Text style={styles.linkedWalletEmpty}>No wallet linked</Text>
             )}
@@ -1299,6 +1317,22 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: Colors.textSecondary,
     fontStyle: 'italic' as const,
+  },
+  walletAddressRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 4,
+    gap: 6,
+  },
+  walletAddressText: {
+    fontSize: 12,
+    color: Colors.textSecondary,
+    fontFamily: 'monospace',
+  },
+  copyAddressBtn: {
+    padding: 4,
+    borderRadius: 6,
+    backgroundColor: Colors.primary + '15',
   },
   modalOverlay: {
     position: 'absolute',
