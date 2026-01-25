@@ -7,15 +7,15 @@ export const lightTheme = {
   surface: '#FFFFFF',
   surfaceLight: '#F5FAFC',
   
-  primary: '#D4AF37',
-  primaryLight: '#E5C76B',
-  primaryDark: '#B8962E',
+  primary: '#2E86AB',
+  primaryLight: '#5DADE2',
+  primaryDark: '#1A5F7A',
   
   accent: '#00B88A',
   accentLight: '#33E5B8',
   
   success: '#00B88A',
-  warning: '#E5A030',
+  warning: '#F5A623',
   error: '#E05050',
   
   text: '#1A2A35',
@@ -26,7 +26,7 @@ export const lightTheme = {
   borderLight: '#E0EDF2',
   
   gradient: {
-    primary: ['#D4AF37', '#B8962E'],
+    primary: ['#2E86AB', '#1A5F7A'],
     accent: ['#00D9A5', '#00B88A'],
     dark: ['#E8F2F7', '#F0F7FA'],
   },
@@ -41,9 +41,9 @@ export const darkTheme = {
   surface: '#1E1E2A',
   surfaceLight: '#252535',
   
-  primary: '#D4AF37',
-  primaryLight: '#E5C76B',
-  primaryDark: '#B8962E',
+  primary: '#2E86AB',
+  primaryLight: '#5DADE2',
+  primaryDark: '#1A5F7A',
   
   accent: '#00D9A5',
   accentLight: '#33E5B8',
@@ -60,7 +60,7 @@ export const darkTheme = {
   borderLight: '#3A3A4A',
   
   gradient: {
-    primary: ['#D4AF37', '#B8962E'],
+    primary: ['#2E86AB', '#1A5F7A'],
     accent: ['#00D9A5', '#00B88A'],
     dark: ['#1A1A25', '#0A0A0F'],
   },
