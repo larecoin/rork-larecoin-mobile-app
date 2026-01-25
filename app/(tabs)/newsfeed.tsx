@@ -488,7 +488,7 @@ export default function NewsfeedScreen() {
         <View style={{ height: 100 }} />
       </ScrollView>
 
-      <TouchableOpacity style={styles.fab}>
+      <TouchableOpacity style={styles.fab} onPress={() => router.push('/menu/create-post')}>
         <Plus size={24} color="#FFF" />
       </TouchableOpacity>
     </View>
