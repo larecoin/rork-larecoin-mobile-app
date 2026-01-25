@@ -5,7 +5,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { 
   ChevronLeft, ChevronRight, Plus, Clock, MapPin, Users, 
   Video, Wallet, Heart, Gift, ShoppingBag, Calendar as CalendarIcon,
-  Bell, Star, CreditCard, ArrowUpRight
+  Bell, Star, CreditCard, ArrowUpRight, Cloud, Sun, CloudRain, Wind, Droplets, Thermometer
 } from 'lucide-react-native';
 import { useApp } from '@/contexts/AppContext';
 
@@ -54,6 +54,42 @@ const mockEvents: Record<string, CalendarEvent[]> = {
 const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
+interface WeatherData {
+  temp: number;
+  condition: 'sunny' | 'cloudy' | 'rainy';
+  humidity: number;
+  wind: number;
+  high: number;
+  low: number;
+  location: string;
+  hourly: { time: string; temp: number; condition: 'sunny' | 'cloudy' | 'rainy' }[];
+}
+
+const mockWeather: WeatherData = {
+  temp: 72,
+  condition: 'sunny',
+  humidity: 45,
+  wind: 8,
+  high: 78,
+  low: 62,
+  location: 'San Francisco, CA',
+  hourly: [
+    { time: '9AM', temp: 65, condition: 'cloudy' },
+    { time: '12PM', temp: 72, condition: 'sunny' },
+    { time: '3PM', temp: 76, condition: 'sunny' },
+    { time: '6PM', temp: 74, condition: 'sunny' },
+    { time: '9PM', temp: 68, condition: 'cloudy' },
+  ],
+};
+
+const getWeatherIcon = (condition: 'sunny' | 'cloudy' | 'rainy') => {
+  switch (condition) {
+    case 'sunny': return Sun;
+    case 'cloudy': return Cloud;
+    case 'rainy': return CloudRain;
+  }
+};
+
 const getEventIcon = (type: EventType) => {
   switch (type) {
     case 'payment': return CreditCard;
@@ -84,6 +120,7 @@ export default function CalendarScreen() {
   const [selectedDate, setSelectedDate] = useState(25);
   const [currentMonth, setCurrentMonth] = useState(0);
   const [currentYear, setCurrentYear] = useState(2026);
+  const [showWeather, setShowWeather] = useState(false);
 
   const getDaysInMonth = (month: number, year: number) => {
     return new Date(year, month + 1, 0).getDate();
@@ -155,10 +192,29 @@ export default function CalendarScreen() {
       <Stack.Screen options={{ headerShown: false }} />
       
       <View style={[styles.header, { paddingTop: insets.top + 10, backgroundColor: colors.surface }]}>
-        <Text style={[styles.headerTitle, { color: colors.text }]}>Calendar</Text>
-        <Text style={[styles.headerSubtitle, { color: colors.textSecondary }]}>
-          Events & Invitations
-        </Text>
+        <View style={styles.headerRow}>
+          <View>
+            <Text style={[styles.headerTitle, { color: colors.text }]}>Calendar</Text>
+            <Text style={[styles.headerSubtitle, { color: colors.textSecondary }]}>
+              Events & Invitations
+            </Text>
+          </View>
+          <TouchableOpacity
+            style={[
+              styles.weatherToggle,
+              { backgroundColor: showWeather ? colors.primary : colors.background }
+            ]}
+            onPress={() => setShowWeather(!showWeather)}
+          >
+            <Cloud size={18} color={showWeather ? '#FFF' : colors.textSecondary} />
+            <Text style={[
+              styles.weatherToggleText,
+              { color: showWeather ? '#FFF' : colors.textSecondary }
+            ]}>
+              Weather
+            </Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
       <ScrollView 
@@ -166,6 +222,68 @@ export default function CalendarScreen() {
         contentContainerStyle={{ paddingBottom: insets.bottom + 100 }}
         showsVerticalScrollIndicator={false}
       >
+        {showWeather && (
+          <View style={[styles.weatherCard, { backgroundColor: colors.surface }]}>
+            <View style={styles.weatherHeader}>
+              <View style={styles.weatherLocation}>
+                <MapPin size={14} color={colors.primary} />
+                <Text style={[styles.weatherLocationText, { color: colors.text }]}>
+                  {mockWeather.location}
+                </Text>
+              </View>
+              <Text style={[styles.weatherDate, { color: colors.textSecondary }]}>
+                {months[currentMonth]} {selectedDate}, {currentYear}
+              </Text>
+            </View>
+            
+            <View style={styles.weatherMain}>
+              <View style={styles.weatherTemp}>
+                {(() => {
+                  const WeatherIcon = getWeatherIcon(mockWeather.condition);
+                  return <WeatherIcon size={48} color="#F59E0B" />;
+                })()}
+                <Text style={[styles.tempText, { color: colors.text }]}>{mockWeather.temp}°</Text>
+                <Text style={[styles.conditionText, { color: colors.textSecondary }]}>
+                  {mockWeather.condition.charAt(0).toUpperCase() + mockWeather.condition.slice(1)}
+                </Text>
+              </View>
+              
+              <View style={styles.weatherDetails}>
+                <View style={styles.weatherDetailRow}>
+                  <Thermometer size={16} color={colors.textTertiary} />
+                  <Text style={[styles.weatherDetailLabel, { color: colors.textSecondary }]}>H/L</Text>
+                  <Text style={[styles.weatherDetailValue, { color: colors.text }]}>
+                    {mockWeather.high}° / {mockWeather.low}°
+                  </Text>
+                </View>
+                <View style={styles.weatherDetailRow}>
+                  <Droplets size={16} color={colors.textTertiary} />
+                  <Text style={[styles.weatherDetailLabel, { color: colors.textSecondary }]}>Humidity</Text>
+                  <Text style={[styles.weatherDetailValue, { color: colors.text }]}>{mockWeather.humidity}%</Text>
+                </View>
+                <View style={styles.weatherDetailRow}>
+                  <Wind size={16} color={colors.textTertiary} />
+                  <Text style={[styles.weatherDetailLabel, { color: colors.textSecondary }]}>Wind</Text>
+                  <Text style={[styles.weatherDetailValue, { color: colors.text }]}>{mockWeather.wind} mph</Text>
+                </View>
+              </View>
+            </View>
+            
+            <View style={[styles.hourlyForecast, { borderTopColor: colors.border }]}>
+              {mockWeather.hourly.map((hour, index) => {
+                const HourIcon = getWeatherIcon(hour.condition);
+                return (
+                  <View key={index} style={styles.hourlyItem}>
+                    <Text style={[styles.hourlyTime, { color: colors.textSecondary }]}>{hour.time}</Text>
+                    <HourIcon size={20} color={hour.condition === 'sunny' ? '#F59E0B' : colors.textTertiary} />
+                    <Text style={[styles.hourlyTemp, { color: colors.text }]}>{hour.temp}°</Text>
+                  </View>
+                );
+              })}
+            </View>
+          </View>
+        )}
+
         {upcomingEvents.length > 0 && (
           <View style={styles.invitationsSection}>
             <Text style={[styles.sectionLabel, { color: colors.textSecondary }]}>PENDING INVITATIONS</Text>
@@ -375,6 +493,99 @@ const styles = StyleSheet.create({
   headerSubtitle: {
     fontSize: 14,
     marginTop: 4,
+  },
+  headerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  weatherToggle: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 20,
+    gap: 6,
+  },
+  weatherToggleText: {
+    fontSize: 13,
+    fontWeight: '600' as const,
+  },
+  weatherCard: {
+    margin: 16,
+    marginBottom: 0,
+    borderRadius: 20,
+    padding: 16,
+  },
+  weatherHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  weatherLocation: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  weatherLocationText: {
+    fontSize: 14,
+    fontWeight: '600' as const,
+  },
+  weatherDate: {
+    fontSize: 12,
+  },
+  weatherMain: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  weatherTemp: {
+    alignItems: 'center',
+  },
+  tempText: {
+    fontSize: 48,
+    fontWeight: '700' as const,
+    marginTop: 4,
+  },
+  conditionText: {
+    fontSize: 14,
+    marginTop: 2,
+  },
+  weatherDetails: {
+    gap: 10,
+  },
+  weatherDetailRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  weatherDetailLabel: {
+    fontSize: 12,
+    width: 60,
+  },
+  weatherDetailValue: {
+    fontSize: 14,
+    fontWeight: '600' as const,
+  },
+  hourlyForecast: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 16,
+    paddingTop: 16,
+    borderTopWidth: 1,
+  },
+  hourlyItem: {
+    alignItems: 'center',
+    gap: 6,
+  },
+  hourlyTime: {
+    fontSize: 11,
+    fontWeight: '500' as const,
+  },
+  hourlyTemp: {
+    fontSize: 14,
+    fontWeight: '600' as const,
   },
   content: {
     flex: 1,
