@@ -16,12 +16,12 @@ import { useApp } from '@/contexts/AppContext';
 import NavMenuModal from '@/components/NavMenuModal';
 
 const menuItems = [
-  { id: 'security', title: 'Security', subtitle: '2FA enabled', icon: Shield, color: '#3498DB' },
-  { id: 'notifications', title: 'Notifications', subtitle: 'Push & Email', icon: Bell, color: '#9B59B6' },
-  { id: 'help', title: 'Help Center', subtitle: 'FAQs & Support', icon: HelpCircle, color: '#E74C3C' },
-  { id: 'terms', title: 'Terms & Privacy', subtitle: 'Legal documents', icon: FileText, color: '#95A5A6' },
-  { id: 'share', title: 'Share App', subtitle: 'Invite friends', icon: Share2, color: '#2ECC71' },
-  { id: 'rate', title: 'Rate Us', subtitle: 'On the App Store', icon: Star, color: '#F39C12' },
+  { id: 'security', title: 'Security', subtitle: '2FA enabled', icon: Shield, color: '#3498DB', route: '/menu/security' },
+  { id: 'notifications', title: 'Notifications', subtitle: 'Push & Email', icon: Bell, color: '#9B59B6', route: '/menu/notifications' },
+  { id: 'help', title: 'Help Center', subtitle: 'FAQs & Support', icon: HelpCircle, color: '#E74C3C', route: '/menu/help-center' },
+  { id: 'terms', title: 'Terms & Privacy', subtitle: 'Legal documents', icon: FileText, color: '#95A5A6', route: '/menu/terms-privacy' },
+  { id: 'share', title: 'Share App', subtitle: 'Invite friends', icon: Share2, color: '#2ECC71', route: '/menu/share-app' },
+  { id: 'rate', title: 'Rate Us', subtitle: 'On the App Store', icon: Star, color: '#F39C12', route: '/menu/rate-us' },
 ];
 
 const socialFeatures = [
@@ -546,6 +546,7 @@ export default function ProfileScreen() {
                 <TouchableOpacity 
                   key={item.id} 
                   style={[styles.menuItem, index === menuItems.length - 1 && styles.menuItemLast]}
+                  onPress={() => router.push(item.route as any)}
                 >
                   <View style={[styles.menuIcon, { backgroundColor: item.color + '20' }]}>
                     <item.icon size={20} color={item.color} />
