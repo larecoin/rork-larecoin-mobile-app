@@ -1,11 +1,24 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, RefreshControl } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
 import { 
   Megaphone, Plus, Eye, MousePointer, DollarSign, 
-  BarChart3, Calendar, Filter, ChevronRight, Pause, Play, Edit2, Trash2
+  BarChart3, Calendar, Filter, ChevronRight, Pause, Play, Edit2, Trash2,
+  Store, Star, MapPin, CheckCircle, Globe, Settings, ExternalLink
 } from 'lucide-react-native';
 import Colors from '@/constants/colors';
+
+interface BusinessListing {
+  id: string;
+  name: string;
+  category: string;
+  address: string;
+  rating: number;
+  reviewCount: number;
+  isVerified: boolean;
+  status: 'active' | 'pending' | 'inactive';
+}
 
 interface Ad {
   id: string;
@@ -57,8 +70,20 @@ const mockAds: Ad[] = [
 
 export default function AdManagerScreen() {
   const insets = useSafeAreaInsets();
+  const router = useRouter();
   const [refreshing, setRefreshing] = useState(false);
   const [ads] = useState<Ad[]>(mockAds);
+  
+  const [businessListing] = useState<BusinessListing | null>({
+    id: '1',
+    name: 'Crypto Coffee Shop',
+    category: 'Food & Beverage',
+    address: '123 Blockchain Ave, Miami, FL',
+    rating: 4.8,
+    reviewCount: 124,
+    isVerified: true,
+    status: 'active',
+  });
 
   const totalSpent = ads.reduce((sum, ad) => sum + ad.spent, 0);
   const totalImpressions = ads.reduce((sum, ad) => sum + ad.impressions, 0);
@@ -93,6 +118,96 @@ export default function AdManagerScreen() {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={Colors.primary} />
         }
       >
+        {/* My Business Listing Section */}
+        <View style={styles.businessListingSection}>
+          <View style={styles.businessListingHeader}>
+            <View style={styles.businessListingTitleRow}>
+              <Globe size={20} color={Colors.primary} />
+              <Text style={styles.businessListingSectionTitle}>My Business Listing</Text>
+            </View>
+            <Text style={styles.businessListingSubtitle}>Global Crypto Merchant Directory</Text>
+          </View>
+
+          {businessListing ? (
+            <View style={styles.businessCard}>
+              <View style={styles.businessCardHeader}>
+                <View style={styles.businessIconContainer}>
+                  <Store size={24} color={Colors.primary} />
+                </View>
+                <View style={styles.businessInfo}>
+                  <View style={styles.businessNameRow}>
+                    <Text style={styles.businessName}>{businessListing.name}</Text>
+                    {businessListing.isVerified && (
+                      <CheckCircle size={16} color={Colors.accent} />
+                    )}
+                  </View>
+                  <Text style={styles.businessCategory}>{businessListing.category}</Text>
+                  <View style={styles.businessLocationRow}>
+                    <MapPin size={12} color={Colors.textSecondary} />
+                    <Text style={styles.businessAddress}>{businessListing.address}</Text>
+                  </View>
+                </View>
+              </View>
+
+              <View style={styles.businessStatsRow}>
+                <View style={styles.businessStatItem}>
+                  <View style={styles.ratingContainer}>
+                    <Star size={14} color="#FFD700" fill="#FFD700" />
+                    <Text style={styles.ratingText}>{businessListing.rating}</Text>
+                  </View>
+                  <Text style={styles.businessStatLabel}>Rating</Text>
+                </View>
+                <View style={styles.businessStatDivider} />
+                <View style={styles.businessStatItem}>
+                  <Text style={styles.businessStatValue}>{businessListing.reviewCount}</Text>
+                  <Text style={styles.businessStatLabel}>Reviews</Text>
+                </View>
+                <View style={styles.businessStatDivider} />
+                <View style={styles.businessStatItem}>
+                  <View style={[
+                    styles.statusIndicator,
+                    { backgroundColor: businessListing.status === 'active' ? Colors.accent : Colors.warning }
+                  ]} />
+                  <Text style={styles.businessStatLabel}>
+                    {businessListing.status.charAt(0).toUpperCase() + businessListing.status.slice(1)}
+                  </Text>
+                </View>
+              </View>
+
+              <View style={styles.businessActions}>
+                <TouchableOpacity 
+                  style={styles.businessActionBtn}
+                  onPress={() => router.push('/menu/business-listings')}
+                >
+                  <Settings size={16} color={Colors.text} />
+                  <Text style={styles.businessActionText}>Manage Listing</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.businessActionBtnPrimary}>
+                  <ExternalLink size={16} color={Colors.background} />
+                  <Text style={styles.businessActionTextPrimary}>View in Directory</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          ) : (
+            <View style={styles.noListingCard}>
+              <View style={styles.noListingIcon}>
+                <Store size={32} color={Colors.textSecondary} />
+              </View>
+              <Text style={styles.noListingTitle}>No Business Listing Yet</Text>
+              <Text style={styles.noListingText}>
+                Add your business to the global crypto merchant directory and reach thousands of crypto users worldwide.
+              </Text>
+              <TouchableOpacity 
+                style={styles.addListingBtn}
+                onPress={() => router.push('/menu/business-listings')}
+              >
+                <Plus size={18} color={Colors.background} />
+                <Text style={styles.addListingBtnText}>Add Business Listing</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+        </View>
+
         <View style={styles.statsRow}>
           <View style={styles.statCard}>
             <View style={[styles.statIcon, { backgroundColor: Colors.primary + '20' }]}>
@@ -200,6 +315,204 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Colors.background,
+  },
+  businessListingSection: {
+    paddingHorizontal: 20,
+    marginBottom: 20,
+  },
+  businessListingHeader: {
+    marginBottom: 12,
+  },
+  businessListingTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 4,
+  },
+  businessListingSectionTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: Colors.text,
+  },
+  businessListingSubtitle: {
+    fontSize: 13,
+    color: Colors.textSecondary,
+    marginLeft: 28,
+  },
+  businessCard: {
+    backgroundColor: Colors.surface,
+    borderRadius: 16,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: Colors.primary + '30',
+  },
+  businessCardHeader: {
+    flexDirection: 'row',
+    marginBottom: 16,
+  },
+  businessIconContainer: {
+    width: 52,
+    height: 52,
+    borderRadius: 14,
+    backgroundColor: Colors.primary + '15',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+  },
+  businessInfo: {
+    flex: 1,
+  },
+  businessNameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginBottom: 2,
+  },
+  businessName: {
+    fontSize: 17,
+    fontWeight: '700',
+    color: Colors.text,
+  },
+  businessCategory: {
+    fontSize: 13,
+    color: Colors.primary,
+    fontWeight: '500',
+    marginBottom: 4,
+  },
+  businessLocationRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  businessAddress: {
+    fontSize: 12,
+    color: Colors.textSecondary,
+    flex: 1,
+  },
+  businessStatsRow: {
+    flexDirection: 'row',
+    backgroundColor: Colors.background,
+    borderRadius: 12,
+    padding: 14,
+    marginBottom: 14,
+    alignItems: 'center',
+  },
+  businessStatItem: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  businessStatDivider: {
+    width: 1,
+    height: 30,
+    backgroundColor: Colors.border,
+  },
+  ratingContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    marginBottom: 2,
+  },
+  ratingText: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: Colors.text,
+  },
+  businessStatValue: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: Colors.text,
+    marginBottom: 2,
+  },
+  businessStatLabel: {
+    fontSize: 11,
+    color: Colors.textSecondary,
+  },
+  statusIndicator: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    marginBottom: 4,
+  },
+  businessActions: {
+    flexDirection: 'row',
+    gap: 10,
+  },
+  businessActionBtn: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    backgroundColor: Colors.background,
+    paddingVertical: 12,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: Colors.border,
+  },
+  businessActionText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: Colors.text,
+  },
+  businessActionBtnPrimary: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    backgroundColor: Colors.primary,
+    paddingVertical: 12,
+    borderRadius: 12,
+  },
+  businessActionTextPrimary: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: Colors.background,
+  },
+  noListingCard: {
+    backgroundColor: Colors.surface,
+    borderRadius: 16,
+    padding: 24,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: Colors.border,
+    borderStyle: 'dashed',
+  },
+  noListingIcon: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: Colors.background,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 14,
+  },
+  noListingTitle: {
+    fontSize: 17,
+    fontWeight: '700',
+    color: Colors.text,
+    marginBottom: 8,
+  },
+  noListingText: {
+    fontSize: 13,
+    color: Colors.textSecondary,
+    textAlign: 'center',
+    lineHeight: 20,
+    marginBottom: 18,
+  },
+  addListingBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    backgroundColor: Colors.primary,
+    paddingHorizontal: 20,
+    paddingVertical: 14,
+    borderRadius: 12,
+  },
+  addListingBtnText: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: Colors.background,
   },
   header: {
     flexDirection: 'row',
