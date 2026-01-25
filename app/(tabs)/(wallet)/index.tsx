@@ -374,15 +374,15 @@ export default function WalletDashboard() {
 
         {/* Card Manager Section */}
         <View style={styles.cardManagerSection}>
-          <View style={[styles.cardManagerHeader, { backgroundColor: colors.primary }]}>
+          <View style={[styles.cardManagerHeader, { backgroundColor: '#E3F2FD' }]}>
             <View style={styles.cardManagerHeaderContent}>
               <View>
                 <Text style={styles.cardManagerLabel}>LUSD Debit Card</Text>
                 <Text style={styles.cardManagerBalance}>${lusdBalance.toLocaleString()}</Text>
                 <Text style={styles.cardManagerSubtext}>Available for card spending</Text>
               </View>
-              <View style={[styles.cardManagerBadge, { backgroundColor: 'rgba(255,255,255,0.2)' }]}>
-                <CreditCard size={20} color="#FFFFFF" />
+              <View style={[styles.cardManagerBadge, { backgroundColor: 'rgba(30,136,229,0.15)' }]}>
+                <CreditCard size={20} color="#1E88E5" />
               </View>
             </View>
           </View>
@@ -1118,17 +1118,17 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   cardManagerLabel: {
-    color: 'rgba(255,255,255,0.8)',
+    color: '#1565C0',
     fontSize: 13,
     marginBottom: 4,
   },
   cardManagerBalance: {
-    color: '#FFFFFF',
+    color: '#0D47A1',
     fontSize: 28,
     fontWeight: '700' as const,
   },
   cardManagerSubtext: {
-    color: 'rgba(255,255,255,0.7)',
+    color: '#1976D2',
     fontSize: 12,
     marginTop: 4,
   },
