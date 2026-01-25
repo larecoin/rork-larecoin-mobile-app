@@ -64,13 +64,13 @@ export default function MerchantDashboard() {
   ];
 
   const merchantTools = [
-    { id: 'qr-shop', icon: Globe, label: 'QR Shop', desc: 'Generate shop QR', color: '#1ABC9C' },
-    { id: 'locations', icon: MapPin, label: 'Locations', desc: '2 active', color: '#E74C3C' },
+    { id: 'inventory', icon: Package, label: 'Inventory', desc: 'Stock manager', color: '#1ABC9C', onPress: () => router.push('/(tabs)/(merchant)/inventory') },
+    { id: 'hr-payroll', icon: Users, label: 'HR & Payroll', desc: 'Team & wages', color: '#3498DB', onPress: () => router.push('/(tabs)/(merchant)/hr-payroll') },
+    { id: 'gift-certs', icon: CreditCard, label: 'Gift Cards', desc: 'Issue & manage', color: '#9B59B6', onPress: () => router.push('/(tabs)/(merchant)/gift-certificates') },
+    { id: 'reports', icon: FileText, label: 'Reports', desc: 'Statements', color: '#E67E22', onPress: () => router.push('/(tabs)/(merchant)/statements-reports') },
+    { id: 'bill-pay', icon: Wallet, label: 'Bill Pay', desc: 'Pay vendors', color: '#E74C3C', onPress: () => router.push('/(tabs)/(merchant)/bill-pay') },
     { id: 'discounts', icon: Percent, label: 'Discounts', desc: '3 active promos', color: '#F39C12' },
-    { id: 'invoices', icon: FileText, label: 'Invoices', desc: 'Create & manage', color: '#9B59B6' },
-    { id: 'customers', icon: Users, label: 'Customers', desc: '127 total', color: '#3498DB' },
-    { id: 'payouts', icon: CreditCard, label: 'Payouts', desc: 'Auto-settle', color: '#2ECC71' },
-    { id: 'ads', icon: Megaphone, label: 'Ad Manager', desc: 'Promote store', color: '#E67E22' },
+    { id: 'ads', icon: Megaphone, label: 'Ad Manager', desc: 'Promote store', color: '#2ECC71' },
     { id: 'settings', icon: Settings, label: 'Settings', desc: 'Store config', color: '#95A5A6' },
   ];
 
@@ -278,7 +278,7 @@ export default function MerchantDashboard() {
           </View>
           <View style={styles.toolsGrid}>
             {merchantTools.map(tool => (
-              <TouchableOpacity key={tool.id} style={styles.toolCard}>
+              <TouchableOpacity key={tool.id} style={styles.toolCard} onPress={tool.onPress}>
                 <View style={[styles.toolIconWrapper, { backgroundColor: tool.color + '15' }]}>
                   <tool.icon size={20} color={tool.color} />
                 </View>

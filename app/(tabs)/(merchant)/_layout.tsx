@@ -39,6 +39,11 @@ export default function MerchantLayout() {
           headerStyle: { backgroundColor: Colors.backgroundSecondary },
         }} 
       />
+      <Stack.Screen name="inventory" options={{ headerShown: false }} />
+      <Stack.Screen name="hr-payroll" options={{ headerShown: false }} />
+      <Stack.Screen name="gift-certificates" options={{ headerShown: false }} />
+      <Stack.Screen name="statements-reports" options={{ headerShown: false }} />
+      <Stack.Screen name="bill-pay" options={{ headerShown: false }} />
     </Stack>
   );
 }
