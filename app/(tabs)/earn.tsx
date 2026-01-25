@@ -1,7 +1,7 @@
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Gift, Coins, Users, Target, Trophy, ChevronRight, Zap, CheckCircle } from 'lucide-react-native';
+import { Gift, Coins, Users, Target, Trophy, ChevronRight, Zap, CheckCircle, Sparkles, TrendingUp, Ticket, Landmark, Leaf } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Colors from '@/constants/colors';
 
@@ -15,12 +15,30 @@ interface EarnOption {
   progress?: number;
 }
 
+interface PendingReward {
+  id: string;
+  source: string;
+  amount: number;
+  icon: React.ComponentType<{ size: number; color: string }>;
+  color: string;
+  apy?: string;
+}
+
 const earnOptions: EarnOption[] = [
   { id: '1', title: 'Daily Check-in', description: 'Claim your daily reward', reward: '5 LARE', icon: Gift, color: '#9B59B6', progress: 100 },
   { id: '2', title: 'Staking Rewards', description: 'Earn passive income on holdings', reward: '12% APY', icon: Coins, color: '#F39C12' },
   { id: '3', title: 'Referral Program', description: 'Invite friends and earn', reward: '50 LARE/ref', icon: Users, color: '#3498DB' },
   { id: '4', title: 'Complete Quests', description: 'Finish tasks for rewards', reward: 'Up to 100 LARE', icon: Target, color: '#E74C3C' },
   { id: '5', title: 'Trading Rewards', description: 'Earn cashback on trades', reward: '0.5% cashback', icon: Zap, color: '#2ECC71' },
+];
+
+const initialPendingRewards: PendingReward[] = [
+  { id: 'staking', source: 'Staking', amount: 28.5, icon: Coins, color: '#F39C12', apy: '12%' },
+  { id: 'farms', source: 'Farms', amount: 15.2, icon: Leaf, color: '#2ECC71', apy: '45%' },
+  { id: 'bonds', source: 'Bonds', amount: 12.8, icon: Landmark, color: '#3498DB', apy: '8%' },
+  { id: 'draws', source: 'Lucky Draws', amount: 10.0, icon: Ticket, color: '#9B59B6' },
+  { id: 'trading', source: 'Trading Cashback', amount: 5.5, icon: TrendingUp, color: '#E74C3C' },
+  { id: 'referral', source: 'Referrals', amount: 3.0, icon: Users, color: '#1ABC9C' },
 ];
 
 const quests = [
@@ -32,9 +50,59 @@ const quests = [
 
 export default function EarnScreen() {
   const insets = useSafeAreaInsets();
+  const [pendingRewardsList, setPendingRewardsList] = useState<PendingReward[]>(initialPendingRewards);
+  const [isHarvesting, setIsHarvesting] = useState(false);
 
   const totalEarned = 1250;
-  const pendingRewards = 75;
+  const totalPendingAmount = pendingRewardsList.reduce((sum, r) => sum + r.amount, 0);
+
+  const handleHarvestAll = () => {
+    if (totalPendingAmount === 0) {
+      Alert.alert('No Rewards', 'You have no pending rewards to harvest.');
+      return;
+    }
+    
+    Alert.alert(
+      'Harvest All Rewards',
+      `You are about to claim ${totalPendingAmount.toFixed(2)} LARE from all sources.`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Harvest All',
+          onPress: () => {
+            setIsHarvesting(true);
+            setTimeout(() => {
+              setPendingRewardsList(prev => prev.map(r => ({ ...r, amount: 0 })));
+              setIsHarvesting(false);
+              Alert.alert('Success!', `You have claimed ${totalPendingAmount.toFixed(2)} LARE!`);
+            }, 1500);
+          },
+        },
+      ]
+    );
+  };
+
+  const handleClaimSingle = (rewardId: string) => {
+    const reward = pendingRewardsList.find(r => r.id === rewardId);
+    if (!reward || reward.amount === 0) return;
+
+    Alert.alert(
+      `Claim ${reward.source}`,
+      `Claim ${reward.amount.toFixed(2)} LARE from ${reward.source}?`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Claim',
+          onPress: () => {
+            setPendingRewardsList(prev =>
+              prev.map(r => (r.id === rewardId ? { ...r, amount: 0 } : r))
+            );
+            Alert.alert('Claimed!', `${reward.amount.toFixed(2)} LARE added to your balance.`);
+          },
+        },
+      ]
+    );
+  };
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
@@ -61,13 +129,54 @@ export default function EarnScreen() {
             <View style={styles.rewardDivider} />
             <View style={styles.rewardStat}>
               <Text style={styles.rewardLabel}>Pending</Text>
-              <Text style={styles.rewardValue}>{pendingRewards} LARE</Text>
+              <Text style={styles.rewardValue}>{totalPendingAmount.toFixed(2)} LARE</Text>
             </View>
           </View>
-          <TouchableOpacity style={styles.claimBtn}>
-            <Text style={styles.claimBtnText}>Claim Rewards</Text>
+          <TouchableOpacity 
+            style={[styles.harvestAllBtn, totalPendingAmount === 0 && styles.harvestAllBtnDisabled]}
+            onPress={handleHarvestAll}
+            disabled={isHarvesting || totalPendingAmount === 0}
+          >
+            <Sparkles size={18} color={totalPendingAmount === 0 ? Colors.textTertiary : Colors.accent} />
+            <Text style={[styles.harvestAllBtnText, totalPendingAmount === 0 && styles.harvestAllBtnTextDisabled]}>
+              {isHarvesting ? 'Harvesting...' : 'Harvest All Rewards'}
+            </Text>
           </TouchableOpacity>
         </LinearGradient>
+
+        <View style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>Pending Rewards</Text>
+            <Text style={styles.pendingTotal}>{totalPendingAmount.toFixed(2)} LARE</Text>
+          </View>
+          <View style={styles.pendingContainer}>
+            {pendingRewardsList.map(reward => (
+              <View key={reward.id} style={styles.pendingItem}>
+                <View style={[styles.pendingIcon, { backgroundColor: reward.color + '20' }]}>
+                  <reward.icon size={18} color={reward.color} />
+                </View>
+                <View style={styles.pendingInfo}>
+                  <Text style={styles.pendingSource}>{reward.source}</Text>
+                  {reward.apy && <Text style={styles.pendingApy}>{reward.apy} APY</Text>}
+                </View>
+                <View style={styles.pendingRight}>
+                  <Text style={[styles.pendingAmount, reward.amount === 0 && styles.pendingAmountZero]}>
+                    {reward.amount.toFixed(2)} LARE
+                  </Text>
+                  <TouchableOpacity
+                    style={[styles.claimSingleBtn, reward.amount === 0 && styles.claimSingleBtnDisabled]}
+                    onPress={() => handleClaimSingle(reward.id)}
+                    disabled={reward.amount === 0}
+                  >
+                    <Text style={[styles.claimSingleText, reward.amount === 0 && styles.claimSingleTextDisabled]}>
+                      Claim
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            ))}
+          </View>
+        </View>
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Ways to Earn</Text>
@@ -295,5 +404,91 @@ const styles = StyleSheet.create({
   },
   questRewardCompleted: {
     color: Colors.textSecondary,
+  },
+  harvestAllBtn: {
+    backgroundColor: Colors.background,
+    borderRadius: 14,
+    paddingVertical: 14,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+  },
+  harvestAllBtnDisabled: {
+    backgroundColor: Colors.surface,
+  },
+  harvestAllBtnText: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: Colors.accent,
+  },
+  harvestAllBtnTextDisabled: {
+    color: Colors.textTertiary,
+  },
+  pendingContainer: {
+    backgroundColor: Colors.surface,
+    borderRadius: 16,
+    padding: 4,
+  },
+  pendingItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 12,
+    borderRadius: 12,
+  },
+  pendingIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  pendingInfo: {
+    flex: 1,
+    marginLeft: 12,
+  },
+  pendingSource: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: Colors.text,
+  },
+  pendingApy: {
+    fontSize: 12,
+    color: Colors.success,
+    marginTop: 2,
+  },
+  pendingRight: {
+    alignItems: 'flex-end',
+    gap: 6,
+  },
+  pendingAmount: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: Colors.text,
+  },
+  pendingAmountZero: {
+    color: Colors.textTertiary,
+  },
+  pendingTotal: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: Colors.primary,
+  },
+  claimSingleBtn: {
+    backgroundColor: Colors.primary + '20',
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 8,
+  },
+  claimSingleBtnDisabled: {
+    backgroundColor: Colors.border,
+  },
+  claimSingleText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: Colors.primary,
+  },
+  claimSingleTextDisabled: {
+    color: Colors.textTertiary,
   },
 });
