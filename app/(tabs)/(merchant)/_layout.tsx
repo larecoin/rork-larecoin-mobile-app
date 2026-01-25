@@ -44,6 +44,7 @@ export default function MerchantLayout() {
       <Stack.Screen name="gift-certificates" options={{ headerShown: false }} />
       <Stack.Screen name="statements-reports" options={{ headerShown: false }} />
       <Stack.Screen name="bill-pay" options={{ headerShown: false }} />
+      <Stack.Screen name="receipts" options={{ headerShown: false }} />
     </Stack>
   );
 }

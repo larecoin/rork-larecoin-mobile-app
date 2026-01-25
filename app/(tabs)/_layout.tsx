@@ -3,7 +3,8 @@ import { View, TouchableOpacity, Text, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { 
   Wallet, TrendingUp, BookOpen, Gift, ShoppingBag, User,
-  LayoutDashboard, Megaphone, Store, Grid3X3, Users, ClipboardList
+  LayoutDashboard, Megaphone, Store, Grid3X3, Users, ClipboardList,
+  Newspaper, Receipt
 } from 'lucide-react-native';
 import { useApp } from '@/contexts/AppContext';
 
@@ -14,9 +15,9 @@ function CustomTabBar() {
   const insets = useSafeAreaInsets();
 
   const walletTabs = [
+    { name: 'newsfeed', title: 'Feed', icon: Newspaper, route: '/newsfeed' },
     { name: '(wallet)', title: 'Wallet', icon: Wallet, route: '/' },
     { name: 'markets', title: 'Markets', icon: TrendingUp, route: '/markets' },
-    { name: 'learn', title: 'Learn', icon: BookOpen, route: '/learn' },
     { name: 'earn', title: 'Earn', icon: Gift, route: '/earn' },
     { name: 'shop', title: 'Shop', icon: ShoppingBag, route: '/shop' },
     { name: 'profile', title: 'Profile', icon: User, route: '/profile' },
@@ -27,8 +28,8 @@ function CustomTabBar() {
     { name: 'ads', title: 'Ad Manager', icon: Megaphone, route: '/(merchant)/ads' },
     { name: 'myshop', title: 'My Shop', icon: Store, route: '/(merchant)/myshop' },
     { name: 'apps', title: 'My Apps', icon: Grid3X3, route: '/(merchant)/apps' },
-    { name: 'contacts', title: 'Contacts', icon: Users, route: '/(merchant)/contacts' },
     { name: 'merchantorders', title: 'Orders', icon: ClipboardList, route: '/(merchant)/merchantorders' },
+    { name: 'receipts', title: 'Receipts', icon: Receipt, route: '/(merchant)/receipts' },
   ];
 
   const tabs = mode === 'merchant' ? merchantTabs : walletTabs;
@@ -73,6 +74,7 @@ export default function TabLayout() {
       }}
       tabBar={() => <CustomTabBar />}
     >
+      <Tabs.Screen name="newsfeed" />
       <Tabs.Screen name="(wallet)" />
       <Tabs.Screen name="(merchant)" />
       <Tabs.Screen name="markets" />
