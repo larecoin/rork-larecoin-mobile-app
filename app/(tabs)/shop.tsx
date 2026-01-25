@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Image } from 'react-native';
+import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { 
   Search, ShoppingCart, ChevronRight, MapPin, QrCode, ChevronDown, ChevronUp,
@@ -235,6 +236,7 @@ const categories: Category[] = [
 
 export default function ShopScreen() {
   const insets = useSafeAreaInsets();
+  const router = useRouter();
   const [selectedLocation, setSelectedLocation] = useState('Current Location');
   const [searchQuery, setSearchQuery] = useState('');
   const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
@@ -391,7 +393,7 @@ export default function ShopScreen() {
           <TouchableOpacity style={styles.iconBtn}>
             <QrCode size={20} color={Colors.text} />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.cartBtn}>
+          <TouchableOpacity style={styles.cartBtn} onPress={() => router.push('/menu/cart')}>
             <ShoppingCart size={20} color={Colors.text} />
             <View style={styles.cartBadge}>
               <Text style={styles.cartBadgeText}>2</Text>
