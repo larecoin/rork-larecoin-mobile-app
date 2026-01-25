@@ -15,7 +15,7 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, RefreshControl, T
 import Svg, { Path, Defs, LinearGradient, Stop } from 'react-native-svg';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { ArrowUpRight, ArrowDownLeft, RefreshCw, Eye, EyeOff, ChevronRight, Plus, ChevronDown, Image, Coins, Droplets, Wallet, Check, Trash2, Edit3, Menu, Search, ArrowLeftRight, Clover, Receipt, GitBranch, Users, ShoppingCart, DollarSign, ShieldCheck, HandCoins, Send, FileText, CreditCard, Lock, Smartphone, Bell, AlertCircle, Shield, Settings, Link, Globe } from 'lucide-react-native';
+import { ArrowUpRight, ArrowDownLeft, RefreshCw, Eye, EyeOff, ChevronRight, Plus, ChevronDown, Image, Coins, Droplets, Wallet, Check, Trash2, Edit3, Menu, Search, ArrowLeftRight, Clover, Receipt, GitBranch, Users, ShoppingCart, DollarSign, ShieldCheck, HandCoins, Send, FileText, CreditCard, Lock, Smartphone, Bell, AlertCircle, Shield, Settings, Link, Globe, TrendingUp, Repeat, Landmark, PiggyBank, Percent, Zap, Bot, Copy, Grid3X3, Target, Gem, Rocket, BarChart3, Scale, CircleDollarSign, Layers, Vote, Sparkles } from 'lucide-react-native';
 import { useApp } from '@/contexts/AppContext';
 import ModeToggle from '@/components/ModeToggle';
 import TokenCard from '@/components/TokenCard';
@@ -74,6 +74,7 @@ export default function WalletDashboard() {
   const [selectedChain, setSelectedChain] = React.useState<string>('');
   const [contractAddress, setContractAddress] = React.useState('');
   const [showChainPicker, setShowChainPicker] = React.useState(false);
+  const [tradeTab, setTradeTab] = React.useState<'basic' | 'advanced'>('basic');
 
   const chains = [
     { id: 'ethereum', name: 'Ethereum', symbol: 'ETH' },
@@ -659,6 +660,219 @@ export default function WalletDashboard() {
               <Text style={[styles.emptyNftsSubtext, { color: colors.textSecondary }]}>Your transaction receipts as NFTs will appear here</Text>
             </View>
           )}
+
+          {/* Trade Section */}
+          <View style={styles.tradeSection}>
+            <View style={styles.tradeSectionHeader}>
+              <Text style={[styles.tradeSectionTitle, { color: colors.text }]}>Trade</Text>
+              <View style={[styles.tradeTabToggle, { backgroundColor: colors.surface }]}>
+                <TouchableOpacity 
+                  style={[styles.tradeTabOption, tradeTab === 'basic' && { backgroundColor: colors.primary }]}
+                  onPress={() => setTradeTab('basic')}
+                >
+                  <Text style={[styles.tradeTabText, { color: tradeTab === 'basic' ? '#FFFFFF' : colors.textSecondary }]}>Basic Trading</Text>
+                </TouchableOpacity>
+                <TouchableOpacity 
+                  style={[styles.tradeTabOption, tradeTab === 'advanced' && { backgroundColor: colors.primary }]}
+                  onPress={() => setTradeTab('advanced')}
+                >
+                  <Text style={[styles.tradeTabText, { color: tradeTab === 'advanced' ? '#FFFFFF' : colors.textSecondary }]}>Advanced Trading</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            {tradeTab === 'basic' ? (
+              <View style={[styles.tradeContent, { backgroundColor: colors.surface }]}>
+                {/* Core Spot Trading */}
+                <View style={styles.tradeCategory}>
+                  <Text style={[styles.tradeCategoryTitle, { color: colors.primary }]}>Core Spot Trading</Text>
+                  <View style={styles.tradeItemsGrid}>
+                    <TouchableOpacity style={styles.tradeItem}>
+                      <View style={[styles.tradeItemIcon, { backgroundColor: '#10B981' + '20' }]}>
+                        <TrendingUp size={16} color="#10B981" />
+                      </View>
+                      <Text style={[styles.tradeItemLabel, { color: colors.text }]}>Spot Trading</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.tradeItem}>
+                      <View style={[styles.tradeItemIcon, { backgroundColor: '#6366F1' + '20' }]}>
+                        <Repeat size={16} color="#6366F1" />
+                      </View>
+                      <Text style={[styles.tradeItemLabel, { color: colors.text }]}>Crypto-to-Crypto</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.tradeItem}>
+                      <View style={[styles.tradeItemIcon, { backgroundColor: '#F59E0B' + '20' }]}>
+                        <Landmark size={16} color="#F59E0B" />
+                      </View>
+                      <Text style={[styles.tradeItemLabel, { color: colors.text }]}>Fiat Exchange</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+
+                {/* DeFi & Yield */}
+                <View style={styles.tradeCategory}>
+                  <Text style={[styles.tradeCategoryTitle, { color: colors.primary }]}>DeFi & Yield</Text>
+                  <View style={styles.tradeItemsGrid}>
+                    <TouchableOpacity style={styles.tradeItem}>
+                      <View style={[styles.tradeItemIcon, { backgroundColor: '#8B5CF6' + '20' }]}>
+                        <Droplets size={16} color="#8B5CF6" />
+                      </View>
+                      <Text style={[styles.tradeItemLabel, { color: colors.text }]}>DEX Swap</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.tradeItem}>
+                      <View style={[styles.tradeItemIcon, { backgroundColor: '#EC4899' + '20' }]}>
+                        <PiggyBank size={16} color="#EC4899" />
+                      </View>
+                      <Text style={[styles.tradeItemLabel, { color: colors.text }]}>Liquidity Mining</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.tradeItem}>
+                      <View style={[styles.tradeItemIcon, { backgroundColor: '#14B8A6' + '20' }]}>
+                        <Percent size={16} color="#14B8A6" />
+                      </View>
+                      <Text style={[styles.tradeItemLabel, { color: colors.text }]}>Yield Farming</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.tradeItem}>
+                      <View style={[styles.tradeItemIcon, { backgroundColor: '#0EA5E9' + '20' }]}>
+                        <HandCoins size={16} color="#0EA5E9" />
+                      </View>
+                      <Text style={[styles.tradeItemLabel, { color: colors.text }]}>Lend/Borrow</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.tradeItem}>
+                      <View style={[styles.tradeItemIcon, { backgroundColor: '#F97316' + '20' }]}>
+                        <Coins size={16} color="#F97316" />
+                      </View>
+                      <Text style={[styles.tradeItemLabel, { color: colors.text }]}>Staking</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.tradeItem}>
+                      <View style={[styles.tradeItemIcon, { backgroundColor: '#84CC16' + '20' }]}>
+                        <Layers size={16} color="#84CC16" />
+                      </View>
+                      <Text style={[styles.tradeItemLabel, { color: colors.text }]}>Liquid Staking</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+
+                {/* Other Activities */}
+                <View style={styles.tradeCategory}>
+                  <Text style={[styles.tradeCategoryTitle, { color: colors.primary }]}>Other</Text>
+                  <View style={styles.tradeItemsGrid}>
+                    <TouchableOpacity style={styles.tradeItem}>
+                      <View style={[styles.tradeItemIcon, { backgroundColor: '#EF4444' + '20' }]}>
+                        <Gem size={16} color="#EF4444" />
+                      </View>
+                      <Text style={[styles.tradeItemLabel, { color: colors.text }]}>NFT Trading</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.tradeItem}>
+                      <View style={[styles.tradeItemIcon, { backgroundColor: '#22C55E' + '20' }]}>
+                        <Zap size={16} color="#22C55E" />
+                      </View>
+                      <Text style={[styles.tradeItemLabel, { color: colors.text }]}>Arbitrage</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.tradeItem}>
+                      <View style={[styles.tradeItemIcon, { backgroundColor: '#A855F7' + '20' }]}>
+                        <Rocket size={16} color="#A855F7" />
+                      </View>
+                      <Text style={[styles.tradeItemLabel, { color: colors.text }]}>IDO/IEO</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </View>
+            ) : (
+              <View style={[styles.tradeContent, { backgroundColor: colors.surface }]}>
+                {/* Leveraged & Derivatives */}
+                <View style={styles.tradeCategory}>
+                  <Text style={[styles.tradeCategoryTitle, { color: colors.primary }]}>Leveraged & Derivatives</Text>
+                  <View style={styles.tradeItemsGrid}>
+                    <TouchableOpacity style={styles.tradeItem}>
+                      <View style={[styles.tradeItemIcon, { backgroundColor: '#EF4444' + '20' }]}>
+                        <TrendingUp size={16} color="#EF4444" />
+                      </View>
+                      <Text style={[styles.tradeItemLabel, { color: colors.text }]}>Margin Trading</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.tradeItem}>
+                      <View style={[styles.tradeItemIcon, { backgroundColor: '#F59E0B' + '20' }]}>
+                        <BarChart3 size={16} color="#F59E0B" />
+                      </View>
+                      <Text style={[styles.tradeItemLabel, { color: colors.text }]}>Futures</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.tradeItem}>
+                      <View style={[styles.tradeItemIcon, { backgroundColor: '#8B5CF6' + '20' }]}>
+                        <RefreshCw size={16} color="#8B5CF6" />
+                      </View>
+                      <Text style={[styles.tradeItemLabel, { color: colors.text }]}>Perpetuals</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.tradeItem}>
+                      <View style={[styles.tradeItemIcon, { backgroundColor: '#06B6D4' + '20' }]}>
+                        <Scale size={16} color="#06B6D4" />
+                      </View>
+                      <Text style={[styles.tradeItemLabel, { color: colors.text }]}>Options</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.tradeItem}>
+                      <View style={[styles.tradeItemIcon, { backgroundColor: '#EC4899' + '20' }]}>
+                        <CircleDollarSign size={16} color="#EC4899" />
+                      </View>
+                      <Text style={[styles.tradeItemLabel, { color: colors.text }]}>CFDs</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.tradeItem}>
+                      <View style={[styles.tradeItemIcon, { backgroundColor: '#10B981' + '20' }]}>
+                        <Zap size={16} color="#10B981" />
+                      </View>
+                      <Text style={[styles.tradeItemLabel, { color: colors.text }]}>Leveraged Tokens</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+
+                {/* Automated Trading */}
+                <View style={styles.tradeCategory}>
+                  <Text style={[styles.tradeCategoryTitle, { color: colors.primary }]}>Automated Trading</Text>
+                  <View style={styles.tradeItemsGrid}>
+                    <TouchableOpacity style={styles.tradeItem}>
+                      <View style={[styles.tradeItemIcon, { backgroundColor: '#3B82F6' + '20' }]}>
+                        <Copy size={16} color="#3B82F6" />
+                      </View>
+                      <Text style={[styles.tradeItemLabel, { color: colors.text }]}>Copy Trading</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.tradeItem}>
+                      <View style={[styles.tradeItemIcon, { backgroundColor: '#14B8A6' + '20' }]}>
+                        <Grid3X3 size={16} color="#14B8A6" />
+                      </View>
+                      <Text style={[styles.tradeItemLabel, { color: colors.text }]}>Grid Bots</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.tradeItem}>
+                      <View style={[styles.tradeItemIcon, { backgroundColor: '#6366F1' + '20' }]}>
+                        <Bot size={16} color="#6366F1" />
+                      </View>
+                      <Text style={[styles.tradeItemLabel, { color: colors.text }]}>DCA Bots</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+
+                {/* Prediction & Events */}
+                <View style={styles.tradeCategory}>
+                  <Text style={[styles.tradeCategoryTitle, { color: colors.primary }]}>Prediction & Events</Text>
+                  <View style={styles.tradeItemsGrid}>
+                    <TouchableOpacity style={styles.tradeItem}>
+                      <View style={[styles.tradeItemIcon, { backgroundColor: '#A855F7' + '20' }]}>
+                        <Target size={16} color="#A855F7" />
+                      </View>
+                      <Text style={[styles.tradeItemLabel, { color: colors.text }]}>Prediction Markets</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.tradeItem}>
+                      <View style={[styles.tradeItemIcon, { backgroundColor: '#F97316' + '20' }]}>
+                        <Vote size={16} color="#F97316" />
+                      </View>
+                      <Text style={[styles.tradeItemLabel, { color: colors.text }]}>Event Trading</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.tradeItem}>
+                      <View style={[styles.tradeItemIcon, { backgroundColor: '#22C55E' + '20' }]}>
+                        <Sparkles size={16} color="#22C55E" />
+                      </View>
+                      <Text style={[styles.tradeItemLabel, { color: colors.text }]}>Flash Loans</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </View>
+            )}
+          </View>
         </View>
 
         <View style={styles.section}>
@@ -1738,5 +1952,70 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 15,
     fontWeight: '600' as const,
+  },
+  tradeSection: {
+    marginTop: 20,
+  },
+  tradeSectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  tradeSectionTitle: {
+    fontSize: 16,
+    fontWeight: '700' as const,
+  },
+  tradeTabToggle: {
+    flexDirection: 'row',
+    borderRadius: 8,
+    padding: 2,
+  },
+  tradeTabOption: {
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 6,
+  },
+  tradeTabText: {
+    fontSize: 11,
+    fontWeight: '600' as const,
+  },
+  tradeContent: {
+    borderRadius: 14,
+    padding: 14,
+  },
+  tradeCategory: {
+    marginBottom: 14,
+  },
+  tradeCategoryTitle: {
+    fontSize: 11,
+    fontWeight: '700' as const,
+    textTransform: 'uppercase' as const,
+    letterSpacing: 0.5,
+    marginBottom: 10,
+  },
+  tradeItemsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  tradeItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    borderRadius: 8,
+    gap: 6,
+  },
+  tradeItemIcon: {
+    width: 28,
+    height: 28,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  tradeItemLabel: {
+    fontSize: 11,
+    fontWeight: '500' as const,
   },
 });
