@@ -4,7 +4,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { 
   Wallet, TrendingUp, BookOpen, Gift, ShoppingBag, User,
   LayoutDashboard, Megaphone, Store, Grid3X3, Users, ClipboardList,
-  Newspaper, Receipt
+  Newspaper, Receipt, Calendar
 } from 'lucide-react-native';
 import { useApp } from '@/contexts/AppContext';
 
@@ -17,7 +17,7 @@ function CustomTabBar() {
   const walletTabs = [
     { name: 'newsfeed', title: 'Feed', icon: Newspaper, route: '/newsfeed' },
     { name: '(wallet)', title: 'Wallet', icon: Wallet, route: '/' },
-    { name: 'markets', title: 'Markets', icon: TrendingUp, route: '/markets' },
+    { name: 'calendar', title: 'Calendar', icon: Calendar, route: '/calendar' },
     { name: 'earn', title: 'Earn', icon: Gift, route: '/earn' },
     { name: 'shop', title: 'Shop', icon: ShoppingBag, route: '/shop' },
     { name: 'profile', title: 'Profile', icon: User, route: '/profile' },
@@ -76,6 +76,7 @@ export default function TabLayout() {
     >
       <Tabs.Screen name="newsfeed" />
       <Tabs.Screen name="(wallet)" />
+      <Tabs.Screen name="calendar" />
       <Tabs.Screen name="(merchant)" />
       <Tabs.Screen name="markets" />
       <Tabs.Screen name="learn" />
