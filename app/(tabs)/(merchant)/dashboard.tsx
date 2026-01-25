@@ -254,7 +254,11 @@ export default function MerchantDashboard() {
                     style={styles.copyAddressBtn}
                     onPress={async (e) => {
                       e.stopPropagation();
-                      await Clipboard.setStringAsync(linkedMerchantWallet.address);
+                      try {
+                        await Clipboard.setStringAsync(linkedMerchantWallet.address);
+                      } catch (error) {
+                        console.log('Copy error:', error);
+                      }
                     }}
                   >
                     <Copy size={14} color={Colors.primary} />

@@ -7,7 +7,6 @@ import {
   CreditCard, Wallet, Clock, Building2, Users, Bitcoin, Fingerprint,
   ChevronDown, ChevronUp, DollarSign, Smartphone, Receipt
 } from 'lucide-react-native';
-import { Platform } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
 import Colors from '@/constants/colors';
 import { useApp } from '@/contexts/AppContext';
@@ -207,13 +206,13 @@ export default function MyShopScreen() {
   };
 
   const copyShopUrl = async () => {
-    if (Platform.OS === 'web') {
-      await navigator.clipboard.writeText(`https://${shopUrl}`);
-    } else {
+    try {
       await Clipboard.setStringAsync(`https://${shopUrl}`);
+      setCopiedUrl(true);
+      setTimeout(() => setCopiedUrl(false), 2000);
+    } catch (error) {
+      console.log('Copy error:', error);
     }
-    setCopiedUrl(true);
-    setTimeout(() => setCopiedUrl(false), 2000);
   };
 
   const onRefresh = () => {
