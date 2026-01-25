@@ -112,16 +112,6 @@ const menuSections: MenuSection[] = [
     ],
   },
   {
-    title: 'Developer',
-    items: [
-      { id: 'developers', label: 'Developers', icon: Code },
-      { id: 'domains', label: 'Domains & Websites', icon: Globe },
-      { id: 'file-storage', label: 'File Storage', icon: HardDrive },
-      { id: 'products-services', label: 'Products & Services', icon: Package },
-      { id: 'apis-hooks', label: "API's & Hooks", icon: Webhook },
-    ],
-  },
-  {
     title: 'Merchant Portal',
     items: [
       { id: 'merchant-portal', label: 'Merchant Portal', icon: Store },
@@ -143,6 +133,16 @@ const menuSections: MenuSection[] = [
     items: [
       { id: 'reseller-program', label: 'Reseller Program', icon: Award },
       { id: 'join-reseller', label: 'Join Reseller Program', icon: UserPlus },
+    ],
+  },
+  {
+    title: 'Developer',
+    items: [
+      { id: 'developers', label: 'Developers', icon: Code },
+      { id: 'domains', label: 'Domains & Websites', icon: Globe },
+      { id: 'file-storage', label: 'File Storage', icon: HardDrive },
+      { id: 'products-services', label: 'Products & Services', icon: Package },
+      { id: 'apis-hooks', label: "API's & Hooks", icon: Webhook },
     ],
   },
 ];
