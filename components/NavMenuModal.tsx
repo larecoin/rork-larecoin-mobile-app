@@ -45,6 +45,17 @@ const menuSections: MenuSection[] = [
     ],
   },
   {
+    title: 'Wallet',
+    items: [
+      { id: 'wallet-nfts', label: 'My Wallet & NFTs', icon: Image },
+      { id: 'staking-rewards', label: 'Staking & Rewards', icon: Coins },
+      { id: 'payment-methods', label: 'Payment Methods', icon: CreditCard },
+      { id: 'forex', label: 'Foreign Exchange', icon: Banknote },
+      { id: 'lucky-draw', label: 'My Lucky Draws', icon: Clover },
+      { id: 'borrow-lend', label: 'Borrow & Lend', icon: HandCoins },
+    ],
+  },
+  {
     title: 'Shopping',
     items: [
       { id: 'shopping', label: 'Shopping', icon: ShoppingCart },
@@ -80,17 +91,6 @@ const menuSections: MenuSection[] = [
     items: [
       { id: 'bug-bounty', label: 'Bug Bounty', icon: Bug },
       { id: 'referrals', label: 'Referrals', icon: Gift },
-    ],
-  },
-  {
-    title: 'Wallet',
-    items: [
-      { id: 'wallet-nfts', label: 'My Wallet & NFTs', icon: Image },
-      { id: 'staking-rewards', label: 'Staking & Rewards', icon: Coins },
-      { id: 'payment-methods', label: 'Payment Methods', icon: CreditCard },
-      { id: 'forex', label: 'Foreign Exchange', icon: Banknote },
-      { id: 'lucky-draw', label: 'My Lucky Draws', icon: Clover },
-      { id: 'borrow-lend', label: 'Borrow & Lend', icon: HandCoins },
     ],
   },
   {
