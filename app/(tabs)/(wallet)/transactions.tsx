@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import { Stack, useRouter } from 'expo-router';
+import { Receipt } from 'lucide-react-native';
 import Colors from '@/constants/colors';
 import { useApp } from '@/contexts/AppContext';
 import TransactionItem from '@/components/TransactionItem';
@@ -16,6 +18,7 @@ const filters: { key: FilterType; label: string }[] = [
 ];
 
 export default function TransactionsScreen() {
+  const router = useRouter();
   const { userTransactions } = useApp();
   const [activeFilter, setActiveFilter] = useState<FilterType>('all');
 
@@ -25,6 +28,20 @@ export default function TransactionsScreen() {
 
   return (
     <View style={styles.container}>
+      <Stack.Screen 
+        options={{ 
+          title: 'Transactions',
+          headerRight: () => (
+            <TouchableOpacity 
+              style={styles.taxButton}
+              onPress={() => router.push('/menu/tax-center')}
+            >
+              <Receipt size={18} color={Colors.primary} />
+              <Text style={styles.taxButtonText}>Taxes</Text>
+            </TouchableOpacity>
+          ),
+        }} 
+      />
       <View style={styles.filterContainer}>
         <FlatList
           horizontal
@@ -121,5 +138,19 @@ const styles = StyleSheet.create({
   emptyText: {
     fontSize: 16,
     color: Colors.textSecondary,
+  },
+  taxButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: Colors.primary + '15',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+    gap: 6,
+  },
+  taxButtonText: {
+    fontSize: 14,
+    fontWeight: '600' as const,
+    color: Colors.primary,
   },
 });
