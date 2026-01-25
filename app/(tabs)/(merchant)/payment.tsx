@@ -11,6 +11,7 @@ const acceptedTokens = tokens.slice(0, 3);
 export default function PaymentScreen() {
   const router = useRouter();
   const [amount, setAmount] = useState('');
+  const [memo, setMemo] = useState('');
   const [selectedToken, setSelectedToken] = useState(acceptedTokens[0]);
   const [showTokenPicker, setShowTokenPicker] = useState(false);
   const [generated, setGenerated] = useState(false);
@@ -27,6 +28,7 @@ export default function PaymentScreen() {
   const handleNewPayment = () => {
     setGenerated(false);
     setAmount('');
+    setMemo('');
   };
 
   const cryptoAmount = parseFloat(amount || '0') / selectedToken.usdValue;
@@ -64,6 +66,12 @@ export default function PaymentScreen() {
             <Text style={styles.cryptoAmount}>
               ≈ {cryptoAmount.toFixed(6)} {selectedToken.symbol}
             </Text>
+            {memo ? (
+              <View style={styles.memoDisplay}>
+                <Text style={styles.memoLabel}>Memo</Text>
+                <Text style={styles.memoText}>{memo}</Text>
+              </View>
+            ) : null}
           </View>
 
           <View style={styles.statusBadge}>
@@ -108,6 +116,19 @@ export default function PaymentScreen() {
               keyboardType="decimal-pad"
             />
           </View>
+        </View>
+
+        <View style={styles.section}>
+          <Text style={styles.label}>Memo (Optional)</Text>
+          <TextInput
+            style={styles.memoInput}
+            value={memo}
+            onChangeText={setMemo}
+            placeholder="What is this payment for?"
+            placeholderTextColor={Colors.textTertiary}
+            multiline
+            numberOfLines={2}
+          />
         </View>
 
         <View style={styles.section}>
@@ -235,6 +256,18 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: Colors.text,
     paddingVertical: 16,
+  },
+  memoInput: {
+    backgroundColor: Colors.surface,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    fontSize: 15,
+    color: Colors.text,
+    minHeight: 60,
+    textAlignVertical: 'top',
   },
   tokenSelector: {
     flexDirection: 'row',
@@ -381,6 +414,23 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: Colors.accent,
     fontWeight: '600',
+  },
+  memoDisplay: {
+    marginTop: 16,
+    paddingTop: 16,
+    borderTopWidth: 1,
+    borderTopColor: Colors.border,
+    alignItems: 'center',
+  },
+  memoLabel: {
+    fontSize: 12,
+    color: Colors.textSecondary,
+    marginBottom: 4,
+  },
+  memoText: {
+    fontSize: 14,
+    color: Colors.text,
+    textAlign: 'center',
   },
   statusBadge: {
     flexDirection: 'row',
