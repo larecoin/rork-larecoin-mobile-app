@@ -5,7 +5,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { 
   Search, ShoppingCart, ChevronRight, MapPin, QrCode, ChevronDown, ChevronUp,
   Car, Briefcase, Home, MapPinned, Zap, Truck, Building2, Tag, Wrench, Globe,
-  Users, Store, ArrowLeft, Clock, Flame, Star, BadgeCheck, TrendingUp, MapPinIcon
+  Users, Store, ArrowLeft, Clock, Flame, Star, BadgeCheck, TrendingUp, MapPinIcon,
+  Navigation, Plus, X, CircleDot, Square, Shield, Sparkles, Timer, UserCheck, Locate
 } from 'lucide-react-native';
 import Colors from '@/constants/colors';
 
@@ -31,6 +32,27 @@ interface MerchantAd {
   bumpedUntil?: Date;
   category: string;
   subcategory: string;
+}
+
+interface RideOption {
+  id: string;
+  name: string;
+  provider: string;
+  providerLogo: string;
+  vehicleType: string;
+  capacity: number;
+  price: number;
+  surge: number;
+  eta: number;
+  duration: number;
+  distance: number;
+  features: string[];
+}
+
+interface Location {
+  address: string;
+  lat?: number;
+  lng?: number;
 }
 
 const generateMockAds = (category: string, subcategory: string): MerchantAd[] => {
@@ -255,6 +277,119 @@ export default function ShopScreen() {
     setAdSearchQuery('');
   };
 
+  const [pickupLocation, setPickupLocation] = useState<Location>({ address: '' });
+  const [dropoffLocation, setDropoffLocation] = useState<Location>({ address: '' });
+  const [stops, setStops] = useState<Location[]>([]);
+  const [selectedRideType, setSelectedRideType] = useState<string>('economy');
+  const [showRideOptions, setShowRideOptions] = useState(false);
+  const [selectedRide, setSelectedRide] = useState<RideOption | null>(null);
+
+  const rideTypes = [
+    { id: 'economy', name: 'Economy', icon: '🚗', description: 'Affordable everyday rides' },
+    { id: 'comfort', name: 'Comfort', icon: '🚙', description: 'Newer cars, extra legroom' },
+    { id: 'premium', name: 'Premium', icon: '🚘', description: 'Luxury vehicles' },
+    { id: 'xl', name: 'XL', icon: '🚐', description: 'For groups up to 6' },
+  ];
+
+  const generateRideOptions = (): RideOption[] => {
+    const basePrice = 12 + Math.random() * 8;
+    const baseDuration = 15 + Math.floor(Math.random() * 20);
+    const baseDistance = 3.5 + Math.random() * 5;
+    
+    return [
+      {
+        id: '1',
+        name: 'UberX',
+        provider: 'Uber',
+        providerLogo: 'https://images.unsplash.com/photo-1617791160505-6f00504e3519?w=100',
+        vehicleType: selectedRideType,
+        capacity: selectedRideType === 'xl' ? 6 : 4,
+        price: basePrice * (selectedRideType === 'premium' ? 1.8 : selectedRideType === 'comfort' ? 1.3 : selectedRideType === 'xl' ? 1.5 : 1),
+        surge: Math.random() > 0.7 ? 1.2 + Math.random() * 0.5 : 1,
+        eta: 3 + Math.floor(Math.random() * 5),
+        duration: baseDuration,
+        distance: baseDistance,
+        features: ['Affordable', 'Quick pickup'],
+      },
+      {
+        id: '2',
+        name: 'Lyft',
+        provider: 'Lyft',
+        providerLogo: 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=100',
+        vehicleType: selectedRideType,
+        capacity: selectedRideType === 'xl' ? 6 : 4,
+        price: (basePrice * 0.95) * (selectedRideType === 'premium' ? 1.75 : selectedRideType === 'comfort' ? 1.25 : selectedRideType === 'xl' ? 1.45 : 1),
+        surge: Math.random() > 0.7 ? 1.1 + Math.random() * 0.4 : 1,
+        eta: 4 + Math.floor(Math.random() * 6),
+        duration: baseDuration + Math.floor(Math.random() * 3),
+        distance: baseDistance,
+        features: ['Friendly drivers', 'Best price'],
+      },
+      {
+        id: '3',
+        name: 'UberX Share',
+        provider: 'Uber',
+        providerLogo: 'https://images.unsplash.com/photo-1617791160505-6f00504e3519?w=100',
+        vehicleType: 'shared',
+        capacity: 2,
+        price: basePrice * 0.65,
+        surge: 1,
+        eta: 5 + Math.floor(Math.random() * 8),
+        duration: baseDuration + 10 + Math.floor(Math.random() * 10),
+        distance: baseDistance,
+        features: ['Save money', 'Eco-friendly'],
+      },
+      {
+        id: '4',
+        name: 'Lyft Shared',
+        provider: 'Lyft',
+        providerLogo: 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=100',
+        vehicleType: 'shared',
+        capacity: 2,
+        price: basePrice * 0.6,
+        surge: 1,
+        eta: 6 + Math.floor(Math.random() * 7),
+        duration: baseDuration + 12 + Math.floor(Math.random() * 8),
+        distance: baseDistance,
+        features: ['Cheapest option', 'Meet new people'],
+      },
+    ];
+  };
+
+  const rideOptions = useMemo(() => {
+    if (showRideOptions) {
+      return generateRideOptions();
+    }
+    return [];
+  }, [showRideOptions, selectedRideType]);
+
+  const handleGetQuotes = () => {
+    if (pickupLocation.address && dropoffLocation.address) {
+      setShowRideOptions(true);
+    }
+  };
+
+  const handleAddStop = () => {
+    if (stops.length < 3) {
+      setStops([...stops, { address: '' }]);
+    }
+  };
+
+  const handleRemoveStop = (index: number) => {
+    setStops(stops.filter((_, i) => i !== index));
+  };
+
+  const handleUpdateStop = (index: number, address: string) => {
+    const newStops = [...stops];
+    newStops[index] = { address };
+    setStops(newStops);
+  };
+
+  const handleRequestRide = (ride: RideOption) => {
+    setSelectedRide(ride);
+    console.log('Requesting ride:', ride);
+  };
+
   const filteredCategories = searchQuery 
     ? categories.filter(cat => 
         cat.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -279,6 +414,268 @@ export default function ShopScreen() {
       return b.postedAt.getTime() - a.postedAt.getTime();
     });
   }, [selectedSubcategory, adSearchQuery]);
+
+  if (selectedSubcategory?.subcategory === 'Rideshare') {
+    return (
+      <View style={[styles.container, { paddingTop: insets.top }]}>
+        <View style={styles.rideHeader}>
+          <TouchableOpacity 
+            style={styles.backBtn}
+            onPress={() => {
+              setSelectedSubcategory(null);
+              setShowRideOptions(false);
+              setSelectedRide(null);
+              setPickupLocation({ address: '' });
+              setDropoffLocation({ address: '' });
+              setStops([]);
+            }}
+          >
+            <ArrowLeft size={22} color={Colors.text} />
+          </TouchableOpacity>
+          <View style={styles.rideHeaderInfo}>
+            <Text style={styles.rideHeaderTitle}>Rideshare</Text>
+            <Text style={styles.rideHeaderSubtitle}>Get a ride anywhere</Text>
+          </View>
+        </View>
+
+        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.rideScrollContent}>
+          {/* Map Preview Area */}
+          <View style={styles.mapPreview}>
+            <View style={styles.mapPlaceholder}>
+              <Navigation size={40} color={Colors.primary} />
+              <Text style={styles.mapPlaceholderText}>Route will appear here</Text>
+            </View>
+            {pickupLocation.address && dropoffLocation.address && (
+              <View style={styles.routeOverlay}>
+                <View style={styles.routeInfo}>
+                  <View style={styles.routePoint}>
+                    <CircleDot size={14} color="#22C55E" />
+                    <Text style={styles.routePointText} numberOfLines={1}>{pickupLocation.address}</Text>
+                  </View>
+                  {stops.map((stop, index) => (
+                    <View key={index} style={styles.routePoint}>
+                      <Square size={12} color="#F59E0B" />
+                      <Text style={styles.routePointText} numberOfLines={1}>{stop.address || 'Stop ' + (index + 1)}</Text>
+                    </View>
+                  ))}
+                  <View style={styles.routePoint}>
+                    <MapPin size={14} color="#EF4444" />
+                    <Text style={styles.routePointText} numberOfLines={1}>{dropoffLocation.address}</Text>
+                  </View>
+                </View>
+              </View>
+            )}
+          </View>
+
+          {/* Location Inputs */}
+          <View style={styles.locationInputsCard}>
+            <View style={styles.locationInputRow}>
+              <View style={styles.locationDotGreen} />
+              <View style={styles.locationInputWrapper}>
+                <Text style={styles.locationInputLabel}>Pickup</Text>
+                <TextInput
+                  style={styles.locationInput}
+                  placeholder="Enter pickup location"
+                  placeholderTextColor={Colors.textTertiary}
+                  value={pickupLocation.address}
+                  onChangeText={(text) => setPickupLocation({ address: text })}
+                />
+              </View>
+              <TouchableOpacity style={styles.locateBtn}>
+                <Locate size={18} color={Colors.primary} />
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.locationDivider} />
+
+            {stops.map((stop, index) => (
+              <React.Fragment key={index}>
+                <View style={styles.locationInputRow}>
+                  <View style={styles.locationDotYellow} />
+                  <View style={styles.locationInputWrapper}>
+                    <Text style={styles.locationInputLabel}>Stop {index + 1}</Text>
+                    <TextInput
+                      style={styles.locationInput}
+                      placeholder="Enter stop location"
+                      placeholderTextColor={Colors.textTertiary}
+                      value={stop.address}
+                      onChangeText={(text) => handleUpdateStop(index, text)}
+                    />
+                  </View>
+                  <TouchableOpacity 
+                    style={styles.removeStopBtn}
+                    onPress={() => handleRemoveStop(index)}
+                  >
+                    <X size={18} color={Colors.error} />
+                  </TouchableOpacity>
+                </View>
+                <View style={styles.locationDivider} />
+              </React.Fragment>
+            ))}
+
+            <View style={styles.locationInputRow}>
+              <View style={styles.locationDotRed} />
+              <View style={styles.locationInputWrapper}>
+                <Text style={styles.locationInputLabel}>Drop-off</Text>
+                <TextInput
+                  style={styles.locationInput}
+                  placeholder="Enter destination"
+                  placeholderTextColor={Colors.textTertiary}
+                  value={dropoffLocation.address}
+                  onChangeText={(text) => setDropoffLocation({ address: text })}
+                />
+              </View>
+            </View>
+
+            {stops.length < 3 && (
+              <TouchableOpacity style={styles.addStopBtn} onPress={handleAddStop}>
+                <Plus size={16} color={Colors.primary} />
+                <Text style={styles.addStopText}>Add stop</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+
+          {/* Ride Type Selector */}
+          <Text style={styles.sectionTitle}>Select ride type</Text>
+          <ScrollView 
+            horizontal 
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.rideTypesScroll}
+          >
+            {rideTypes.map((type) => (
+              <TouchableOpacity
+                key={type.id}
+                style={[
+                  styles.rideTypeCard,
+                  selectedRideType === type.id && styles.rideTypeCardSelected
+                ]}
+                onPress={() => setSelectedRideType(type.id)}
+              >
+                <Text style={styles.rideTypeIcon}>{type.icon}</Text>
+                <Text style={[
+                  styles.rideTypeName,
+                  selectedRideType === type.id && styles.rideTypeNameSelected
+                ]}>{type.name}</Text>
+                <Text style={styles.rideTypeDesc}>{type.description}</Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+
+          {/* Get Quote Button */}
+          {!showRideOptions && (
+            <TouchableOpacity 
+              style={[
+                styles.getQuoteBtn,
+                (!pickupLocation.address || !dropoffLocation.address) && styles.getQuoteBtnDisabled
+              ]}
+              onPress={handleGetQuotes}
+              disabled={!pickupLocation.address || !dropoffLocation.address}
+            >
+              <Search size={20} color="#FFF" />
+              <Text style={styles.getQuoteBtnText}>Get Ride Quotes</Text>
+            </TouchableOpacity>
+          )}
+
+          {/* Ride Options */}
+          {showRideOptions && (
+            <View style={styles.rideOptionsSection}>
+              <View style={styles.rideOptionsHeader}>
+                <Text style={styles.sectionTitle}>Available Rides</Text>
+                <TouchableOpacity onPress={() => setShowRideOptions(false)}>
+                  <Text style={styles.editRouteText}>Edit route</Text>
+                </TouchableOpacity>
+              </View>
+
+              {rideOptions.sort((a, b) => a.price - b.price).map((ride) => (
+                <TouchableOpacity
+                  key={ride.id}
+                  style={[
+                    styles.rideOptionCard,
+                    selectedRide?.id === ride.id && styles.rideOptionCardSelected
+                  ]}
+                  onPress={() => setSelectedRide(ride)}
+                >
+                  <View style={styles.rideOptionLeft}>
+                    <View style={[
+                      styles.providerBadge,
+                      ride.provider === 'Uber' ? styles.uberBadge : styles.lyftBadge
+                    ]}>
+                      <Text style={styles.providerBadgeText}>{ride.provider}</Text>
+                    </View>
+                    <View style={styles.rideOptionInfo}>
+                      <Text style={styles.rideOptionName}>{ride.name}</Text>
+                      <View style={styles.rideOptionMeta}>
+                        <Timer size={12} color={Colors.textTertiary} />
+                        <Text style={styles.rideOptionMetaText}>{ride.eta} min away</Text>
+                        <Text style={styles.rideOptionDot}>•</Text>
+                        <UserCheck size={12} color={Colors.textTertiary} />
+                        <Text style={styles.rideOptionMetaText}>{ride.capacity} seats</Text>
+                      </View>
+                      <View style={styles.rideFeatures}>
+                        {ride.features.map((feature, i) => (
+                          <View key={i} style={styles.featureTag}>
+                            <Text style={styles.featureTagText}>{feature}</Text>
+                          </View>
+                        ))}
+                      </View>
+                    </View>
+                  </View>
+                  <View style={styles.rideOptionRight}>
+                    {ride.surge > 1 && (
+                      <View style={styles.surgeBadge}>
+                        <Sparkles size={10} color="#FFF" />
+                        <Text style={styles.surgeBadgeText}>{ride.surge.toFixed(1)}x</Text>
+                      </View>
+                    )}
+                    <Text style={styles.ridePrice}>${(ride.price * ride.surge).toFixed(2)}</Text>
+                    <Text style={styles.rideDuration}>{ride.duration} min trip</Text>
+                  </View>
+                </TouchableOpacity>
+              ))}
+
+              {selectedRide && (
+                <View style={styles.bookingSection}>
+                  <View style={styles.bookingSummary}>
+                    <View style={styles.bookingDetail}>
+                      <Text style={styles.bookingLabel}>Provider</Text>
+                      <Text style={styles.bookingValue}>{selectedRide.provider} - {selectedRide.name}</Text>
+                    </View>
+                    <View style={styles.bookingDetail}>
+                      <Text style={styles.bookingLabel}>Est. Arrival</Text>
+                      <Text style={styles.bookingValue}>{selectedRide.eta} min</Text>
+                    </View>
+                    <View style={styles.bookingDetail}>
+                      <Text style={styles.bookingLabel}>Trip Duration</Text>
+                      <Text style={styles.bookingValue}>{selectedRide.duration} min ({selectedRide.distance.toFixed(1)} mi)</Text>
+                    </View>
+                    <View style={styles.bookingDetail}>
+                      <Text style={styles.bookingLabel}>Total Fare</Text>
+                      <Text style={styles.bookingValuePrice}>${(selectedRide.price * selectedRide.surge).toFixed(2)}</Text>
+                    </View>
+                  </View>
+
+                  <TouchableOpacity 
+                    style={styles.requestRideBtn}
+                    onPress={() => handleRequestRide(selectedRide)}
+                  >
+                    <Car size={20} color="#FFF" />
+                    <Text style={styles.requestRideBtnText}>Request {selectedRide.name}</Text>
+                  </TouchableOpacity>
+
+                  <View style={styles.safetyNote}>
+                    <Shield size={14} color={Colors.textSecondary} />
+                    <Text style={styles.safetyNoteText}>Your safety is our priority. All drivers are verified.</Text>
+                  </View>
+                </View>
+              )}
+            </View>
+          )}
+
+          <View style={{ height: 100 }} />
+        </ScrollView>
+      </View>
+    );
+  }
 
   if (selectedSubcategory) {
     return (
@@ -820,5 +1217,382 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '700' as const,
     color: '#FFF',
+  },
+  // Rideshare styles
+  rideHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 14,
+    gap: 12,
+  },
+  rideHeaderInfo: {
+    flex: 1,
+  },
+  rideHeaderTitle: {
+    fontSize: 24,
+    fontWeight: '700' as const,
+    color: Colors.text,
+  },
+  rideHeaderSubtitle: {
+    fontSize: 13,
+    color: Colors.textSecondary,
+    marginTop: 2,
+  },
+  rideScrollContent: {
+    paddingHorizontal: 20,
+  },
+  mapPreview: {
+    height: 180,
+    backgroundColor: Colors.surface,
+    borderRadius: 16,
+    marginBottom: 16,
+    overflow: 'hidden',
+    position: 'relative',
+  },
+  mapPlaceholder: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#1a2a3a',
+  },
+  mapPlaceholderText: {
+    fontSize: 13,
+    color: Colors.textTertiary,
+    marginTop: 8,
+  },
+  routeOverlay: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: 'rgba(0,0,0,0.7)',
+    padding: 12,
+  },
+  routeInfo: {
+    gap: 6,
+  },
+  routePoint: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  routePointText: {
+    fontSize: 12,
+    color: '#FFF',
+    flex: 1,
+  },
+  locationInputsCard: {
+    backgroundColor: Colors.surface,
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 20,
+  },
+  locationInputRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  locationDotGreen: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    backgroundColor: '#22C55E',
+  },
+  locationDotYellow: {
+    width: 10,
+    height: 10,
+    borderRadius: 2,
+    backgroundColor: '#F59E0B',
+  },
+  locationDotRed: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    backgroundColor: '#EF4444',
+  },
+  locationInputWrapper: {
+    flex: 1,
+  },
+  locationInputLabel: {
+    fontSize: 11,
+    color: Colors.textTertiary,
+    marginBottom: 2,
+    textTransform: 'uppercase' as const,
+    letterSpacing: 0.5,
+  },
+  locationInput: {
+    fontSize: 15,
+    color: Colors.text,
+    padding: 0,
+    paddingVertical: 4,
+  },
+  locateBtn: {
+    width: 36,
+    height: 36,
+    borderRadius: 10,
+    backgroundColor: Colors.primary + '15',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  removeStopBtn: {
+    width: 32,
+    height: 32,
+    borderRadius: 8,
+    backgroundColor: Colors.error + '15',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  locationDivider: {
+    height: 1,
+    backgroundColor: Colors.border,
+    marginVertical: 12,
+    marginLeft: 24,
+  },
+  addStopBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    marginTop: 12,
+    paddingVertical: 10,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: Colors.primary + '40',
+    borderStyle: 'dashed',
+  },
+  addStopText: {
+    fontSize: 14,
+    fontWeight: '600' as const,
+    color: Colors.primary,
+  },
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: '700' as const,
+    color: Colors.text,
+    marginBottom: 12,
+  },
+  rideTypesScroll: {
+    paddingBottom: 16,
+    gap: 10,
+  },
+  rideTypeCard: {
+    width: 110,
+    backgroundColor: Colors.surface,
+    borderRadius: 14,
+    padding: 14,
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: 'transparent',
+  },
+  rideTypeCardSelected: {
+    borderColor: Colors.primary,
+    backgroundColor: Colors.primary + '10',
+  },
+  rideTypeIcon: {
+    fontSize: 28,
+    marginBottom: 6,
+  },
+  rideTypeName: {
+    fontSize: 14,
+    fontWeight: '600' as const,
+    color: Colors.text,
+    marginBottom: 2,
+  },
+  rideTypeNameSelected: {
+    color: Colors.primary,
+  },
+  rideTypeDesc: {
+    fontSize: 10,
+    color: Colors.textTertiary,
+    textAlign: 'center' as const,
+  },
+  getQuoteBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
+    backgroundColor: Colors.primary,
+    borderRadius: 14,
+    paddingVertical: 16,
+    marginTop: 8,
+  },
+  getQuoteBtnDisabled: {
+    backgroundColor: Colors.textTertiary,
+    opacity: 0.5,
+  },
+  getQuoteBtnText: {
+    fontSize: 16,
+    fontWeight: '700' as const,
+    color: '#FFF',
+  },
+  rideOptionsSection: {
+    marginTop: 8,
+  },
+  rideOptionsHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  editRouteText: {
+    fontSize: 13,
+    fontWeight: '600' as const,
+    color: Colors.primary,
+  },
+  rideOptionCard: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    backgroundColor: Colors.surface,
+    borderRadius: 14,
+    padding: 14,
+    marginBottom: 10,
+    borderWidth: 2,
+    borderColor: 'transparent',
+  },
+  rideOptionCardSelected: {
+    borderColor: Colors.primary,
+    backgroundColor: Colors.primary + '08',
+  },
+  rideOptionLeft: {
+    flex: 1,
+    gap: 8,
+  },
+  providerBadge: {
+    alignSelf: 'flex-start',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 6,
+  },
+  uberBadge: {
+    backgroundColor: '#000',
+  },
+  lyftBadge: {
+    backgroundColor: '#FF00BF',
+  },
+  providerBadgeText: {
+    fontSize: 11,
+    fontWeight: '700' as const,
+    color: '#FFF',
+  },
+  rideOptionInfo: {
+    gap: 4,
+  },
+  rideOptionName: {
+    fontSize: 16,
+    fontWeight: '600' as const,
+    color: Colors.text,
+  },
+  rideOptionMeta: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  rideOptionMetaText: {
+    fontSize: 12,
+    color: Colors.textTertiary,
+  },
+  rideOptionDot: {
+    fontSize: 12,
+    color: Colors.textTertiary,
+    marginHorizontal: 2,
+  },
+  rideFeatures: {
+    flexDirection: 'row',
+    gap: 6,
+    marginTop: 4,
+  },
+  featureTag: {
+    backgroundColor: Colors.backgroundTertiary,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 6,
+  },
+  featureTagText: {
+    fontSize: 10,
+    color: Colors.textSecondary,
+  },
+  rideOptionRight: {
+    alignItems: 'flex-end',
+    justifyContent: 'center',
+    gap: 2,
+  },
+  surgeBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 3,
+    backgroundColor: '#F59E0B',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
+    marginBottom: 4,
+  },
+  surgeBadgeText: {
+    fontSize: 10,
+    fontWeight: '700' as const,
+    color: '#FFF',
+  },
+  ridePrice: {
+    fontSize: 20,
+    fontWeight: '700' as const,
+    color: Colors.text,
+  },
+  rideDuration: {
+    fontSize: 11,
+    color: Colors.textTertiary,
+  },
+  bookingSection: {
+    marginTop: 16,
+    backgroundColor: Colors.surface,
+    borderRadius: 16,
+    padding: 16,
+  },
+  bookingSummary: {
+    gap: 10,
+    marginBottom: 16,
+  },
+  bookingDetail: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  bookingLabel: {
+    fontSize: 13,
+    color: Colors.textSecondary,
+  },
+  bookingValue: {
+    fontSize: 13,
+    fontWeight: '600' as const,
+    color: Colors.text,
+  },
+  bookingValuePrice: {
+    fontSize: 18,
+    fontWeight: '700' as const,
+    color: Colors.primary,
+  },
+  requestRideBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
+    backgroundColor: '#22C55E',
+    borderRadius: 14,
+    paddingVertical: 16,
+  },
+  requestRideBtnText: {
+    fontSize: 16,
+    fontWeight: '700' as const,
+    color: '#FFF',
+  },
+  safetyNote: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    marginTop: 12,
+  },
+  safetyNoteText: {
+    fontSize: 11,
+    color: Colors.textSecondary,
   },
 });
