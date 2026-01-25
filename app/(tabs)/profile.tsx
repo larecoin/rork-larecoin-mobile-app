@@ -34,15 +34,15 @@ const socialFeatures = [
 ];
 
 const contentToolsFeatures = [
-  { id: 'photos', title: 'Photos', icon: Camera, color: '#0EA5E9', route: null },
+  { id: 'photos', title: 'Photos', icon: Camera, color: '#0EA5E9', route: '/menu/photos' },
   { id: 'media', title: 'Videos/Media', icon: Video, color: '#8B5CF6', route: '/menu/media' },
   { id: 'resume', title: 'Resume', icon: FileUser, color: '#14B8A6', route: '/menu/resume' },
   { id: 'files', title: 'File Storage', icon: FolderOpen, color: '#06B6D4', route: '/menu/file-storage' },
   { id: 'calendar', title: 'Calendar', icon: Calendar, color: '#F59E0B', route: '/menu/calendar' },
   { id: 'contacts', title: 'Contacts', icon: Contact, color: '#3B82F6', route: '/menu/contacts' },
-  { id: 'articles', title: 'Articles', icon: Newspaper, color: '#84CC16', route: null },
-  { id: 'blog', title: 'Blog', icon: PenTool, color: '#6366F1', route: null },
-  { id: 'podcast', title: 'Podcast', icon: Mic, color: '#EC4899', route: null },
+  { id: 'articles', title: 'Articles', icon: Newspaper, color: '#84CC16', route: '/menu/articles' },
+  { id: 'blog', title: 'Blog', icon: PenTool, color: '#6366F1', route: '/menu/blog' },
+  { id: 'podcast', title: 'Podcast', icon: Mic, color: '#EC4899', route: '/menu/podcast' },
   { id: 'creator', title: 'Creator Tools', icon: Palette, color: '#F472B6', route: '/menu/creator-tools' },
   { id: 'developers', title: 'Developers', icon: Code, color: '#22C55E', route: '/menu/developers' },
   { id: 'apis', title: 'APIs & Hooks', icon: Link, color: '#EF4444', route: '/menu/apis-hooks' },
