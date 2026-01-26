@@ -114,17 +114,18 @@ const styles = StyleSheet.create({
   },
   tabsScroll: {
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingVertical: 8,
+    maxHeight: 44,
   },
   tab: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-    marginRight: 8,
+    paddingHorizontal: 14,
+    paddingVertical: 6,
+    borderRadius: 16,
+    marginRight: 6,
   },
   tabText: {
-    fontSize: 13,
-    fontWeight: '500' as const,
+    fontSize: 12,
+    fontWeight: '600' as const,
   },
   content: {
     flex: 1,
