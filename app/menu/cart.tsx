@@ -165,7 +165,7 @@ export default function CartScreen() {
   return (
     <View style={[styles.container, dynamicStyles.container]}>
       <View style={styles.header}>
-        <Text style={[styles.headerTitle, dynamicStyles.text]}>Shopping Cart</Text>
+        <Text style={[styles.headerTitle, dynamicStyles.text]}>Checkout</Text>
         <View style={styles.headerBadge}>
           <ShoppingBag size={20} color={colors.primary} />
           <View style={[styles.badge, { backgroundColor: colors.primary }]}>
