@@ -202,11 +202,10 @@ export default function CartScreen() {
               onChangeText={setManualSku}
             />
             <TouchableOpacity 
-              style={[styles.addSkuBtn, { backgroundColor: colors.primary, opacity: manualSku ? 1 : 0.5 }]}
-              onPress={() => manualSku && addScannedItem(manualSku)}
-              disabled={!manualSku}
+              style={[styles.addSkuBtn, { backgroundColor: colors.primary }]}
+              onPress={handleScanBarcode}
             >
-              <Plus size={20} color="#FFF" />
+              <ScanBarcode size={20} color="#FFF" />
             </TouchableOpacity>
           </View>
         </View>
