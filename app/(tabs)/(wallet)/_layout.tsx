@@ -151,6 +151,13 @@ export default function WalletLayout() {
         }} 
       />
       <Stack.Screen 
+        name="precious-metals" 
+        options={{ 
+          title: 'Tokenized Precious Metals',
+          headerStyle: { backgroundColor: Colors.backgroundSecondary },
+        }} 
+      />
+      <Stack.Screen 
         name="dex-swap" 
         options={{ 
           title: 'DEX Swap',
