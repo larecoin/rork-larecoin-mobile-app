@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Modal, TextInput, Linking, Platform } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Modal, TextInput, Linking, Platform, Dimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { 
@@ -36,18 +36,23 @@ const socialFeatures = [
 
 const contentToolsFeatures = [
   { id: 'photos', title: 'Photos', icon: Camera, color: '#0EA5E9', route: '/menu/photos' },
-  { id: 'media', title: 'Videos/Media', icon: Video, color: '#8B5CF6', route: '/menu/media' },
+  { id: 'media', title: 'Videos', icon: Video, color: '#8B5CF6', route: '/menu/media' },
   { id: 'resume', title: 'Resume', icon: FileUser, color: '#14B8A6', route: '/menu/resume' },
-  { id: 'files', title: 'File Storage', icon: FolderOpen, color: '#06B6D4', route: '/menu/file-storage' },
+  { id: 'files', title: 'Files', icon: FolderOpen, color: '#06B6D4', route: '/menu/file-storage' },
   { id: 'calendar', title: 'Calendar', icon: Calendar, color: '#F59E0B', route: '/menu/calendar' },
   { id: 'contacts', title: 'Contacts', icon: Contact, color: '#3B82F6', route: '/menu/contacts' },
   { id: 'articles', title: 'Articles', icon: Newspaper, color: '#84CC16', route: '/menu/articles' },
   { id: 'blog', title: 'Blog', icon: PenTool, color: '#6366F1', route: '/menu/blog' },
   { id: 'podcast', title: 'Podcast', icon: Mic, color: '#EC4899', route: '/menu/podcast' },
-  { id: 'creator', title: 'Creator Tools', icon: Palette, color: '#F472B6', route: '/menu/creator-tools' },
-  { id: 'developers', title: 'Developers', icon: Code, color: '#22C55E', route: '/menu/developers' },
-  { id: 'apis', title: 'APIs & Hooks', icon: Link, color: '#EF4444', route: '/menu/apis-hooks' },
+  { id: 'creator', title: 'Creator', icon: Palette, color: '#F472B6', route: '/menu/creator-tools' },
+  { id: 'developers', title: 'Devs', icon: Code, color: '#22C55E', route: '/menu/developers' },
+  { id: 'apis', title: 'APIs', icon: Link, color: '#EF4444', route: '/menu/apis-hooks' },
 ];
+
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
+const CONTENT_PADDING = 16;
+const CONTENT_GAP = 10;
+const CONTENT_CARD_WIDTH = (SCREEN_WIDTH - (CONTENT_PADDING * 2) - (CONTENT_GAP * 3)) / 4;
 
 const newsCategories = [
   { id: 'all', label: 'All', icon: Rss, color: '#FF6B6B' },
@@ -414,7 +419,7 @@ export default function ProfileScreen() {
                   <View style={[styles.contentToolIcon, { backgroundColor: feature.color + '15' }]}>
                     <feature.icon size={22} color={feature.color} />
                   </View>
-                  <Text style={styles.contentToolTitle}>{feature.title}</Text>
+                  <Text style={styles.contentToolTitle} numberOfLines={1}>{feature.title}</Text>
                 </TouchableOpacity>
               ))}
             </View>
@@ -1476,20 +1481,20 @@ const styles = StyleSheet.create({
   contentToolsGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    paddingHorizontal: 16,
-    gap: 10,
+    paddingHorizontal: CONTENT_PADDING,
+    gap: CONTENT_GAP,
     marginBottom: 20,
   },
   contentToolCard: {
-    width: '23%',
+    width: CONTENT_CARD_WIDTH,
     backgroundColor: Colors.surface,
     borderRadius: 14,
-    padding: 12,
+    padding: 10,
     alignItems: 'center',
   },
   contentToolIcon: {
-    width: 44,
-    height: 44,
+    width: 40,
+    height: 40,
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
