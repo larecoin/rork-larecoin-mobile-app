@@ -826,6 +826,12 @@ export default function WalletDashboard() {
                       </View>
                       <Text style={[styles.tradeItemLabel, { color: colors.text }]}>Fiat Exchange</Text>
                     </TouchableOpacity>
+                    <TouchableOpacity style={styles.tradeItem} onPress={() => router.push('/menu/assets-market')}>
+                      <View style={[styles.tradeItemIcon, { backgroundColor: '#D4AF37' + '20' }]}>
+                        <Gem size={16} color="#D4AF37" />
+                      </View>
+                      <Text style={[styles.tradeItemLabel, { color: colors.text }]}>Tokenized Metals</Text>
+                    </TouchableOpacity>
                   </View>
                 </View>
 
