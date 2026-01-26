@@ -10,15 +10,27 @@ const listings = [
   { id: '2', name: 'Ferrari 488 GTB', type: 'Vehicle', price: '$320K', tokens: '1,000', available: '450', apy: '5.5%', image: 'https://images.unsplash.com/photo-1583121274602-3e2820c69888?w=200&h=200&fit=crop' },
   { id: '3', name: 'Tech Startup Equity', type: 'Business', price: '$5M', tokens: '50,000', available: '12,000', apy: '15%', image: 'https://images.unsplash.com/photo-1559136555-9303baea8ebd?w=200&h=200&fit=crop' },
   { id: '4', name: 'Beachfront Villa', type: 'Real Estate', price: '$1.8M', tokens: '8,000', available: '2,100', apy: '7.8%', image: 'https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=200&h=200&fit=crop' },
+  { id: '5', name: 'Gold Bullion', type: 'Precious Metals', price: '$2,024/oz', tokens: '5,000', available: '2,800', apy: '0%', image: 'https://images.unsplash.com/photo-1610375461246-83df859d849d?w=200&h=200&fit=crop' },
+  { id: '6', name: 'Silver Bars', type: 'Precious Metals', price: '$23.45/oz', tokens: '20,000', available: '15,000', apy: '0%', image: 'https://images.unsplash.com/photo-1589656966895-2f33e7653819?w=200&h=200&fit=crop' },
+  { id: '7', name: 'Platinum Reserve', type: 'Precious Metals', price: '$982/oz', tokens: '3,000', available: '1,200', apy: '0%', image: 'https://images.unsplash.com/photo-1504274066651-8d31a536b11a?w=200&h=200&fit=crop' },
+  { id: '8', name: 'Palladium Tokens', type: 'Precious Metals', price: '$1,045/oz', tokens: '2,000', available: '900', apy: '0%', image: 'https://images.unsplash.com/photo-1617375407633-acd67aba7864?w=200&h=200&fit=crop' },
 ];
 
-const categories = ['All', 'Real Estate', 'Vehicles', 'Business', 'Art'];
+const categories = ['All', 'Precious Metals', 'Real Estate', 'Vehicles', 'Business', 'Art'];
 
 export default function AssetsMarketScreen() {
   const insets = useSafeAreaInsets();
   const { colors } = useApp();
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('All');
+  const [selectedCategory, setSelectedCategory] = useState('Precious Metals');
+
+  const filteredListings = listings.filter(listing => {
+    const matchesSearch = listing.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      listing.type.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesCategory = selectedCategory === 'All' || listing.type === selectedCategory ||
+      (selectedCategory === 'Vehicles' && listing.type === 'Vehicle');
+    return matchesSearch && matchesCategory;
+  });
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
@@ -66,7 +78,7 @@ export default function AssetsMarketScreen() {
 
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, { color: colors.textTertiary }]}>Featured Listings</Text>
-          {listings.map((listing) => (
+          {filteredListings.map((listing) => (
             <TouchableOpacity
               key={listing.id}
               style={[styles.listingCard, { backgroundColor: colors.surface }]}
