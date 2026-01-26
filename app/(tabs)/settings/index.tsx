@@ -9,6 +9,7 @@ import {
   HelpCircle, 
   FileText,
   ChevronRight,
+  ChevronLeft,
   LogOut,
   Sun,
   Moon,
@@ -95,6 +96,15 @@ export default function SettingsScreen() {
       <Stack.Screen 
         options={{ 
           title: 'Settings',
+          headerLeft: () => (
+            <TouchableOpacity 
+              onPress={() => router.back()}
+              style={styles.headerBackButton}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            >
+              <ChevronLeft size={24} color={colors.text} />
+            </TouchableOpacity>
+          ),
           headerRight: () => (
             <TouchableOpacity 
               onPress={() => setNavMenuVisible(true)}
@@ -343,5 +353,9 @@ const styles = StyleSheet.create({
   headerMenuButton: {
     padding: 4,
     marginRight: 8,
+  },
+  headerBackButton: {
+    padding: 4,
+    marginLeft: 8,
   },
 });
