@@ -98,7 +98,7 @@ export default function SettingsScreen() {
           title: 'Settings',
           headerLeft: () => (
             <TouchableOpacity 
-              onPress={() => router.back()}
+              onPress={() => router.push('/profile')}
               style={styles.headerBackButton}
               hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
             >
