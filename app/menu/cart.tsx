@@ -3,7 +3,7 @@ import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, 
   Image, Alert, Platform, Modal
 } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, Stack } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { 
   ArrowLeft, Trash2, Plus, Minus, ScanBarcode, CreditCard, Wallet,
@@ -164,6 +164,7 @@ export default function CartScreen() {
 
   return (
     <View style={[styles.container, dynamicStyles.container]}>
+      <Stack.Screen options={{ title: 'Shopping Cart' }} />
       <View style={styles.header}>
         <Text style={[styles.headerTitle, dynamicStyles.text]}>Checkout</Text>
         <View style={styles.headerBadge}>
