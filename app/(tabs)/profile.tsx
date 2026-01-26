@@ -157,7 +157,7 @@ export default function ProfileScreen() {
           <Menu size={24} color={Colors.text} />
         </TouchableOpacity>
         <Text style={styles.title}>Profile</Text>
-        <TouchableOpacity style={styles.settingsBtn}>
+        <TouchableOpacity style={styles.settingsBtn} onPress={() => router.push('/settings')}>
           <Settings size={20} color={Colors.text} />
         </TouchableOpacity>
       </View>
