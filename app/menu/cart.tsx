@@ -163,7 +163,7 @@ export default function CartScreen() {
   };
 
   return (
-    <View style={[styles.container, dynamicStyles.container, { paddingTop: insets.top }]}>
+    <View style={[styles.container, dynamicStyles.container]}>
       <View style={styles.header}>
         <Text style={[styles.headerTitle, dynamicStyles.text]}>Shopping Cart</Text>
         <View style={styles.headerBadge}>
