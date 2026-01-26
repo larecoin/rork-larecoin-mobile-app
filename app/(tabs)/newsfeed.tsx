@@ -123,6 +123,8 @@ export default function NewsfeedScreen() {
   const [savedPosts, setSavedPosts] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [showNavMenu, setShowNavMenu] = useState(false);
+  const [showNotificationsModal, setShowNotificationsModal] = useState(false);
+  const [showFilterModal, setShowFilterModal] = useState(false);
 
   const onRefresh = () => {
     setRefreshing(true);
@@ -177,7 +179,10 @@ export default function NewsfeedScreen() {
         </TouchableOpacity>
         <Text style={[styles.title, { color: colors.text }]}>Feed</Text>
         <View style={styles.headerActions}>
-          <TouchableOpacity style={[styles.headerBtn, { backgroundColor: colors.surface }]}>
+          <TouchableOpacity 
+            style={[styles.headerBtn, { backgroundColor: colors.surface }]}
+            onPress={() => router.push('/menu/notifications')}
+          >
             <Bell size={20} color={colors.text} />
             <View style={styles.notifBadge}>
               <Text style={styles.notifBadgeText}>3</Text>
@@ -195,7 +200,10 @@ export default function NewsfeedScreen() {
           value={searchQuery}
           onChangeText={setSearchQuery}
         />
-        <TouchableOpacity style={[styles.filterBtn, { backgroundColor: colors.background }]}>
+        <TouchableOpacity 
+          style={[styles.filterBtn, { backgroundColor: colors.background }]}
+          onPress={() => setShowFilterModal(true)}
+        >
           <Filter size={16} color={colors.textSecondary} />
         </TouchableOpacity>
       </View>
@@ -207,18 +215,18 @@ export default function NewsfeedScreen() {
           contentContainerStyle={styles.tabContainer}
         >
           <TouchableOpacity 
-            style={[styles.tab, activeTab === 'markets' && [styles.tabActive, { backgroundColor: colors.primary + '15' }]]}
-            onPress={() => setActiveTab('markets')}
-          >
-            <Coins size={16} color={activeTab === 'markets' ? colors.primary : colors.textSecondary} />
-            <Text style={[styles.tabText, { color: colors.textSecondary }, activeTab === 'markets' && [styles.tabTextActive, { color: colors.primary }]]}>Markets</Text>
-          </TouchableOpacity>
-          <TouchableOpacity 
             style={[styles.tab, activeTab === 'foryou' && [styles.tabActive, { backgroundColor: colors.primary + '15' }]]}
             onPress={() => setActiveTab('foryou')}
           >
             <Heart size={16} color={activeTab === 'foryou' ? colors.primary : colors.textSecondary} />
             <Text style={[styles.tabText, { color: colors.textSecondary }, activeTab === 'foryou' && [styles.tabTextActive, { color: colors.primary }]]}>For You</Text>
+          </TouchableOpacity>
+          <TouchableOpacity 
+            style={[styles.tab, activeTab === 'markets' && [styles.tabActive, { backgroundColor: colors.primary + '15' }]]}
+            onPress={() => setActiveTab('markets')}
+          >
+            <Coins size={16} color={activeTab === 'markets' ? colors.primary : colors.textSecondary} />
+            <Text style={[styles.tabText, { color: colors.textSecondary }, activeTab === 'markets' && [styles.tabTextActive, { color: colors.primary }]]}>Markets</Text>
           </TouchableOpacity>
           <TouchableOpacity 
             style={[styles.tab, activeTab === 'following' && [styles.tabActive, { backgroundColor: colors.primary + '15' }]]}
@@ -504,6 +512,31 @@ export default function NewsfeedScreen() {
       </TouchableOpacity>
 
       <NavMenuModal visible={showNavMenu} onClose={() => setShowNavMenu(false)} />
+
+      {/* Filter Modal */}
+      {showFilterModal && (
+        <TouchableOpacity 
+          style={styles.modalOverlay} 
+          activeOpacity={1} 
+          onPress={() => setShowFilterModal(false)}
+        >
+          <View style={[styles.filterModal, { backgroundColor: colors.surface }]}>
+            <Text style={[styles.filterModalTitle, { color: colors.text }]}>Filter Posts</Text>
+            <TouchableOpacity style={[styles.filterOption, { borderBottomColor: colors.border }]}>
+              <Text style={[styles.filterOptionText, { color: colors.text }]}>Most Recent</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={[styles.filterOption, { borderBottomColor: colors.border }]}>
+              <Text style={[styles.filterOptionText, { color: colors.text }]}>Most Popular</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={[styles.filterOption, { borderBottomColor: colors.border }]}>
+              <Text style={[styles.filterOptionText, { color: colors.text }]}>Most Commented</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.filterOption}>
+              <Text style={[styles.filterOptionText, { color: colors.text }]}>Verified Only</Text>
+            </TouchableOpacity>
+          </View>
+        </TouchableOpacity>
+      )}
     </View>
   );
 }
@@ -983,5 +1016,40 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '600' as const,
     color: '#10B981',
+  },
+  modalOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 1000,
+  },
+  filterModal: {
+    width: '80%',
+    borderRadius: 16,
+    padding: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.25,
+    shadowRadius: 12,
+    elevation: 10,
+  },
+  filterModalTitle: {
+    fontSize: 18,
+    fontWeight: '700' as const,
+    marginBottom: 16,
+    textAlign: 'center',
+  },
+  filterOption: {
+    paddingVertical: 14,
+    borderBottomWidth: 1,
+  },
+  filterOptionText: {
+    fontSize: 16,
+    fontWeight: '500' as const,
   },
 });
