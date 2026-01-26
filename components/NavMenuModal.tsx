@@ -170,7 +170,7 @@ export default function NavMenuModal({ visible, onClose }: NavMenuModalProps) {
       'profile': '/(tabs)/profile',
       'messages': '/menu/messages',
       'resume': '/menu/resume',
-      'calendar': '/menu/calendar',
+      'calendar': '/(tabs)/calendar',
       'contacts': '/menu/contacts',
       'follow': '/menu/follow',
       'dating': '/menu/dating',
