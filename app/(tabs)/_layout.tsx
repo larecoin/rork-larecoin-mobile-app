@@ -24,8 +24,8 @@ function CustomTabBar() {
   ];
 
   const merchantTabs = [
-    { name: '(merchant)', title: 'Portal', icon: LayoutDashboard, route: '/(merchant)/dashboard' },
-    { name: 'myshop', title: 'My Shop', icon: Store, route: '/(merchant)/myshop' },
+    { name: '(merchant)', title: 'Portal', icon: LayoutDashboard, route: '/(merchant)/myshop' },
+    { name: 'myshop', title: 'My Shop', icon: Store, route: '/(merchant)/dashboard' },
     { name: 'ads', title: 'Ad Manager', icon: Megaphone, route: '/(merchant)/ads' },
     { name: 'merchantorders', title: 'Orders', icon: ClipboardList, route: '/(merchant)/merchantorders' },
     { name: 'receipts', title: 'Receipts', icon: Receipt, route: '/(merchant)/receipts' },
