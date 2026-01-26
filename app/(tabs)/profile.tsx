@@ -9,7 +9,7 @@ import {
   MoreHorizontal, Globe, Palette, Video, FolderOpen, FileUser, Calendar,
   Contact, Code, Link, Mic, PenTool, Camera, Newspaper, Menu,
   DollarSign, Wallet, TrendingUp, CreditCard, Coins, ToggleLeft, ToggleRight, Clock,
-  AtSign, ExternalLink, X
+  AtSign, ExternalLink, X, Flag, Zap, Briefcase, Cpu, Gamepad2, Music, Film, ShoppingBag
 } from 'lucide-react-native';
 import Colors from '@/constants/colors';
 import { useApp } from '@/contexts/AppContext';
@@ -46,6 +46,21 @@ const contentToolsFeatures = [
   { id: 'creator', title: 'Creator Tools', icon: Palette, color: '#F472B6', route: '/menu/creator-tools' },
   { id: 'developers', title: 'Developers', icon: Code, color: '#22C55E', route: '/menu/developers' },
   { id: 'apis', title: 'APIs & Hooks', icon: Link, color: '#EF4444', route: '/menu/apis-hooks' },
+];
+
+const newsCategories = [
+  { id: 'all', label: 'All', icon: Rss, color: '#FF6B6B' },
+  { id: 'crypto', label: 'Crypto', icon: Coins, color: '#F59E0B' },
+  { id: 'defi', label: 'DeFi', icon: TrendingUp, color: '#10B981' },
+  { id: 'nfts', label: 'NFTs', icon: Palette, color: '#8B5CF6' },
+  { id: 'markets', label: 'Markets', icon: TrendingUp, color: '#3B82F6' },
+  { id: 'tech', label: 'Tech', icon: Cpu, color: '#06B6D4' },
+  { id: 'business', label: 'Business', icon: Briefcase, color: '#6366F1' },
+  { id: 'gaming', label: 'Gaming', icon: Gamepad2, color: '#EC4899' },
+  { id: 'entertainment', label: 'Entertainment', icon: Film, color: '#F472B6' },
+  { id: 'music', label: 'Music', icon: Music, color: '#A78BFA' },
+  { id: 'sports', label: 'Sports', icon: Zap, color: '#EF4444' },
+  { id: 'shopping', label: 'Shopping', icon: ShoppingBag, color: '#14B8A6' },
 ];
 
 const feedPosts = [
@@ -99,6 +114,7 @@ export default function ProfileScreen() {
   const [tipsEnabled, setTipsEnabled] = useState(true);
   const [subscriptionsEnabled, setSubscriptionsEnabled] = useState(false);
   const [payPerViewEnabled, setPayPerViewEnabled] = useState(true);
+  const [activeNewsCategory, setActiveNewsCategory] = useState('all');
 
   const handleCopyAddress = () => {
     setCopied(true);
@@ -261,10 +277,41 @@ export default function ProfileScreen() {
             <View style={styles.feedSection}>
               <View style={styles.feedHeader}>
                 <Text style={styles.feedTitle}>News Feed</Text>
-                <TouchableOpacity>
-                  <Text style={styles.seeAllText}>See All</Text>
+                <TouchableOpacity style={styles.reportNewsBtn}>
+                  <Flag size={14} color="#EF4444" />
+                  <Text style={styles.reportNewsText}>Report News</Text>
                 </TouchableOpacity>
               </View>
+
+              <ScrollView 
+                horizontal 
+                showsHorizontalScrollIndicator={false} 
+                style={styles.categoriesScroll}
+                contentContainerStyle={styles.categoriesContent}
+              >
+                {newsCategories.map((category) => (
+                  <TouchableOpacity
+                    key={category.id}
+                    style={[
+                      styles.categoryChip,
+                      activeNewsCategory === category.id && styles.categoryChipActive,
+                      activeNewsCategory === category.id && { backgroundColor: category.color + '20', borderColor: category.color }
+                    ]}
+                    onPress={() => setActiveNewsCategory(category.id)}
+                  >
+                    <category.icon 
+                      size={14} 
+                      color={activeNewsCategory === category.id ? category.color : Colors.textSecondary} 
+                    />
+                    <Text style={[
+                      styles.categoryChipText,
+                      activeNewsCategory === category.id && { color: category.color }
+                    ]}>
+                      {category.label}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
 
               {feedPosts.map((post) => (
                 <View key={post.id} style={styles.postCard}>
@@ -956,6 +1003,48 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600' as const,
     color: Colors.primary,
+  },
+  reportNewsBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: '#EF4444' + '15',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 8,
+  },
+  reportNewsText: {
+    fontSize: 12,
+    fontWeight: '600' as const,
+    color: '#EF4444',
+  },
+  categoriesScroll: {
+    marginBottom: 16,
+    marginLeft: -20,
+    marginRight: -20,
+  },
+  categoriesContent: {
+    paddingHorizontal: 20,
+    gap: 8,
+  },
+  categoryChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 20,
+    backgroundColor: Colors.surface,
+    borderWidth: 1,
+    borderColor: Colors.border,
+  },
+  categoryChipActive: {
+    borderWidth: 1,
+  },
+  categoryChipText: {
+    fontSize: 12,
+    fontWeight: '600' as const,
+    color: Colors.textSecondary,
   },
   postCard: {
     backgroundColor: Colors.surface,
