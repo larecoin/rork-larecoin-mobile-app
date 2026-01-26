@@ -10,7 +10,7 @@ import {
   Contact, Code, Link, Mic, PenTool, Camera, Newspaper, Menu,
   DollarSign, Wallet, TrendingUp, CreditCard, Coins, ToggleLeft, ToggleRight, Clock,
   AtSign, ExternalLink, X, Flag, Zap, Briefcase, Cpu, Gamepad2, Music, Film, ShoppingBag,
-  Radio, FileEdit, MapPin, Image, AlertCircle, Play, StopCircle, Upload
+  Radio, FileEdit, MapPin, Image as ImageIcon, AlertCircle, Play, StopCircle, Upload
 } from 'lucide-react-native';
 import Colors from '@/constants/colors';
 import { useApp } from '@/contexts/AppContext';
@@ -781,7 +781,7 @@ export default function ProfileScreen() {
                   </View>
 
                   <TouchableOpacity style={styles.attachMediaBtn}>
-                    <Image size={20} color={Colors.primary} />
+                    <ImageIcon size={20} color={Colors.primary} />
                     <Text style={styles.attachMediaText}>Attach Photos/Videos</Text>
                   </TouchableOpacity>
 
