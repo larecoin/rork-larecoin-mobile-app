@@ -144,6 +144,8 @@ export default function CalendarScreen() {
     description: '',
   });
   const [events, setEvents] = useState<Record<string, CalendarEvent[]>>(mockEvents);
+  const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
+  const [showEventDetailModal, setShowEventDetailModal] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [userLocation, setUserLocation] = useState<{
     city: string;
@@ -622,6 +624,10 @@ export default function CalendarScreen() {
                 <TouchableOpacity
                   key={event.id}
                   style={[styles.eventCard, { backgroundColor: colors.surface }]}
+                  onPress={() => {
+                    setSelectedEvent(event);
+                    setShowEventDetailModal(true);
+                  }}
                 >
                   <View style={[styles.eventIconContainer, { backgroundColor: eventColor + '20' }]}>
                     <EventIcon size={20} color={eventColor} />
@@ -804,6 +810,158 @@ export default function CalendarScreen() {
             </ScrollView>
           </View>
         </KeyboardAvoidingView>
+      </Modal>
+
+      <Modal
+        visible={showEventDetailModal}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setShowEventDetailModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <TouchableOpacity 
+            style={styles.modalBackdrop} 
+            activeOpacity={1} 
+            onPress={() => setShowEventDetailModal(false)}
+          />
+          <View style={[styles.modalContainer, { backgroundColor: colors.surface }]}>
+            <View style={styles.modalHandle} />
+            
+            {selectedEvent && (
+              <>
+                <View style={styles.modalHeader}>
+                  <View style={styles.eventDetailModalHeader}>
+                    <View style={[styles.eventDetailIconContainer, { backgroundColor: getEventColor(selectedEvent.type) + '20' }]}>
+                      {(() => {
+                        const EventIcon = getEventIcon(selectedEvent.type);
+                        return <EventIcon size={24} color={getEventColor(selectedEvent.type)} />;
+                      })()}
+                    </View>
+                    <View style={styles.eventDetailHeaderText}>
+                      <Text style={[styles.eventDetailTitle, { color: colors.text }]}>{selectedEvent.title}</Text>
+                      <View style={[styles.eventTypeBadge, { backgroundColor: getEventColor(selectedEvent.type) + '20' }]}>
+                        <Text style={[styles.eventTypeBadgeText, { color: getEventColor(selectedEvent.type) }]}>
+                          {selectedEvent.type.charAt(0).toUpperCase() + selectedEvent.type.slice(1)}
+                        </Text>
+                      </View>
+                    </View>
+                  </View>
+                  <TouchableOpacity onPress={() => setShowEventDetailModal(false)}>
+                    <X size={24} color={colors.textSecondary} />
+                  </TouchableOpacity>
+                </View>
+
+                <ScrollView style={styles.eventDetailContent} showsVerticalScrollIndicator={false}>
+                  <View style={[styles.eventDetailSection, { backgroundColor: colors.background }]}>
+                    <View style={styles.eventDetailRow}>
+                      <View style={[styles.eventDetailIconBg, { backgroundColor: colors.primary + '20' }]}>
+                        <CalendarIcon size={18} color={colors.primary} />
+                      </View>
+                      <View style={styles.eventDetailRowContent}>
+                        <Text style={[styles.eventDetailLabel, { color: colors.textSecondary }]}>Date</Text>
+                        <Text style={[styles.eventDetailValue, { color: colors.text }]}>
+                          {months[currentMonth]} {selectedDate}, {currentYear}
+                        </Text>
+                      </View>
+                    </View>
+
+                    {selectedEvent.time && (
+                      <View style={styles.eventDetailRow}>
+                        <View style={[styles.eventDetailIconBg, { backgroundColor: '#10B981' + '20' }]}>
+                          <Clock size={18} color="#10B981" />
+                        </View>
+                        <View style={styles.eventDetailRowContent}>
+                          <Text style={[styles.eventDetailLabel, { color: colors.textSecondary }]}>Time</Text>
+                          <Text style={[styles.eventDetailValue, { color: colors.text }]}>
+                            {selectedEvent.time}{selectedEvent.duration ? ` (${selectedEvent.duration})` : ''}
+                          </Text>
+                        </View>
+                      </View>
+                    )}
+
+                    {selectedEvent.location && (
+                      <View style={styles.eventDetailRow}>
+                        <View style={[styles.eventDetailIconBg, { backgroundColor: '#EC4899' + '20' }]}>
+                          <MapPin size={18} color="#EC4899" />
+                        </View>
+                        <View style={styles.eventDetailRowContent}>
+                          <Text style={[styles.eventDetailLabel, { color: colors.textSecondary }]}>Location</Text>
+                          <Text style={[styles.eventDetailValue, { color: colors.text }]}>
+                            {selectedEvent.location}
+                          </Text>
+                        </View>
+                      </View>
+                    )}
+
+                    {selectedEvent.attendees && (
+                      <View style={styles.eventDetailRow}>
+                        <View style={[styles.eventDetailIconBg, { backgroundColor: '#8B5CF6' + '20' }]}>
+                          <Users size={18} color="#8B5CF6" />
+                        </View>
+                        <View style={styles.eventDetailRowContent}>
+                          <Text style={[styles.eventDetailLabel, { color: colors.textSecondary }]}>Attendees</Text>
+                          <Text style={[styles.eventDetailValue, { color: colors.text }]}>
+                            {selectedEvent.attendees} people
+                          </Text>
+                        </View>
+                      </View>
+                    )}
+
+                    {selectedEvent.amount && (
+                      <View style={styles.eventDetailRow}>
+                        <View style={[styles.eventDetailIconBg, { backgroundColor: '#10B981' + '20' }]}>
+                          <CreditCard size={18} color="#10B981" />
+                        </View>
+                        <View style={styles.eventDetailRowContent}>
+                          <Text style={[styles.eventDetailLabel, { color: colors.textSecondary }]}>Amount</Text>
+                          <Text style={[styles.eventDetailValue, { color: '#10B981', fontWeight: '700' as const }]}>
+                            {selectedEvent.amount}
+                          </Text>
+                        </View>
+                      </View>
+                    )}
+                  </View>
+
+                  {selectedEvent.description && (
+                    <View style={[styles.descriptionSection, { backgroundColor: colors.background }]}>
+                      <Text style={[styles.descriptionTitle, { color: colors.text }]}>Description</Text>
+                      <Text style={[styles.descriptionText, { color: colors.textSecondary }]}>
+                        {selectedEvent.description}
+                      </Text>
+                    </View>
+                  )}
+
+                  {selectedEvent.sender && (
+                    <View style={[styles.senderSection, { backgroundColor: colors.background }]}>
+                      <Text style={[styles.senderSectionTitle, { color: colors.text }]}>
+                        {selectedEvent.type === 'payment' ? 'From' : 'Organizer'}
+                      </Text>
+                      <View style={styles.senderInfo}>
+                        {selectedEvent.senderAvatar && (
+                          <Image source={{ uri: selectedEvent.senderAvatar }} style={styles.senderAvatarLarge} />
+                        )}
+                        <Text style={[styles.senderNameLarge, { color: colors.text }]}>
+                          {selectedEvent.sender}
+                        </Text>
+                      </View>
+                    </View>
+                  )}
+
+                  {selectedEvent.type === 'invitation' && !selectedEvent.isConfirmed && (
+                    <View style={styles.invitationActionsLarge}>
+                      <TouchableOpacity style={[styles.acceptBtnLarge, { backgroundColor: colors.primary }]}>
+                        <Text style={styles.acceptBtnTextLarge}>Accept Invitation</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity style={[styles.declineBtnLarge, { borderColor: colors.border }]}>
+                        <Text style={[styles.declineBtnTextLarge, { color: colors.textSecondary }]}>Decline</Text>
+                      </TouchableOpacity>
+                    </View>
+                  )}
+                </ScrollView>
+              </>
+            )}
+          </View>
+        </View>
       </Modal>
     </View>
   );
@@ -1377,5 +1535,133 @@ const styles = StyleSheet.create({
     color: '#FFF',
     fontSize: 16,
     fontWeight: '600' as const,
+  },
+  eventDetailModalHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+    gap: 14,
+  },
+  eventDetailIconContainer: {
+    width: 52,
+    height: 52,
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  eventDetailHeaderText: {
+    flex: 1,
+    gap: 6,
+  },
+  eventDetailTitle: {
+    fontSize: 20,
+    fontWeight: '700' as const,
+  },
+  eventTypeBadge: {
+    alignSelf: 'flex-start',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  eventTypeBadgeText: {
+    fontSize: 12,
+    fontWeight: '600' as const,
+  },
+  eventDetailContent: {
+    marginTop: 20,
+  },
+  eventDetailSection: {
+    borderRadius: 16,
+    padding: 16,
+    gap: 16,
+  },
+  eventDetailRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 14,
+  },
+  eventDetailIconBg: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  eventDetailRowContent: {
+    flex: 1,
+  },
+  eventDetailLabel: {
+    fontSize: 12,
+    fontWeight: '500' as const,
+    marginBottom: 2,
+  },
+  eventDetailValue: {
+    fontSize: 15,
+    fontWeight: '600' as const,
+  },
+  descriptionSection: {
+    borderRadius: 16,
+    padding: 16,
+    marginTop: 12,
+  },
+  descriptionTitle: {
+    fontSize: 14,
+    fontWeight: '600' as const,
+    marginBottom: 8,
+  },
+  descriptionText: {
+    fontSize: 14,
+    lineHeight: 22,
+  },
+  senderSection: {
+    borderRadius: 16,
+    padding: 16,
+    marginTop: 12,
+  },
+  senderSectionTitle: {
+    fontSize: 14,
+    fontWeight: '600' as const,
+    marginBottom: 12,
+  },
+  senderInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  senderAvatarLarge: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+  },
+  senderNameLarge: {
+    fontSize: 16,
+    fontWeight: '600' as const,
+  },
+  invitationActionsLarge: {
+    marginTop: 20,
+    gap: 12,
+    marginBottom: 20,
+  },
+  acceptBtnLarge: {
+    height: 52,
+    borderRadius: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  acceptBtnTextLarge: {
+    color: '#FFF',
+    fontSize: 16,
+    fontWeight: '600' as const,
+  },
+  declineBtnLarge: {
+    height: 48,
+    borderRadius: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+  },
+  declineBtnTextLarge: {
+    fontSize: 15,
+    fontWeight: '500' as const,
   },
 });
