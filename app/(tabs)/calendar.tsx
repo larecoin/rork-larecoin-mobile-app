@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, TextInput } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, TextInput, Modal, KeyboardAvoidingView, Platform } from 'react-native';
 import { Stack } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { 
@@ -127,6 +127,23 @@ export default function CalendarScreen() {
   const [locationInput, setLocationInput] = useState('');
   const [isEditingLocation, setIsEditingLocation] = useState(false);
   const [showNavMenu, setShowNavMenu] = useState(false);
+  const [showAddEventModal, setShowAddEventModal] = useState(false);
+  const [newEvent, setNewEvent] = useState<{
+    title: string;
+    time: string;
+    duration: string;
+    type: EventType;
+    location: string;
+    description: string;
+  }>({
+    title: '',
+    time: '',
+    duration: '',
+    type: 'meeting',
+    location: '',
+    description: '',
+  });
+  const [events, setEvents] = useState<Record<string, CalendarEvent[]>>(mockEvents);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [userLocation, setUserLocation] = useState<{
     city: string;
@@ -207,18 +224,18 @@ export default function CalendarScreen() {
   const emptyDays = Array.from({ length: firstDay }, (_, i) => i);
 
   const selectedDateKey = formatDateKey(selectedDate, currentMonth, currentYear);
-  const selectedEvents = mockEvents[selectedDateKey] || [];
+  const selectedEvents = events[selectedDateKey] || [];
 
   const daysWithEvents = useMemo(() => {
     const eventDays = new Set<number>();
-    Object.keys(mockEvents).forEach(key => {
+    Object.keys(events).forEach(key => {
       const [year, month, day] = key.split('-').map(Number);
       if (year === currentYear && month - 1 === currentMonth) {
         eventDays.add(day);
       }
     });
     return eventDays;
-  }, [currentMonth, currentYear]);
+  }, [currentMonth, currentYear, events]);
 
   const prevMonth = () => {
     if (currentMonth === 0) {
@@ -242,15 +259,56 @@ export default function CalendarScreen() {
 
   const upcomingEvents = useMemo(() => {
     const upcoming: (CalendarEvent & { date: string })[] = [];
-    Object.entries(mockEvents).forEach(([date, events]) => {
-      events.forEach(event => {
+    Object.entries(events).forEach(([date, eventsList]) => {
+      eventsList.forEach(event => {
         if (event.type === 'invitation' && !event.isConfirmed) {
           upcoming.push({ ...event, date });
         }
       });
     });
     return upcoming.slice(0, 3);
-  }, []);
+  }, [events]);
+
+  const handleAddEvent = () => {
+    if (!newEvent.title.trim() || !newEvent.time.trim()) {
+      return;
+    }
+
+    const eventId = Date.now().toString();
+    const newCalendarEvent: CalendarEvent = {
+      id: eventId,
+      title: newEvent.title,
+      time: newEvent.time,
+      duration: newEvent.duration,
+      type: newEvent.type,
+      location: newEvent.location || undefined,
+      description: newEvent.description || undefined,
+    };
+
+    setEvents(prev => ({
+      ...prev,
+      [selectedDateKey]: [...(prev[selectedDateKey] || []), newCalendarEvent],
+    }));
+
+    setNewEvent({
+      title: '',
+      time: '',
+      duration: '',
+      type: 'meeting',
+      location: '',
+      description: '',
+    });
+    setShowAddEventModal(false);
+  };
+
+  const eventTypes: { type: EventType; label: string; color: string }[] = [
+    { type: 'meeting', label: 'Meeting', color: '#3B82F6' },
+    { type: 'social', label: 'Social', color: '#EC4899' },
+    { type: 'payment', label: 'Payment', color: '#10B981' },
+    { type: 'reminder', label: 'Reminder', color: '#8B5CF6' },
+    { type: 'shopping', label: 'Shopping', color: '#EF4444' },
+    { type: 'invitation', label: 'Invitation', color: '#F59E0B' },
+  ];
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
@@ -539,7 +597,10 @@ export default function CalendarScreen() {
                 {selectedEvents.length} {selectedEvents.length === 1 ? 'event' : 'events'}
               </Text>
             </View>
-            <TouchableOpacity style={[styles.addButton, { backgroundColor: colors.primary }]}>
+            <TouchableOpacity 
+              style={[styles.addButton, { backgroundColor: colors.primary }]}
+              onPress={() => setShowAddEventModal(true)}
+            >
               <Plus size={20} color="#FFF" />
             </TouchableOpacity>
           </View>
@@ -626,6 +687,124 @@ export default function CalendarScreen() {
       </ScrollView>
 
       <NavMenuModal visible={showNavMenu} onClose={() => setShowNavMenu(false)} />
+
+      <Modal
+        visible={showAddEventModal}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setShowAddEventModal(false)}
+      >
+        <KeyboardAvoidingView 
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={styles.modalOverlay}
+        >
+          <TouchableOpacity 
+            style={styles.modalBackdrop} 
+            activeOpacity={1} 
+            onPress={() => setShowAddEventModal(false)}
+          />
+          <View style={[styles.modalContainer, { backgroundColor: colors.surface }]}>
+            <View style={styles.modalHandle} />
+            
+            <View style={styles.modalHeader}>
+              <Text style={[styles.modalTitle, { color: colors.text }]}>New Event</Text>
+              <TouchableOpacity onPress={() => setShowAddEventModal(false)}>
+                <X size={24} color={colors.textSecondary} />
+              </TouchableOpacity>
+            </View>
+
+            <Text style={[styles.modalDateLabel, { color: colors.textSecondary }]}>
+              {months[currentMonth]} {selectedDate}, {currentYear}
+            </Text>
+
+            <ScrollView style={styles.modalContent} showsVerticalScrollIndicator={false}>
+              <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>Event Title *</Text>
+              <TextInput
+                style={[styles.textInput, { backgroundColor: colors.background, color: colors.text, borderColor: colors.border }]}
+                placeholder="Enter event title"
+                placeholderTextColor={colors.textTertiary}
+                value={newEvent.title}
+                onChangeText={(text) => setNewEvent(prev => ({ ...prev, title: text }))}
+              />
+
+              <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>Time *</Text>
+              <TextInput
+                style={[styles.textInput, { backgroundColor: colors.background, color: colors.text, borderColor: colors.border }]}
+                placeholder="e.g., 10:00 AM"
+                placeholderTextColor={colors.textTertiary}
+                value={newEvent.time}
+                onChangeText={(text) => setNewEvent(prev => ({ ...prev, time: text }))}
+              />
+
+              <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>Duration</Text>
+              <TextInput
+                style={[styles.textInput, { backgroundColor: colors.background, color: colors.text, borderColor: colors.border }]}
+                placeholder="e.g., 1h, 30min"
+                placeholderTextColor={colors.textTertiary}
+                value={newEvent.duration}
+                onChangeText={(text) => setNewEvent(prev => ({ ...prev, duration: text }))}
+              />
+
+              <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>Event Type</Text>
+              <View style={styles.eventTypeGrid}>
+                {eventTypes.map((item) => (
+                  <TouchableOpacity
+                    key={item.type}
+                    style={[
+                      styles.eventTypeButton,
+                      { borderColor: colors.border },
+                      newEvent.type === item.type && { backgroundColor: item.color + '20', borderColor: item.color },
+                    ]}
+                    onPress={() => setNewEvent(prev => ({ ...prev, type: item.type }))}
+                  >
+                    <View style={[styles.eventTypeDot, { backgroundColor: item.color }]} />
+                    <Text style={[
+                      styles.eventTypeText,
+                      { color: newEvent.type === item.type ? item.color : colors.textSecondary }
+                    ]}>
+                      {item.label}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+
+              <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>Location</Text>
+              <TextInput
+                style={[styles.textInput, { backgroundColor: colors.background, color: colors.text, borderColor: colors.border }]}
+                placeholder="Enter location"
+                placeholderTextColor={colors.textTertiary}
+                value={newEvent.location}
+                onChangeText={(text) => setNewEvent(prev => ({ ...prev, location: text }))}
+              />
+
+              <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>Description</Text>
+              <TextInput
+                style={[styles.textInputMultiline, { backgroundColor: colors.background, color: colors.text, borderColor: colors.border }]}
+                placeholder="Add event description"
+                placeholderTextColor={colors.textTertiary}
+                value={newEvent.description}
+                onChangeText={(text) => setNewEvent(prev => ({ ...prev, description: text }))}
+                multiline
+                numberOfLines={3}
+                textAlignVertical="top"
+              />
+
+              <TouchableOpacity
+                style={[
+                  styles.addEventButton,
+                  { backgroundColor: colors.primary },
+                  (!newEvent.title.trim() || !newEvent.time.trim()) && { opacity: 0.5 },
+                ]}
+                onPress={handleAddEvent}
+                disabled={!newEvent.title.trim() || !newEvent.time.trim()}
+              >
+                <Plus size={20} color="#FFF" />
+                <Text style={styles.addEventButtonText}>Add Event</Text>
+              </TouchableOpacity>
+            </ScrollView>
+          </View>
+        </KeyboardAvoidingView>
+      </Modal>
     </View>
   );
 }
@@ -1096,5 +1275,107 @@ const styles = StyleSheet.create({
   eventDescription: {
     fontSize: 12,
     marginTop: 4,
+  },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: 'flex-end',
+  },
+  modalBackdrop: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContainer: {
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    paddingHorizontal: 20,
+    paddingBottom: 34,
+    maxHeight: '85%',
+  },
+  modalHandle: {
+    width: 40,
+    height: 4,
+    backgroundColor: '#D1D5DB',
+    borderRadius: 2,
+    alignSelf: 'center',
+    marginTop: 12,
+    marginBottom: 16,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  modalTitle: {
+    fontSize: 22,
+    fontWeight: '700' as const,
+  },
+  modalDateLabel: {
+    fontSize: 14,
+    marginBottom: 20,
+  },
+  modalContent: {
+    flexGrow: 0,
+  },
+  inputLabel: {
+    fontSize: 13,
+    fontWeight: '600' as const,
+    marginBottom: 8,
+    marginTop: 4,
+  },
+  textInput: {
+    height: 48,
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    fontSize: 15,
+    marginBottom: 16,
+    borderWidth: 1,
+  },
+  textInputMultiline: {
+    height: 90,
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingTop: 14,
+    fontSize: 15,
+    marginBottom: 20,
+    borderWidth: 1,
+  },
+  eventTypeGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 10,
+    marginBottom: 16,
+  },
+  eventTypeButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 20,
+    borderWidth: 1,
+    gap: 6,
+  },
+  eventTypeDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+  },
+  eventTypeText: {
+    fontSize: 13,
+    fontWeight: '500' as const,
+  },
+  addEventButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: 52,
+    borderRadius: 14,
+    gap: 8,
+    marginBottom: 10,
+  },
+  addEventButtonText: {
+    color: '#FFF',
+    fontSize: 16,
+    fontWeight: '600' as const,
   },
 });
