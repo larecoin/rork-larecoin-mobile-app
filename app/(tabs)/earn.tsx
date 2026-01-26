@@ -124,7 +124,7 @@ export default function EarnScreen() {
 
       <ScrollView showsVerticalScrollIndicator={false}>
         <LinearGradient
-          colors={[Colors.accent, Colors.accent + 'CC']}
+          colors={['#D4E9D7', '#C1DFC4']}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
           style={styles.rewardsCard}
@@ -299,17 +299,17 @@ const styles = StyleSheet.create({
   },
   rewardDivider: {
     width: 1,
-    backgroundColor: 'rgba(255,255,255,0.2)',
+    backgroundColor: 'rgba(30,81,40,0.2)',
   },
   rewardLabel: {
     fontSize: 13,
-    color: 'rgba(255,255,255,0.7)',
+    color: '#3D6B45',
     marginBottom: 4,
   },
   rewardValue: {
     fontSize: 22,
     fontWeight: '700',
-    color: Colors.background,
+    color: '#1E5128',
   },
   claimBtn: {
     backgroundColor: Colors.background,
