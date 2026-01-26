@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, RefreshControl, Modal } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, RefreshControl, Modal, Image } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { 
   Store, QrCode, Package, Edit2, Eye, Share2, Settings, 
   Heart, ChevronRight, Plus, Check, X, Globe, MapPin, Copy, Link,
   CreditCard, Wallet, Clock, Building2, Users, Bitcoin, Fingerprint,
-  ChevronDown, ChevronUp, DollarSign, Smartphone, Receipt, Menu, RefreshCw
+  ChevronDown, ChevronUp, DollarSign, Smartphone, Receipt, Menu, RefreshCw,
+  Star, UserCircle, Navigation, Trash2, Phone, Mail, ShoppingCart,
+  Layers, Cable, Map, Zap, Lock, Unlock, TrendingUp
 } from 'lucide-react-native';
 import ModeToggle from '@/components/ModeToggle';
 import MerchantNavMenuModal from '@/components/MerchantNavMenuModal';
@@ -34,6 +36,79 @@ interface PaymentCategory {
   description: string;
   methods: PaymentMethod[];
 }
+
+interface Customer {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  totalOrders: number;
+  totalSpent: number;
+  lastOrder: string;
+  avatar?: string;
+}
+
+interface Review {
+  id: string;
+  customerName: string;
+  rating: number;
+  comment: string;
+  date: string;
+  productName?: string;
+  replied: boolean;
+}
+
+interface ShopLocation {
+  id: string;
+  name: string;
+  address: string;
+  city: string;
+  isActive: boolean;
+  orders: number;
+  revenue: number;
+}
+
+interface MetaverseLand {
+  id: string;
+  name: string;
+  zone: string;
+  size: string;
+  price: number;
+  features: string[];
+  image: string;
+  available: boolean;
+  type: '2D' | '3D' | 'VR' | 'AR';
+}
+
+const mockCustomers: Customer[] = [
+  { id: '1', name: 'John Smith', email: 'john@email.com', phone: '+1 555-0101', totalOrders: 12, totalSpent: 1240.50, lastOrder: '2 days ago' },
+  { id: '2', name: 'Sarah Johnson', email: 'sarah@email.com', phone: '+1 555-0102', totalOrders: 8, totalSpent: 890.25, lastOrder: '1 week ago' },
+  { id: '3', name: 'Mike Williams', email: 'mike@email.com', phone: '+1 555-0103', totalOrders: 5, totalSpent: 456.00, lastOrder: '3 days ago' },
+  { id: '4', name: 'Emily Brown', email: 'emily@email.com', phone: '+1 555-0104', totalOrders: 15, totalSpent: 2100.75, lastOrder: 'Today' },
+  { id: '5', name: 'David Lee', email: 'david@email.com', phone: '+1 555-0105', totalOrders: 3, totalSpent: 245.00, lastOrder: '5 days ago' },
+];
+
+const mockReviews: Review[] = [
+  { id: '1', customerName: 'John S.', rating: 5, comment: 'Excellent products and fast shipping! Will definitely order again.', date: '2 days ago', productName: 'Premium Widget', replied: true },
+  { id: '2', customerName: 'Sarah J.', rating: 4, comment: 'Good quality, but delivery took a bit longer than expected.', date: '1 week ago', productName: 'Basic Kit', replied: false },
+  { id: '3', customerName: 'Mike W.', rating: 5, comment: 'Amazing customer service! They resolved my issue quickly.', date: '3 days ago', replied: true },
+  { id: '4', customerName: 'Emily B.', rating: 3, comment: 'Product was okay, but packaging could be better.', date: '5 days ago', productName: 'Starter Pack', replied: false },
+  { id: '5', customerName: 'David L.', rating: 5, comment: 'Best shop in the area! Highly recommend.', date: '1 day ago', replied: false },
+];
+
+const mockLocations: ShopLocation[] = [
+  { id: '1', name: 'Main Store', address: '123 Main Street', city: 'New York, NY', isActive: true, orders: 45, revenue: 12500 },
+  { id: '2', name: 'Downtown Branch', address: '456 Commerce Ave', city: 'New York, NY', isActive: true, orders: 32, revenue: 8900 },
+  { id: '3', name: 'Mall Kiosk', address: 'Westfield Mall, Level 2', city: 'Brooklyn, NY', isActive: false, orders: 12, revenue: 3200 },
+];
+
+const metaverseLands: MetaverseLand[] = [
+  { id: '1', name: 'Prime Plaza Lot', zone: 'Central District', size: '10x10m', price: 2500, features: ['High Traffic', 'Billboard Rights', 'Event Space'], image: 'https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=400', available: true, type: 'VR' },
+  { id: '2', name: 'Neon Street Corner', zone: 'Entertainment Hub', size: '15x15m', price: 4500, features: ['AR Portal', 'Music Venue', 'NFT Gallery'], image: 'https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=400', available: true, type: 'AR' },
+  { id: '3', name: 'Skyline Tower Base', zone: 'Business Park', size: '20x20m', price: 8000, features: ['3D Storefront', 'Meeting Rooms', 'Premium Visibility'], image: 'https://images.unsplash.com/photo-1614850523459-c2f4c699c52e?w=400', available: true, type: '3D' },
+  { id: '4', name: 'Pixel Garden Plot', zone: 'Creative Quarter', size: '8x8m', price: 1200, features: ['2D Shop Display', 'Social Hub', 'Art Wall'], image: 'https://images.unsplash.com/photo-1558591710-4b4a1ae0f04d?w=400', available: true, type: '2D' },
+  { id: '5', name: 'VR Mall Suite', zone: 'Shopping Complex', size: '12x12m', price: 5500, features: ['Virtual Try-On', 'Interactive Demo', '360° View'], image: 'https://images.unsplash.com/photo-1617802690992-15d93263d3a9?w=400', available: false, type: 'VR' },
+];
 
 const charities: Charity[] = [
   { id: '1', name: 'Red Cross', category: 'Humanitarian', description: 'Disaster relief and emergency assistance' },
@@ -186,6 +261,15 @@ export default function MyShopScreen() {
   const [showNavMenu, setShowNavMenu] = useState(false);
   const [showAddProfileModal, setShowAddProfileModal] = useState(false);
   const [showSwitchProfileModal, setShowSwitchProfileModal] = useState(false);
+  const [showCustomersModal, setShowCustomersModal] = useState(false);
+  const [showRatingsModal, setShowRatingsModal] = useState(false);
+  const [showLocationsModal, setShowLocationsModal] = useState(false);
+  const [showMetaverseModal, setShowMetaverseModal] = useState(false);
+  const [selectedLand, setSelectedLand] = useState<MetaverseLand | null>(null);
+  const [ownedLands, setOwnedLands] = useState<string[]>([]);
+  const [customers] = useState<Customer[]>(mockCustomers);
+  const [reviews] = useState<Review[]>(mockReviews);
+  const [locations, setLocations] = useState<ShopLocation[]>(mockLocations);
 
   const shopSlug = merchantProfile.name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
   const shopUrl = `larecoin.com/shop/${shopSlug}`;
@@ -230,6 +314,34 @@ export default function MyShopScreen() {
     orders: 89,
     rating: 4.8,
     products: merchantProducts.length,
+    customers: customers.length,
+    locations: locations.filter(l => l.isActive).length,
+  };
+
+  const toggleLocationStatus = (locationId: string) => {
+    setLocations(prev => prev.map(loc => 
+      loc.id === locationId ? { ...loc, isActive: !loc.isActive } : loc
+    ));
+  };
+
+  const purchaseLand = (land: MetaverseLand) => {
+    if (!ownedLands.includes(land.id)) {
+      setOwnedLands(prev => [...prev, land.id]);
+      setSelectedLand(null);
+    }
+  };
+
+  const averageRating = reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length;
+
+  const renderStars = (rating: number) => {
+    return Array.from({ length: 5 }, (_, i) => (
+      <Star 
+        key={i} 
+        size={14} 
+        color={i < rating ? '#F39C12' : Colors.border} 
+        fill={i < rating ? '#F39C12' : 'transparent'}
+      />
+    ));
   };
 
   return (
@@ -284,20 +396,20 @@ export default function MyShopScreen() {
           <Text style={styles.shopDescription}>{merchantProfile.description}</Text>
           
           <View style={styles.shopStatsRow}>
-            <View style={styles.shopStatItem}>
-              <Text style={styles.shopStatValue}>{shopStats.views}</Text>
-              <Text style={styles.shopStatLabel}>Views</Text>
-            </View>
+            <TouchableOpacity style={styles.shopStatItem} onPress={() => setShowCustomersModal(true)}>
+              <Text style={styles.shopStatValue}>{shopStats.customers}</Text>
+              <Text style={styles.shopStatLabel}>Customers</Text>
+            </TouchableOpacity>
             <View style={styles.shopStatDivider} />
-            <View style={styles.shopStatItem}>
-              <Text style={styles.shopStatValue}>{shopStats.orders}</Text>
-              <Text style={styles.shopStatLabel}>Orders</Text>
-            </View>
-            <View style={styles.shopStatDivider} />
-            <View style={styles.shopStatItem}>
+            <TouchableOpacity style={styles.shopStatItem} onPress={() => setShowRatingsModal(true)}>
               <Text style={styles.shopStatValue}>{shopStats.rating}</Text>
               <Text style={styles.shopStatLabel}>Rating</Text>
-            </View>
+            </TouchableOpacity>
+            <View style={styles.shopStatDivider} />
+            <TouchableOpacity style={styles.shopStatItem} onPress={() => setShowLocationsModal(true)}>
+              <Text style={styles.shopStatValue}>{shopStats.locations}</Text>
+              <Text style={styles.shopStatLabel}>Locations</Text>
+            </TouchableOpacity>
             <View style={styles.shopStatDivider} />
             <View style={styles.shopStatItem}>
               <Text style={styles.shopStatValue}>{shopStats.products}</Text>
@@ -400,7 +512,7 @@ export default function MyShopScreen() {
               </View>
               <Text style={styles.actionLabel}>Online Store</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.actionCard}>
+            <TouchableOpacity style={styles.actionCard} onPress={() => setShowLocationsModal(true)}>
               <View style={[styles.actionIcon, { backgroundColor: '#E74C3C' + '20' }]}>
                 <MapPin size={22} color="#E74C3C" />
               </View>
@@ -408,6 +520,47 @@ export default function MyShopScreen() {
             </TouchableOpacity>
           </View>
         </View>
+
+        <TouchableOpacity 
+          style={styles.metaverseCard}
+          onPress={() => setShowMetaverseModal(true)}
+        >
+          <View style={styles.metaverseGradient}>
+            <View style={styles.metaverseIconWrapper}>
+              <Cable size={28} color="#fff" />
+            </View>
+            <View style={styles.metaverseInfo}>
+              <Text style={styles.metaverseTitle}>Metaverse Shop Plots</Text>
+              <Text style={styles.metaverseDesc}>Buy virtual land for VR/AR/3D/2D storefronts</Text>
+              <View style={styles.metaverseBadges}>
+                <View style={styles.metaverseBadge}>
+                  <Layers size={12} color="#fff" />
+                  <Text style={styles.metaverseBadgeText}>VR</Text>
+                </View>
+                <View style={styles.metaverseBadge}>
+                  <Map size={12} color="#fff" />
+                  <Text style={styles.metaverseBadgeText}>AR</Text>
+                </View>
+                <View style={styles.metaverseBadge}>
+                  <Cable size={12} color="#fff" />
+                  <Text style={styles.metaverseBadgeText}>3D</Text>
+                </View>
+                <View style={styles.metaverseBadge}>
+                  <Globe size={12} color="#fff" />
+                  <Text style={styles.metaverseBadgeText}>2D</Text>
+                </View>
+              </View>
+            </View>
+            <View style={styles.metaverseArrow}>
+              <ChevronRight size={24} color="#fff" />
+            </View>
+          </View>
+          {ownedLands.length > 0 && (
+            <View style={styles.ownedLandsRow}>
+              <Text style={styles.ownedLandsText}>{ownedLands.length} plots owned</Text>
+            </View>
+          )}
+        </TouchableOpacity>
 
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
@@ -586,6 +739,370 @@ export default function MyShopScreen() {
             >
               <Text style={styles.saveBtnText}>Save Payment Settings</Text>
             </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Customers Modal */}
+      <Modal
+        visible={showCustomersModal}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setShowCustomersModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={[styles.paymentModalContent, { paddingBottom: insets.bottom + 20 }]}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Customers</Text>
+              <TouchableOpacity onPress={() => setShowCustomersModal(false)}>
+                <X size={24} color={Colors.text} />
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.customerStats}>
+              <View style={styles.customerStatBox}>
+                <Text style={styles.customerStatValue}>{customers.length}</Text>
+                <Text style={styles.customerStatLabel}>Total</Text>
+              </View>
+              <View style={styles.customerStatBox}>
+                <Text style={styles.customerStatValue}>${customers.reduce((a, c) => a + c.totalSpent, 0).toLocaleString()}</Text>
+                <Text style={styles.customerStatLabel}>Revenue</Text>
+              </View>
+              <View style={styles.customerStatBox}>
+                <Text style={styles.customerStatValue}>{customers.reduce((a, c) => a + c.totalOrders, 0)}</Text>
+                <Text style={styles.customerStatLabel}>Orders</Text>
+              </View>
+            </View>
+
+            <ScrollView style={styles.customerList} showsVerticalScrollIndicator={false}>
+              {customers.map(customer => (
+                <View key={customer.id} style={styles.customerCard}>
+                  <View style={styles.customerAvatar}>
+                    <UserCircle size={40} color={Colors.primary} />
+                  </View>
+                  <View style={styles.customerInfo}>
+                    <Text style={styles.customerName}>{customer.name}</Text>
+                    <View style={styles.customerContactRow}>
+                      <Mail size={12} color={Colors.textSecondary} />
+                      <Text style={styles.customerContact}>{customer.email}</Text>
+                    </View>
+                    <View style={styles.customerMetrics}>
+                      <View style={styles.customerMetric}>
+                        <ShoppingCart size={12} color={Colors.accent} />
+                        <Text style={styles.customerMetricText}>{customer.totalOrders} orders</Text>
+                      </View>
+                      <View style={styles.customerMetric}>
+                        <DollarSign size={12} color={Colors.accent} />
+                        <Text style={styles.customerMetricText}>${customer.totalSpent.toFixed(2)}</Text>
+                      </View>
+                    </View>
+                  </View>
+                  <View style={styles.customerActions}>
+                    <TouchableOpacity style={styles.customerActionBtn}>
+                      <Phone size={16} color={Colors.primary} />
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.customerActionBtn}>
+                      <Mail size={16} color={Colors.primary} />
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              ))}
+              <View style={{ height: 20 }} />
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Ratings Modal */}
+      <Modal
+        visible={showRatingsModal}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setShowRatingsModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={[styles.paymentModalContent, { paddingBottom: insets.bottom + 20 }]}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Reviews & Ratings</Text>
+              <TouchableOpacity onPress={() => setShowRatingsModal(false)}>
+                <X size={24} color={Colors.text} />
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.ratingOverview}>
+              <View style={styles.ratingBig}>
+                <Text style={styles.ratingBigValue}>{averageRating.toFixed(1)}</Text>
+                <View style={styles.ratingStars}>
+                  {renderStars(Math.round(averageRating))}
+                </View>
+                <Text style={styles.ratingCount}>{reviews.length} reviews</Text>
+              </View>
+              <View style={styles.ratingBreakdown}>
+                {[5, 4, 3, 2, 1].map(stars => {
+                  const count = reviews.filter(r => r.rating === stars).length;
+                  const percent = (count / reviews.length) * 100;
+                  return (
+                    <View key={stars} style={styles.ratingBar}>
+                      <Text style={styles.ratingBarLabel}>{stars}</Text>
+                      <Star size={12} color="#F39C12" fill="#F39C12" />
+                      <View style={styles.ratingBarTrack}>
+                        <View style={[styles.ratingBarFill, { width: `${percent}%` }]} />
+                      </View>
+                      <Text style={styles.ratingBarCount}>{count}</Text>
+                    </View>
+                  );
+                })}
+              </View>
+            </View>
+
+            <ScrollView style={styles.reviewList} showsVerticalScrollIndicator={false}>
+              {reviews.map(review => (
+                <View key={review.id} style={styles.reviewCard}>
+                  <View style={styles.reviewHeader}>
+                    <View style={styles.reviewerInfo}>
+                      <Text style={styles.reviewerName}>{review.customerName}</Text>
+                      <View style={styles.reviewStars}>
+                        {renderStars(review.rating)}
+                      </View>
+                    </View>
+                    <Text style={styles.reviewDate}>{review.date}</Text>
+                  </View>
+                  {review.productName && (
+                    <Text style={styles.reviewProduct}>Product: {review.productName}</Text>
+                  )}
+                  <Text style={styles.reviewComment}>{review.comment}</Text>
+                  <View style={styles.reviewActions}>
+                    {review.replied ? (
+                      <View style={styles.repliedBadge}>
+                        <Check size={12} color={Colors.accent} />
+                        <Text style={styles.repliedText}>Replied</Text>
+                      </View>
+                    ) : (
+                      <TouchableOpacity style={styles.replyBtn}>
+                        <Text style={styles.replyBtnText}>Reply</Text>
+                      </TouchableOpacity>
+                    )}
+                  </View>
+                </View>
+              ))}
+              <View style={{ height: 20 }} />
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Locations Modal */}
+      <Modal
+        visible={showLocationsModal}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setShowLocationsModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={[styles.paymentModalContent, { paddingBottom: insets.bottom + 20 }]}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Shop Locations</Text>
+              <TouchableOpacity onPress={() => setShowLocationsModal(false)}>
+                <X size={24} color={Colors.text} />
+              </TouchableOpacity>
+            </View>
+
+            <TouchableOpacity style={styles.addLocationBtn}>
+              <Plus size={20} color={Colors.primary} />
+              <Text style={styles.addLocationText}>Add New Location</Text>
+            </TouchableOpacity>
+
+            <ScrollView style={styles.locationList} showsVerticalScrollIndicator={false}>
+              {locations.map(location => (
+                <View key={location.id} style={[styles.locationCard, !location.isActive && styles.locationCardInactive]}>
+                  <View style={styles.locationHeader}>
+                    <View style={[styles.locationIcon, { backgroundColor: location.isActive ? Colors.accent + '20' : Colors.border + '30' }]}>
+                      <MapPin size={20} color={location.isActive ? Colors.accent : Colors.textSecondary} />
+                    </View>
+                    <View style={styles.locationInfo}>
+                      <Text style={styles.locationName}>{location.name}</Text>
+                      <Text style={styles.locationAddress}>{location.address}</Text>
+                      <Text style={styles.locationCity}>{location.city}</Text>
+                    </View>
+                    <TouchableOpacity 
+                      style={[styles.locationToggle, location.isActive && styles.locationToggleActive]}
+                      onPress={() => toggleLocationStatus(location.id)}
+                    >
+                      {location.isActive ? (
+                        <Unlock size={16} color={Colors.accent} />
+                      ) : (
+                        <Lock size={16} color={Colors.textSecondary} />
+                      )}
+                    </TouchableOpacity>
+                  </View>
+                  <View style={styles.locationStats}>
+                    <View style={styles.locationStat}>
+                      <ShoppingCart size={14} color={Colors.textSecondary} />
+                      <Text style={styles.locationStatText}>{location.orders} orders</Text>
+                    </View>
+                    <View style={styles.locationStat}>
+                      <DollarSign size={14} color={Colors.textSecondary} />
+                      <Text style={styles.locationStatText}>${location.revenue.toLocaleString()}</Text>
+                    </View>
+                    <View style={[styles.locationStatus, location.isActive ? styles.locationStatusActive : styles.locationStatusInactive]}>
+                      <Text style={[styles.locationStatusText, location.isActive && styles.locationStatusTextActive]}>
+                        {location.isActive ? 'Active' : 'Inactive'}
+                      </Text>
+                    </View>
+                  </View>
+                  <View style={styles.locationActions}>
+                    <TouchableOpacity style={styles.locationActionBtn}>
+                      <Edit2 size={16} color={Colors.primary} />
+                      <Text style={styles.locationActionText}>Edit</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.locationActionBtn}>
+                      <Navigation size={16} color={Colors.primary} />
+                      <Text style={styles.locationActionText}>Directions</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={[styles.locationActionBtn, styles.locationActionDanger]}>
+                      <Trash2 size={16} color="#E74C3C" />
+                      <Text style={[styles.locationActionText, { color: '#E74C3C' }]}>Remove</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              ))}
+              <View style={{ height: 20 }} />
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Metaverse Land Modal */}
+      <Modal
+        visible={showMetaverseModal}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setShowMetaverseModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={[styles.paymentModalContent, { paddingBottom: insets.bottom + 20 }]}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Metaverse Land Plots</Text>
+              <TouchableOpacity onPress={() => setShowMetaverseModal(false)}>
+                <X size={24} color={Colors.text} />
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.metaverseNotice}>
+              <Cable size={18} color="#8E44AD" />
+              <Text style={styles.metaverseNoticeText}>
+                Own virtual commercial land to host your shop in immersive environments
+              </Text>
+            </View>
+
+            <ScrollView style={styles.landList} showsVerticalScrollIndicator={false}>
+              {metaverseLands.map(land => {
+                const isOwned = ownedLands.includes(land.id);
+                return (
+                  <TouchableOpacity 
+                    key={land.id} 
+                    style={[styles.landCard, isOwned && styles.landCardOwned]}
+                    onPress={() => !isOwned && setSelectedLand(land)}
+                  >
+                    <Image source={{ uri: land.image }} style={styles.landImage} />
+                    <View style={styles.landTypeBadge}>
+                      <Text style={styles.landTypeText}>{land.type}</Text>
+                    </View>
+                    {isOwned && (
+                      <View style={styles.ownedBadge}>
+                        <Check size={12} color="#fff" />
+                        <Text style={styles.ownedBadgeText}>Owned</Text>
+                      </View>
+                    )}
+                    <View style={styles.landInfo}>
+                      <Text style={styles.landName}>{land.name}</Text>
+                      <Text style={styles.landZone}>{land.zone} • {land.size}</Text>
+                      <View style={styles.landFeatures}>
+                        {land.features.slice(0, 2).map((feature, idx) => (
+                          <View key={idx} style={styles.landFeatureBadge}>
+                            <Text style={styles.landFeatureText}>{feature}</Text>
+                          </View>
+                        ))}
+                        {land.features.length > 2 && (
+                          <Text style={styles.landMoreFeatures}>+{land.features.length - 2}</Text>
+                        )}
+                      </View>
+                      <View style={styles.landPriceRow}>
+                        <Text style={styles.landPrice}>${land.price.toLocaleString()}</Text>
+                        {!isOwned && land.available && (
+                          <View style={styles.availableBadge}>
+                            <Text style={styles.availableText}>Available</Text>
+                          </View>
+                        )}
+                        {!land.available && !isOwned && (
+                          <View style={styles.soldBadge}>
+                            <Text style={styles.soldText}>Sold</Text>
+                          </View>
+                        )}
+                      </View>
+                    </View>
+                  </TouchableOpacity>
+                );
+              })}
+              <View style={{ height: 20 }} />
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Land Purchase Modal */}
+      <Modal
+        visible={selectedLand !== null}
+        animationType="fade"
+        transparent={true}
+        onRequestClose={() => setSelectedLand(null)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={[styles.purchaseModal, { paddingBottom: insets.bottom + 20 }]}>
+            {selectedLand && (
+              <>
+                <Image source={{ uri: selectedLand.image }} style={styles.purchaseImage} />
+                <TouchableOpacity style={styles.purchaseClose} onPress={() => setSelectedLand(null)}>
+                  <X size={24} color="#fff" />
+                </TouchableOpacity>
+                <View style={styles.purchaseContent}>
+                  <View style={styles.purchaseHeader}>
+                    <Text style={styles.purchaseTitle}>{selectedLand.name}</Text>
+                    <View style={styles.purchaseTypeBadge}>
+                      <Text style={styles.purchaseTypeText}>{selectedLand.type}</Text>
+                    </View>
+                  </View>
+                  <Text style={styles.purchaseZone}>{selectedLand.zone} • {selectedLand.size}</Text>
+                  
+                  <View style={styles.purchaseFeatures}>
+                    <Text style={styles.purchaseFeaturesTitle}>Features</Text>
+                    {selectedLand.features.map((feature, idx) => (
+                      <View key={idx} style={styles.purchaseFeatureRow}>
+                        <Check size={16} color={Colors.accent} />
+                        <Text style={styles.purchaseFeatureText}>{feature}</Text>
+                      </View>
+                    ))}
+                  </View>
+
+                  <View style={styles.purchasePriceBox}>
+                    <Text style={styles.purchasePriceLabel}>Purchase Price</Text>
+                    <Text style={styles.purchasePriceValue}>${selectedLand.price.toLocaleString()} LUSD</Text>
+                  </View>
+
+                  <TouchableOpacity 
+                    style={styles.purchaseBtn}
+                    onPress={() => purchaseLand(selectedLand)}
+                  >
+                    <Zap size={20} color="#fff" />
+                    <Text style={styles.purchaseBtnText}>Purchase Land Plot</Text>
+                  </TouchableOpacity>
+
+                  <Text style={styles.purchaseDisclaimer}>
+                    Virtual land ownership is recorded on-chain. You can resell or lease your plot anytime.
+                  </Text>
+                </View>
+              </>
+            )}
           </View>
         </View>
       </Modal>
@@ -1177,5 +1694,669 @@ const styles = StyleSheet.create({
   paymentMethodToggleEnabled: {
     backgroundColor: Colors.accent,
     borderColor: Colors.accent,
+  },
+  // Customer Modal Styles
+  customerStats: {
+    flexDirection: 'row',
+    gap: 10,
+    marginBottom: 16,
+  },
+  customerStatBox: {
+    flex: 1,
+    backgroundColor: Colors.surface,
+    borderRadius: 12,
+    padding: 14,
+    alignItems: 'center',
+  },
+  customerStatValue: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: Colors.text,
+    marginBottom: 2,
+  },
+  customerStatLabel: {
+    fontSize: 11,
+    color: Colors.textSecondary,
+  },
+  customerList: {
+    flex: 1,
+  },
+  customerCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: Colors.surface,
+    borderRadius: 14,
+    padding: 14,
+    marginBottom: 10,
+  },
+  customerAvatar: {
+    marginRight: 12,
+  },
+  customerInfo: {
+    flex: 1,
+  },
+  customerName: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: Colors.text,
+    marginBottom: 4,
+  },
+  customerContactRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginBottom: 6,
+  },
+  customerContact: {
+    fontSize: 12,
+    color: Colors.textSecondary,
+  },
+  customerMetrics: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  customerMetric: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  customerMetricText: {
+    fontSize: 12,
+    color: Colors.accent,
+    fontWeight: '500',
+  },
+  customerActions: {
+    flexDirection: 'column',
+    gap: 6,
+  },
+  customerActionBtn: {
+    width: 36,
+    height: 36,
+    borderRadius: 10,
+    backgroundColor: Colors.primary + '15',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  // Rating Modal Styles
+  ratingOverview: {
+    flexDirection: 'row',
+    backgroundColor: Colors.surface,
+    borderRadius: 14,
+    padding: 16,
+    marginBottom: 16,
+    gap: 20,
+  },
+  ratingBig: {
+    alignItems: 'center',
+    paddingRight: 20,
+    borderRightWidth: 1,
+    borderRightColor: Colors.border,
+  },
+  ratingBigValue: {
+    fontSize: 40,
+    fontWeight: '700',
+    color: Colors.text,
+  },
+  ratingStars: {
+    flexDirection: 'row',
+    gap: 2,
+    marginVertical: 4,
+  },
+  ratingCount: {
+    fontSize: 12,
+    color: Colors.textSecondary,
+  },
+  ratingBreakdown: {
+    flex: 1,
+    justifyContent: 'center',
+    gap: 4,
+  },
+  ratingBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  ratingBarLabel: {
+    fontSize: 12,
+    color: Colors.textSecondary,
+    width: 12,
+  },
+  ratingBarTrack: {
+    flex: 1,
+    height: 6,
+    backgroundColor: Colors.border,
+    borderRadius: 3,
+    overflow: 'hidden',
+  },
+  ratingBarFill: {
+    height: '100%',
+    backgroundColor: '#F39C12',
+    borderRadius: 3,
+  },
+  ratingBarCount: {
+    fontSize: 11,
+    color: Colors.textSecondary,
+    width: 16,
+    textAlign: 'right',
+  },
+  reviewList: {
+    flex: 1,
+  },
+  reviewCard: {
+    backgroundColor: Colors.surface,
+    borderRadius: 14,
+    padding: 14,
+    marginBottom: 10,
+  },
+  reviewHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: 8,
+  },
+  reviewerInfo: {
+    gap: 4,
+  },
+  reviewerName: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: Colors.text,
+  },
+  reviewStars: {
+    flexDirection: 'row',
+    gap: 2,
+  },
+  reviewDate: {
+    fontSize: 11,
+    color: Colors.textSecondary,
+  },
+  reviewProduct: {
+    fontSize: 12,
+    color: Colors.primary,
+    marginBottom: 6,
+  },
+  reviewComment: {
+    fontSize: 13,
+    color: Colors.text,
+    lineHeight: 20,
+    marginBottom: 10,
+  },
+  reviewActions: {
+    flexDirection: 'row',
+  },
+  repliedBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: Colors.accent + '15',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 8,
+  },
+  repliedText: {
+    fontSize: 12,
+    color: Colors.accent,
+    fontWeight: '500',
+  },
+  replyBtn: {
+    backgroundColor: Colors.primary + '15',
+    paddingHorizontal: 14,
+    paddingVertical: 6,
+    borderRadius: 8,
+  },
+  replyBtnText: {
+    fontSize: 12,
+    color: Colors.primary,
+    fontWeight: '600',
+  },
+  // Location Modal Styles
+  addLocationBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    backgroundColor: Colors.primary + '15',
+    borderRadius: 12,
+    padding: 14,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: Colors.primary + '30',
+    borderStyle: 'dashed',
+  },
+  addLocationText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: Colors.primary,
+  },
+  locationList: {
+    flex: 1,
+  },
+  locationCard: {
+    backgroundColor: Colors.surface,
+    borderRadius: 14,
+    padding: 14,
+    marginBottom: 12,
+  },
+  locationCardInactive: {
+    opacity: 0.7,
+  },
+  locationHeader: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: 12,
+  },
+  locationIcon: {
+    width: 44,
+    height: 44,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+  },
+  locationInfo: {
+    flex: 1,
+  },
+  locationName: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: Colors.text,
+    marginBottom: 2,
+  },
+  locationAddress: {
+    fontSize: 13,
+    color: Colors.textSecondary,
+  },
+  locationCity: {
+    fontSize: 12,
+    color: Colors.textSecondary,
+  },
+  locationToggle: {
+    width: 36,
+    height: 36,
+    borderRadius: 10,
+    backgroundColor: Colors.background,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  locationToggleActive: {
+    backgroundColor: Colors.accent + '15',
+  },
+  locationStats: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 16,
+    marginBottom: 12,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: Colors.border,
+  },
+  locationStat: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  locationStatText: {
+    fontSize: 13,
+    color: Colors.textSecondary,
+  },
+  locationStatus: {
+    marginLeft: 'auto',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 8,
+  },
+  locationStatusActive: {
+    backgroundColor: Colors.accent + '15',
+  },
+  locationStatusInactive: {
+    backgroundColor: Colors.border + '50',
+  },
+  locationStatusText: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: Colors.textSecondary,
+  },
+  locationStatusTextActive: {
+    color: Colors.accent,
+  },
+  locationActions: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  locationActionBtn: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    backgroundColor: Colors.background,
+    paddingVertical: 10,
+    borderRadius: 10,
+  },
+  locationActionDanger: {
+    backgroundColor: '#E74C3C' + '10',
+  },
+  locationActionText: {
+    fontSize: 12,
+    fontWeight: '500',
+    color: Colors.primary,
+  },
+  // Metaverse Card Styles
+  metaverseCard: {
+    marginHorizontal: 20,
+    marginBottom: 20,
+    borderRadius: 18,
+    overflow: 'hidden',
+  },
+  metaverseGradient: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 18,
+    backgroundColor: '#8E44AD',
+  },
+  metaverseIconWrapper: {
+    width: 56,
+    height: 56,
+    borderRadius: 16,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 14,
+  },
+  metaverseInfo: {
+    flex: 1,
+  },
+  metaverseTitle: {
+    fontSize: 17,
+    fontWeight: '700',
+    color: '#fff',
+    marginBottom: 4,
+  },
+  metaverseDesc: {
+    fontSize: 12,
+    color: 'rgba(255,255,255,0.8)',
+    marginBottom: 10,
+  },
+  metaverseBadges: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  metaverseBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 6,
+  },
+  metaverseBadgeText: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: '#fff',
+  },
+  metaverseArrow: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    backgroundColor: 'rgba(255,255,255,0.15)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  ownedLandsRow: {
+    backgroundColor: 'rgba(0,0,0,0.15)',
+    paddingVertical: 8,
+    alignItems: 'center',
+  },
+  ownedLandsText: {
+    fontSize: 12,
+    color: '#fff',
+    fontWeight: '600',
+  },
+  // Metaverse Modal Styles
+  metaverseNotice: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#8E44AD' + '15',
+    borderRadius: 12,
+    padding: 14,
+    marginBottom: 16,
+    gap: 10,
+  },
+  metaverseNoticeText: {
+    flex: 1,
+    fontSize: 13,
+    color: Colors.text,
+    lineHeight: 18,
+  },
+  landList: {
+    flex: 1,
+  },
+  landCard: {
+    backgroundColor: Colors.surface,
+    borderRadius: 16,
+    overflow: 'hidden',
+    marginBottom: 14,
+  },
+  landCardOwned: {
+    borderWidth: 2,
+    borderColor: Colors.accent,
+  },
+  landImage: {
+    width: '100%',
+    height: 140,
+    backgroundColor: Colors.border,
+  },
+  landTypeBadge: {
+    position: 'absolute',
+    top: 10,
+    left: 10,
+    backgroundColor: '#8E44AD',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 8,
+  },
+  landTypeText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#fff',
+  },
+  ownedBadge: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: Colors.accent,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 8,
+  },
+  ownedBadgeText: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: '#fff',
+  },
+  landInfo: {
+    padding: 14,
+  },
+  landName: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: Colors.text,
+    marginBottom: 4,
+  },
+  landZone: {
+    fontSize: 13,
+    color: Colors.textSecondary,
+    marginBottom: 10,
+  },
+  landFeatures: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 6,
+    marginBottom: 12,
+  },
+  landFeatureBadge: {
+    backgroundColor: Colors.background,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 8,
+  },
+  landFeatureText: {
+    fontSize: 11,
+    color: Colors.text,
+    fontWeight: '500',
+  },
+  landMoreFeatures: {
+    fontSize: 11,
+    color: Colors.primary,
+    fontWeight: '600',
+    alignSelf: 'center',
+  },
+  landPriceRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  landPrice: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: Colors.text,
+  },
+  availableBadge: {
+    backgroundColor: Colors.accent + '15',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 8,
+  },
+  availableText: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: Colors.accent,
+  },
+  soldBadge: {
+    backgroundColor: '#E74C3C' + '15',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 8,
+  },
+  soldText: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: '#E74C3C',
+  },
+  // Purchase Modal Styles
+  purchaseModal: {
+    backgroundColor: Colors.background,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    overflow: 'hidden',
+    maxHeight: '90%',
+  },
+  purchaseImage: {
+    width: '100%',
+    height: 200,
+    backgroundColor: Colors.border,
+  },
+  purchaseClose: {
+    position: 'absolute',
+    top: 16,
+    right: 16,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  purchaseContent: {
+    padding: 20,
+  },
+  purchaseHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 4,
+  },
+  purchaseTitle: {
+    fontSize: 22,
+    fontWeight: '700',
+    color: Colors.text,
+  },
+  purchaseTypeBadge: {
+    backgroundColor: '#8E44AD',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 8,
+  },
+  purchaseTypeText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#fff',
+  },
+  purchaseZone: {
+    fontSize: 14,
+    color: Colors.textSecondary,
+    marginBottom: 20,
+  },
+  purchaseFeatures: {
+    marginBottom: 20,
+  },
+  purchaseFeaturesTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: Colors.text,
+    marginBottom: 12,
+  },
+  purchaseFeatureRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginBottom: 8,
+  },
+  purchaseFeatureText: {
+    fontSize: 14,
+    color: Colors.text,
+  },
+  purchasePriceBox: {
+    backgroundColor: Colors.surface,
+    borderRadius: 14,
+    padding: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 16,
+  },
+  purchasePriceLabel: {
+    fontSize: 14,
+    color: Colors.textSecondary,
+  },
+  purchasePriceValue: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: Colors.text,
+  },
+  purchaseBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
+    backgroundColor: '#8E44AD',
+    borderRadius: 14,
+    paddingVertical: 16,
+    marginBottom: 12,
+  },
+  purchaseBtnText: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#fff',
+  },
+  purchaseDisclaimer: {
+    fontSize: 11,
+    color: Colors.textSecondary,
+    textAlign: 'center',
+    lineHeight: 16,
   },
 });
