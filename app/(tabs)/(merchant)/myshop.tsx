@@ -5,8 +5,10 @@ import {
   Store, QrCode, Package, Edit2, Eye, Share2, Settings, 
   Heart, ChevronRight, Plus, Check, X, Globe, MapPin, Copy, Link,
   CreditCard, Wallet, Clock, Building2, Users, Bitcoin, Fingerprint,
-  ChevronDown, ChevronUp, DollarSign, Smartphone, Receipt
+  ChevronDown, ChevronUp, DollarSign, Smartphone, Receipt, Menu, RefreshCw
 } from 'lucide-react-native';
+import ModeToggle from '@/components/ModeToggle';
+import MerchantNavMenuModal from '@/components/MerchantNavMenuModal';
 import * as Clipboard from 'expo-clipboard';
 import Colors from '@/constants/colors';
 import { useApp } from '@/contexts/AppContext';
@@ -181,6 +183,9 @@ export default function MyShopScreen() {
   const [enabledPaymentMethods, setEnabledPaymentMethods] = useState<string[]>([
     'visa', 'mastercard', 'apple-pay', 'google-pay', 'paypal', 'btc', 'eth', 'usdt', 'usdc'
   ]);
+  const [showNavMenu, setShowNavMenu] = useState(false);
+  const [showAddProfileModal, setShowAddProfileModal] = useState(false);
+  const [showSwitchProfileModal, setShowSwitchProfileModal] = useState(false);
 
   const shopSlug = merchantProfile.name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
   const shopUrl = `larecoin.com/shop/${shopSlug}`;
@@ -230,10 +235,31 @@ export default function MyShopScreen() {
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>My Shop</Text>
-        <TouchableOpacity style={styles.settingsBtn}>
-          <Settings size={22} color={Colors.text} />
+        <TouchableOpacity 
+          style={styles.menuButton}
+          onPress={() => setShowNavMenu(true)}
+        >
+          <Menu size={24} color={Colors.text} />
         </TouchableOpacity>
+        <View style={styles.headerCenter}>
+          <Text style={styles.greeting}>My Shop</Text>
+          <Text style={styles.businessName}>{merchantProfile.name}</Text>
+        </View>
+        <View style={styles.headerActions}>
+          <TouchableOpacity 
+            style={styles.headerIconBtn}
+            onPress={() => setShowAddProfileModal(true)}
+          >
+            <Plus size={20} color={Colors.text} />
+          </TouchableOpacity>
+          <TouchableOpacity 
+            style={styles.headerIconBtn}
+            onPress={() => setShowSwitchProfileModal(true)}
+          >
+            <RefreshCw size={20} color={Colors.text} />
+          </TouchableOpacity>
+          <ModeToggle />
+        </View>
       </View>
 
       <ScrollView
@@ -409,6 +435,8 @@ export default function MyShopScreen() {
         <View style={{ height: 100 }} />
       </ScrollView>
 
+      <MerchantNavMenuModal visible={showNavMenu} onClose={() => setShowNavMenu(false)} />
+
       <Modal
         visible={showCharityModal}
         animationType="slide"
@@ -574,18 +602,40 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    gap: 12,
   },
-  headerTitle: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: Colors.text,
-  },
-  settingsBtn: {
+  menuButton: {
     width: 40,
     height: 40,
     borderRadius: 12,
+    backgroundColor: Colors.surface,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  headerCenter: {
+    flex: 1,
+  },
+  greeting: {
+    fontSize: 12,
+    color: Colors.textSecondary,
+    marginBottom: 2,
+  },
+  businessName: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: Colors.text,
+  },
+  headerActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  headerIconBtn: {
+    width: 36,
+    height: 36,
+    borderRadius: 10,
     backgroundColor: Colors.surface,
     alignItems: 'center',
     justifyContent: 'center',

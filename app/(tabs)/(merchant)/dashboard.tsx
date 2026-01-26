@@ -122,31 +122,10 @@ export default function MerchantDashboard() {
         }
       >
         <View style={styles.header}>
-          <TouchableOpacity 
-            style={styles.menuButton}
-            onPress={() => setShowNavMenu(true)}
-          >
-            <Menu size={24} color={Colors.text} />
+          <Text style={styles.headerTitle}>{isCharityMode ? 'Charity Portal' : 'Merchant Portal'}</Text>
+          <TouchableOpacity style={styles.settingsBtn}>
+            <Settings size={22} color={Colors.text} />
           </TouchableOpacity>
-          <View style={styles.headerCenter}>
-            <Text style={styles.greeting}>{isCharityMode ? 'Charity Portal' : 'Merchant Portal'}</Text>
-            <Text style={styles.businessName}>{merchantProfile?.name}</Text>
-          </View>
-          <View style={styles.headerActions}>
-            <TouchableOpacity 
-              style={styles.headerIconBtn}
-              onPress={() => setShowAddProfileModal(true)}
-            >
-              <Plus size={20} color={Colors.text} />
-            </TouchableOpacity>
-            <TouchableOpacity 
-              style={styles.headerIconBtn}
-              onPress={() => setShowSwitchProfileModal(true)}
-            >
-              <RefreshCw size={20} color={Colors.text} />
-            </TouchableOpacity>
-            <ModeToggle />
-          </View>
         </View>
 
         {!isCharityMode && (
@@ -993,30 +972,21 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    gap: 12,
+    paddingHorizontal: 20,
+    paddingVertical: 16,
   },
-  menuButton: {
+  headerTitle: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: Colors.text,
+  },
+  settingsBtn: {
     width: 40,
     height: 40,
     borderRadius: 12,
     backgroundColor: Colors.surface,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  headerCenter: {
-    flex: 1,
-  },
-  greeting: {
-    fontSize: 12,
-    color: Colors.textSecondary,
-    marginBottom: 2,
-  },
-  businessName: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: Colors.text,
   },
   businessProfileCard: {
     marginHorizontal: 20,
