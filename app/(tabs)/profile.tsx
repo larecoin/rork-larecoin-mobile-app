@@ -9,7 +9,8 @@ import {
   MoreHorizontal, Globe, Palette, Video, FolderOpen, FileUser, Calendar,
   Contact, Code, Link, Mic, PenTool, Camera, Newspaper, Menu,
   DollarSign, Wallet, TrendingUp, CreditCard, Coins, ToggleLeft, ToggleRight, Clock,
-  AtSign, ExternalLink, X, Flag, Zap, Briefcase, Cpu, Gamepad2, Music, Film, ShoppingBag
+  AtSign, ExternalLink, X, Flag, Zap, Briefcase, Cpu, Gamepad2, Music, Film, ShoppingBag,
+  Radio, FileEdit, MapPin, Image, AlertCircle, Play, StopCircle, Upload
 } from 'lucide-react-native';
 import Colors from '@/constants/colors';
 import { useApp } from '@/contexts/AppContext';
@@ -115,6 +116,24 @@ export default function ProfileScreen() {
   const [subscriptionsEnabled, setSubscriptionsEnabled] = useState(false);
   const [payPerViewEnabled, setPayPerViewEnabled] = useState(true);
   const [activeNewsCategory, setActiveNewsCategory] = useState('all');
+  const [showReportNewsModal, setShowReportNewsModal] = useState(false);
+  const [reportNewsMode, setReportNewsMode] = useState<'select' | 'report' | 'live'>('select');
+  const [isLiveStreaming, setIsLiveStreaming] = useState(false);
+  const [newsReportForm, setNewsReportForm] = useState({
+    title: '',
+    category: 'all',
+    location: '',
+    description: '',
+    source: '',
+  });
+  const [liveStreamData, setLiveStreamData] = useState({
+    title: '',
+    category: 'all',
+    location: '',
+    description: '',
+    viewerCount: 0,
+    duration: 0,
+  });
 
   const handleCopyAddress = () => {
     setCopied(true);
@@ -277,7 +296,7 @@ export default function ProfileScreen() {
             <View style={styles.feedSection}>
               <View style={styles.feedHeader}>
                 <Text style={styles.feedTitle}>News Feed</Text>
-                <TouchableOpacity style={styles.reportNewsBtn}>
+                <TouchableOpacity style={styles.reportNewsBtn} onPress={() => { setReportNewsMode('select'); setShowReportNewsModal(true); }}>
                   <Flag size={14} color="#EF4444" />
                   <Text style={styles.reportNewsText}>Report News</Text>
                 </TouchableOpacity>
@@ -620,6 +639,335 @@ export default function ProfileScreen() {
       </ScrollView>
 
       <NavMenuModal visible={showNavMenu} onClose={() => setShowNavMenu(false)} />
+
+      <Modal
+        visible={showReportNewsModal}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setShowReportNewsModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.reportNewsModalContent}>
+            {reportNewsMode === 'select' && (
+              <>
+                <View style={styles.modalHeader}>
+                  <Text style={styles.modalTitle}>Report News</Text>
+                  <TouchableOpacity onPress={() => setShowReportNewsModal(false)}>
+                    <X size={24} color={Colors.text} />
+                  </TouchableOpacity>
+                </View>
+
+                <Text style={styles.modalSubtitle}>
+                  Share breaking news or go live to report a story
+                </Text>
+
+                <View style={styles.reportOptionsContainer}>
+                  <TouchableOpacity 
+                    style={styles.reportOptionCard}
+                    onPress={() => setReportNewsMode('report')}
+                  >
+                    <View style={[styles.reportOptionIcon, { backgroundColor: '#3B82F6' + '20' }]}>
+                      <FileEdit size={28} color="#3B82F6" />
+                    </View>
+                    <Text style={styles.reportOptionTitle}>Submit News</Text>
+                    <Text style={styles.reportOptionDesc}>Write and submit a news report with details and sources</Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity 
+                    style={[styles.reportOptionCard, styles.reportOptionCardLive]}
+                    onPress={() => setReportNewsMode('live')}
+                  >
+                    <View style={[styles.reportOptionIcon, { backgroundColor: '#EF4444' + '20' }]}>
+                      <Radio size={28} color="#EF4444" />
+                    </View>
+                    <View style={styles.liveBadge}>
+                      <Text style={styles.liveBadgeText}>LIVE</Text>
+                    </View>
+                    <Text style={styles.reportOptionTitle}>Go Live</Text>
+                    <Text style={styles.reportOptionDesc}>Stream live news like an anchor - auto-transcribed & published</Text>
+                  </TouchableOpacity>
+                </View>
+              </>
+            )}
+
+            {reportNewsMode === 'report' && (
+              <>
+                <View style={styles.modalHeader}>
+                  <TouchableOpacity onPress={() => setReportNewsMode('select')} style={styles.backButton}>
+                    <ChevronRight size={20} color={Colors.text} style={{ transform: [{ rotate: '180deg' }] }} />
+                  </TouchableOpacity>
+                  <Text style={styles.modalTitleCentered}>Submit News Report</Text>
+                  <TouchableOpacity onPress={() => setShowReportNewsModal(false)}>
+                    <X size={24} color={Colors.text} />
+                  </TouchableOpacity>
+                </View>
+
+                <ScrollView style={styles.formScrollView} showsVerticalScrollIndicator={false}>
+                  <View style={styles.formGroup}>
+                    <Text style={styles.formLabel}>Headline *</Text>
+                    <TextInput
+                      style={styles.formInput}
+                      placeholder="Enter news headline"
+                      placeholderTextColor={Colors.textTertiary}
+                      value={newsReportForm.title}
+                      onChangeText={(text) => setNewsReportForm({ ...newsReportForm, title: text })}
+                    />
+                  </View>
+
+                  <View style={styles.formGroup}>
+                    <Text style={styles.formLabel}>Category</Text>
+                    <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.categoryPicker}>
+                      {newsCategories.slice(0, 8).map((cat) => (
+                        <TouchableOpacity
+                          key={cat.id}
+                          style={[
+                            styles.categoryPickerItem,
+                            newsReportForm.category === cat.id && { backgroundColor: cat.color + '20', borderColor: cat.color }
+                          ]}
+                          onPress={() => setNewsReportForm({ ...newsReportForm, category: cat.id })}
+                        >
+                          <cat.icon size={14} color={newsReportForm.category === cat.id ? cat.color : Colors.textSecondary} />
+                          <Text style={[
+                            styles.categoryPickerText,
+                            newsReportForm.category === cat.id && { color: cat.color }
+                          ]}>{cat.label}</Text>
+                        </TouchableOpacity>
+                      ))}
+                    </ScrollView>
+                  </View>
+
+                  <View style={styles.formGroup}>
+                    <Text style={styles.formLabel}>Location</Text>
+                    <View style={styles.inputWithIcon}>
+                      <MapPin size={18} color={Colors.textSecondary} />
+                      <TextInput
+                        style={styles.formInputWithIcon}
+                        placeholder="Where is this happening?"
+                        placeholderTextColor={Colors.textTertiary}
+                        value={newsReportForm.location}
+                        onChangeText={(text) => setNewsReportForm({ ...newsReportForm, location: text })}
+                      />
+                    </View>
+                  </View>
+
+                  <View style={styles.formGroup}>
+                    <Text style={styles.formLabel}>Description *</Text>
+                    <TextInput
+                      style={[styles.formInput, styles.formTextArea]}
+                      placeholder="Describe the news story in detail..."
+                      placeholderTextColor={Colors.textTertiary}
+                      value={newsReportForm.description}
+                      onChangeText={(text) => setNewsReportForm({ ...newsReportForm, description: text })}
+                      multiline
+                      numberOfLines={4}
+                      textAlignVertical="top"
+                    />
+                  </View>
+
+                  <View style={styles.formGroup}>
+                    <Text style={styles.formLabel}>Source (optional)</Text>
+                    <TextInput
+                      style={styles.formInput}
+                      placeholder="Link or reference to original source"
+                      placeholderTextColor={Colors.textTertiary}
+                      value={newsReportForm.source}
+                      onChangeText={(text) => setNewsReportForm({ ...newsReportForm, source: text })}
+                    />
+                  </View>
+
+                  <TouchableOpacity style={styles.attachMediaBtn}>
+                    <Image size={20} color={Colors.primary} />
+                    <Text style={styles.attachMediaText}>Attach Photos/Videos</Text>
+                  </TouchableOpacity>
+
+                  <View style={styles.submitDisclaimer}>
+                    <AlertCircle size={14} color={Colors.textSecondary} />
+                    <Text style={styles.disclaimerText}>
+                      Your report will be reviewed before publishing. False reports may result in account suspension.
+                    </Text>
+                  </View>
+                </ScrollView>
+
+                <TouchableOpacity 
+                  style={[
+                    styles.submitReportBtn,
+                    (!newsReportForm.title || !newsReportForm.description) && styles.submitReportBtnDisabled
+                  ]}
+                  disabled={!newsReportForm.title || !newsReportForm.description}
+                  onPress={() => {
+                    console.log('Submitting news report:', newsReportForm);
+                    setNewsReportForm({ title: '', category: 'all', location: '', description: '', source: '' });
+                    setShowReportNewsModal(false);
+                  }}
+                >
+                  <Upload size={18} color="#FFF" />
+                  <Text style={styles.submitReportBtnText}>Submit Report</Text>
+                </TouchableOpacity>
+              </>
+            )}
+
+            {reportNewsMode === 'live' && (
+              <>
+                <View style={styles.modalHeader}>
+                  {!isLiveStreaming && (
+                    <TouchableOpacity onPress={() => setReportNewsMode('select')} style={styles.backButton}>
+                      <ChevronRight size={20} color={Colors.text} style={{ transform: [{ rotate: '180deg' }] }} />
+                    </TouchableOpacity>
+                  )}
+                  <Text style={[styles.modalTitleCentered, isLiveStreaming && { marginLeft: 0 }]}>
+                    {isLiveStreaming ? 'You\'re Live!' : 'Go Live'}
+                  </Text>
+                  {!isLiveStreaming && (
+                    <TouchableOpacity onPress={() => setShowReportNewsModal(false)}>
+                      <X size={24} color={Colors.text} />
+                    </TouchableOpacity>
+                  )}
+                  {isLiveStreaming && <View style={{ width: 24 }} />}
+                </View>
+
+                {!isLiveStreaming ? (
+                  <ScrollView style={styles.formScrollView} showsVerticalScrollIndicator={false}>
+                    <View style={styles.livePreviewContainer}>
+                      <View style={styles.livePreviewPlaceholder}>
+                        <Camera size={40} color={Colors.textSecondary} />
+                        <Text style={styles.livePreviewText}>Camera Preview</Text>
+                      </View>
+                    </View>
+
+                    <View style={styles.formGroup}>
+                      <Text style={styles.formLabel}>Stream Title *</Text>
+                      <TextInput
+                        style={styles.formInput}
+                        placeholder="What's the news story?"
+                        placeholderTextColor={Colors.textTertiary}
+                        value={liveStreamData.title}
+                        onChangeText={(text) => setLiveStreamData({ ...liveStreamData, title: text })}
+                      />
+                    </View>
+
+                    <View style={styles.formGroup}>
+                      <Text style={styles.formLabel}>Category</Text>
+                      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.categoryPicker}>
+                        {newsCategories.slice(0, 8).map((cat) => (
+                          <TouchableOpacity
+                            key={cat.id}
+                            style={[
+                              styles.categoryPickerItem,
+                              liveStreamData.category === cat.id && { backgroundColor: cat.color + '20', borderColor: cat.color }
+                            ]}
+                            onPress={() => setLiveStreamData({ ...liveStreamData, category: cat.id })}
+                          >
+                            <cat.icon size={14} color={liveStreamData.category === cat.id ? cat.color : Colors.textSecondary} />
+                            <Text style={[
+                              styles.categoryPickerText,
+                              liveStreamData.category === cat.id && { color: cat.color }
+                            ]}>{cat.label}</Text>
+                          </TouchableOpacity>
+                        ))}
+                      </ScrollView>
+                    </View>
+
+                    <View style={styles.formGroup}>
+                      <Text style={styles.formLabel}>Location</Text>
+                      <View style={styles.inputWithIcon}>
+                        <MapPin size={18} color={Colors.textSecondary} />
+                        <TextInput
+                          style={styles.formInputWithIcon}
+                          placeholder="Where are you reporting from?"
+                          placeholderTextColor={Colors.textTertiary}
+                          value={liveStreamData.location}
+                          onChangeText={(text) => setLiveStreamData({ ...liveStreamData, location: text })}
+                        />
+                      </View>
+                    </View>
+
+                    <View style={styles.liveInfoBox}>
+                      <View style={styles.liveInfoRow}>
+                        <Mic size={16} color="#10B981" />
+                        <Text style={styles.liveInfoText}>Auto-transcription enabled</Text>
+                      </View>
+                      <View style={styles.liveInfoRow}>
+                        <FileEdit size={16} color="#3B82F6" />
+                        <Text style={styles.liveInfoText}>AI will write article from your stream</Text>
+                      </View>
+                      <View style={styles.liveInfoRow}>
+                        <Newspaper size={16} color="#8B5CF6" />
+                        <Text style={styles.liveInfoText}>Auto-publish to News Feed when you end</Text>
+                      </View>
+                    </View>
+                  </ScrollView>
+                ) : (
+                  <View style={styles.liveStreamingContainer}>
+                    <View style={styles.liveStreamPreview}>
+                      <View style={styles.liveIndicator}>
+                        <View style={styles.liveIndicatorDot} />
+                        <Text style={styles.liveIndicatorText}>LIVE</Text>
+                      </View>
+                      <Camera size={50} color="#FFF" />
+                      <Text style={styles.liveStreamTitle}>{liveStreamData.title}</Text>
+                    </View>
+
+                    <View style={styles.liveStatsRow}>
+                      <View style={styles.liveStat}>
+                        <Users size={16} color={Colors.primary} />
+                        <Text style={styles.liveStatValue}>{liveStreamData.viewerCount}</Text>
+                        <Text style={styles.liveStatLabel}>Viewers</Text>
+                      </View>
+                      <View style={styles.liveStat}>
+                        <Clock size={16} color="#EF4444" />
+                        <Text style={styles.liveStatValue}>{Math.floor(liveStreamData.duration / 60)}:{(liveStreamData.duration % 60).toString().padStart(2, '0')}</Text>
+                        <Text style={styles.liveStatLabel}>Duration</Text>
+                      </View>
+                    </View>
+
+                    <View style={styles.transcriptionBox}>
+                      <View style={styles.transcriptionHeader}>
+                        <Mic size={14} color="#10B981" />
+                        <Text style={styles.transcriptionTitle}>Live Transcription</Text>
+                      </View>
+                      <Text style={styles.transcriptionText}>
+                        Your speech is being transcribed in real-time. The AI is generating an article based on your report...
+                      </Text>
+                    </View>
+                  </View>
+                )}
+
+                <TouchableOpacity 
+                  style={[
+                    isLiveStreaming ? styles.stopLiveBtn : styles.goLiveBtn,
+                    !isLiveStreaming && !liveStreamData.title && styles.goLiveBtnDisabled
+                  ]}
+                  disabled={!isLiveStreaming && !liveStreamData.title}
+                  onPress={() => {
+                    if (isLiveStreaming) {
+                      console.log('Ending live stream, generating article...');
+                      setIsLiveStreaming(false);
+                      setLiveStreamData({ title: '', category: 'all', location: '', description: '', viewerCount: 0, duration: 0 });
+                      setShowReportNewsModal(false);
+                    } else {
+                      console.log('Starting live stream:', liveStreamData);
+                      setIsLiveStreaming(true);
+                      setLiveStreamData({ ...liveStreamData, viewerCount: 12, duration: 0 });
+                    }
+                  }}
+                >
+                  {isLiveStreaming ? (
+                    <>
+                      <StopCircle size={20} color="#FFF" />
+                      <Text style={styles.stopLiveBtnText}>End Stream & Publish</Text>
+                    </>
+                  ) : (
+                    <>
+                      <Play size={20} color="#FFF" />
+                      <Text style={styles.goLiveBtnText}>Start Live Stream</Text>
+                    </>
+                  )}
+                </TouchableOpacity>
+              </>
+            )}
+          </View>
+        </View>
+      </Modal>
 
       <Modal
         visible={showHandleModal}
@@ -1448,6 +1796,342 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   },
   saveButtonText: {
+    fontSize: 15,
+    fontWeight: '600' as const,
+    color: '#FFF',
+  },
+  reportNewsModalContent: {
+    width: '100%',
+    maxWidth: 420,
+    maxHeight: '90%',
+    backgroundColor: Colors.surface,
+    borderRadius: 20,
+    padding: 20,
+  },
+  reportOptionsContainer: {
+    gap: 12,
+    marginTop: 8,
+  },
+  reportOptionCard: {
+    backgroundColor: Colors.background,
+    borderRadius: 16,
+    padding: 20,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: Colors.border,
+  },
+  reportOptionCardLive: {
+    position: 'relative',
+    borderColor: '#EF4444' + '40',
+    backgroundColor: '#EF4444' + '08',
+  },
+  reportOptionIcon: {
+    width: 56,
+    height: 56,
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 12,
+  },
+  reportOptionTitle: {
+    fontSize: 16,
+    fontWeight: '700' as const,
+    color: Colors.text,
+    marginBottom: 6,
+  },
+  reportOptionDesc: {
+    fontSize: 13,
+    color: Colors.textSecondary,
+    textAlign: 'center',
+    lineHeight: 18,
+  },
+  liveBadge: {
+    position: 'absolute',
+    top: 12,
+    right: 12,
+    backgroundColor: '#EF4444',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 6,
+  },
+  liveBadgeText: {
+    fontSize: 10,
+    fontWeight: '700' as const,
+    color: '#FFF',
+  },
+  backButton: {
+    width: 32,
+    height: 32,
+    borderRadius: 8,
+    backgroundColor: Colors.background,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  modalTitleCentered: {
+    flex: 1,
+    fontSize: 18,
+    fontWeight: '700' as const,
+    color: Colors.text,
+    textAlign: 'center',
+    marginLeft: -32,
+  },
+  formScrollView: {
+    maxHeight: 400,
+    marginVertical: 16,
+  },
+  formGroup: {
+    marginBottom: 16,
+  },
+  formLabel: {
+    fontSize: 13,
+    fontWeight: '600' as const,
+    color: Colors.text,
+    marginBottom: 8,
+  },
+  formInput: {
+    backgroundColor: Colors.background,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    fontSize: 15,
+    color: Colors.text,
+  },
+  formTextArea: {
+    minHeight: 100,
+    textAlignVertical: 'top' as const,
+  },
+  inputWithIcon: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: Colors.background,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    paddingHorizontal: 14,
+    gap: 10,
+  },
+  formInputWithIcon: {
+    flex: 1,
+    paddingVertical: 12,
+    fontSize: 15,
+    color: Colors.text,
+  },
+  categoryPicker: {
+    flexDirection: 'row',
+    marginHorizontal: -4,
+  },
+  categoryPickerItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 20,
+    backgroundColor: Colors.background,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    marginHorizontal: 4,
+  },
+  categoryPickerText: {
+    fontSize: 12,
+    fontWeight: '600' as const,
+    color: Colors.textSecondary,
+  },
+  attachMediaBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    backgroundColor: Colors.primary + '10',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: Colors.primary + '30',
+    borderStyle: 'dashed',
+    paddingVertical: 14,
+    marginBottom: 16,
+  },
+  attachMediaText: {
+    fontSize: 14,
+    fontWeight: '600' as const,
+    color: Colors.primary,
+  },
+  submitDisclaimer: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 8,
+    backgroundColor: Colors.background,
+    borderRadius: 10,
+    padding: 12,
+    marginBottom: 8,
+  },
+  disclaimerText: {
+    flex: 1,
+    fontSize: 12,
+    color: Colors.textSecondary,
+    lineHeight: 16,
+  },
+  submitReportBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    backgroundColor: '#3B82F6',
+    borderRadius: 14,
+    paddingVertical: 14,
+  },
+  submitReportBtnDisabled: {
+    opacity: 0.5,
+  },
+  submitReportBtnText: {
+    fontSize: 15,
+    fontWeight: '600' as const,
+    color: '#FFF',
+  },
+  livePreviewContainer: {
+    marginBottom: 16,
+  },
+  livePreviewPlaceholder: {
+    height: 160,
+    backgroundColor: '#1a1a2e',
+    borderRadius: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+  },
+  livePreviewText: {
+    fontSize: 14,
+    color: Colors.textSecondary,
+  },
+  liveInfoBox: {
+    backgroundColor: Colors.background,
+    borderRadius: 12,
+    padding: 14,
+    gap: 10,
+  },
+  liveInfoRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  liveInfoText: {
+    fontSize: 13,
+    color: Colors.text,
+  },
+  goLiveBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    backgroundColor: '#EF4444',
+    borderRadius: 14,
+    paddingVertical: 14,
+  },
+  goLiveBtnDisabled: {
+    opacity: 0.5,
+  },
+  goLiveBtnText: {
+    fontSize: 15,
+    fontWeight: '600' as const,
+    color: '#FFF',
+  },
+  liveStreamingContainer: {
+    marginVertical: 16,
+  },
+  liveStreamPreview: {
+    height: 180,
+    backgroundColor: '#1a1a2e',
+    borderRadius: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 16,
+    position: 'relative',
+  },
+  liveIndicator: {
+    position: 'absolute',
+    top: 12,
+    left: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: '#EF4444',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 6,
+  },
+  liveIndicatorDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: '#FFF',
+  },
+  liveIndicatorText: {
+    fontSize: 11,
+    fontWeight: '700' as const,
+    color: '#FFF',
+  },
+  liveStreamTitle: {
+    fontSize: 14,
+    fontWeight: '600' as const,
+    color: '#FFF',
+    marginTop: 10,
+  },
+  liveStatsRow: {
+    flexDirection: 'row',
+    gap: 12,
+    marginBottom: 16,
+  },
+  liveStat: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    backgroundColor: Colors.background,
+    borderRadius: 12,
+    paddingVertical: 12,
+  },
+  liveStatValue: {
+    fontSize: 16,
+    fontWeight: '700' as const,
+    color: Colors.text,
+  },
+  liveStatLabel: {
+    fontSize: 12,
+    color: Colors.textSecondary,
+  },
+  transcriptionBox: {
+    backgroundColor: Colors.background,
+    borderRadius: 12,
+    padding: 14,
+  },
+  transcriptionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 8,
+  },
+  transcriptionTitle: {
+    fontSize: 13,
+    fontWeight: '600' as const,
+    color: '#10B981',
+  },
+  transcriptionText: {
+    fontSize: 13,
+    color: Colors.textSecondary,
+    lineHeight: 18,
+  },
+  stopLiveBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    backgroundColor: '#EF4444',
+    borderRadius: 14,
+    paddingVertical: 14,
+  },
+  stopLiveBtnText: {
     fontSize: 15,
     fontWeight: '600' as const,
     color: '#FFF',
