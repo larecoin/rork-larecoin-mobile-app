@@ -111,21 +111,6 @@ export default function MerchantDashboard() {
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
-      {!isCharityMode && (
-        <TouchableOpacity 
-          style={styles.nonprofitBanner}
-          onPress={() => {
-            setNewProfileType('charity');
-            setShowAddProfileModal(true);
-          }}
-        >
-          <Heart size={16} color="#E74C3C" />
-          <Text style={styles.nonprofitBannerText}>
-            Are you a Non Profit? <Text style={styles.nonprofitBannerLink}>(Register your Charity and get Grants)</Text>
-          </Text>
-        </TouchableOpacity>
-      )}
-      
       <ScrollView 
         showsVerticalScrollIndicator={false}
         refreshControl={
@@ -163,6 +148,21 @@ export default function MerchantDashboard() {
             <ModeToggle />
           </View>
         </View>
+
+        {!isCharityMode && (
+          <TouchableOpacity 
+            style={styles.nonprofitBanner}
+            onPress={() => {
+              setNewProfileType('charity');
+              setShowAddProfileModal(true);
+            }}
+          >
+            <Heart size={16} color="#E74C3C" />
+            <Text style={styles.nonprofitBannerText}>
+              Are you a Non Profit? <Text style={styles.nonprofitBannerLink}>(Register your Charity and get Grants)</Text>
+            </Text>
+          </TouchableOpacity>
+        )}
 
         {isCharityMode ? (
           <View style={styles.charityProfileCard}>
@@ -1558,6 +1558,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFF5F5',
     paddingVertical: 10,
     paddingHorizontal: 16,
+    marginHorizontal: 20,
+    marginBottom: 16,
+    borderRadius: 12,
     gap: 8,
   },
   nonprofitBannerText: {
