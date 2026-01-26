@@ -165,9 +165,6 @@ export default function CartScreen() {
   return (
     <View style={[styles.container, dynamicStyles.container, { paddingTop: insets.top }]}>
       <View style={styles.header}>
-        <TouchableOpacity style={[styles.backBtn, dynamicStyles.surface]} onPress={() => router.back()}>
-          <ArrowLeft size={22} color={colors.text} />
-        </TouchableOpacity>
         <Text style={[styles.headerTitle, dynamicStyles.text]}>Shopping Cart</Text>
         <View style={styles.headerBadge}>
           <ShoppingBag size={20} color={colors.primary} />
@@ -546,7 +543,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 20,
     paddingVertical: 14,
-    gap: 12,
   },
   backBtn: {
     width: 40,
