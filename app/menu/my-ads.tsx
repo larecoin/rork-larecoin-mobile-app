@@ -1,95 +1,128 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Modal, Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Modal, Alert, Image, TextInput } from 'react-native';
 import { Stack, useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { 
-  Eye, MousePointer, DollarSign, Plus, ChevronRight, Pause, Play, 
-  Trash2, Edit3, TrendingUp, BarChart3, Clock, Target, X, 
-  Calendar, Zap, Award, Filter, MoreVertical
+  Eye, MessageCircle, DollarSign, Plus, Pause, Play, 
+  Trash2, Edit3, Clock, X, Package, Tag, MapPin,
+  TrendingUp, Flame, MoreVertical, Search, Filter, CheckCircle,
+  AlertCircle, RefreshCw, Share2, Copy, Heart
 } from 'lucide-react-native';
 import { useApp } from '@/contexts/AppContext';
 
-interface Ad {
+interface Listing {
   id: string;
   title: string;
   description: string;
-  status: 'active' | 'paused' | 'ended' | 'pending';
+  price: number;
+  originalPrice?: number;
+  status: 'active' | 'paused' | 'sold' | 'expired' | 'pending';
   views: number;
-  clicks: number;
-  conversions: number;
-  spent: number;
-  budget: number;
-  ctr: number;
-  startDate: string;
-  endDate: string;
+  inquiries: number;
+  favorites: number;
   category: string;
-  image: string;
+  subcategory: string;
+  condition: string;
+  location: string;
+  images: string[];
+  createdAt: Date;
+  expiresAt: Date;
+  isBumped: boolean;
+  bumpedUntil?: Date;
 }
 
-const mockAds: Ad[] = [
+const mockListings: Listing[] = [
   { 
     id: '1', 
-    title: 'NFT Collection Launch', 
-    description: 'Exclusive digital art collection featuring rare collectibles',
+    title: 'iPhone 14 Pro Max - Like New', 
+    description: 'Barely used, comes with original box and accessories. No scratches.',
+    price: 899,
+    originalPrice: 1099,
     status: 'active', 
-    views: 12500, 
-    clicks: 450, 
-    conversions: 32,
-    spent: 125, 
-    budget: 500,
-    ctr: 3.6,
-    startDate: '2025-01-15',
-    endDate: '2025-02-15',
-    category: 'Digital Art',
-    image: 'https://images.unsplash.com/photo-1620321023374-d1a68fbc720d?w=200'
+    views: 342, 
+    inquiries: 12, 
+    favorites: 28,
+    category: 'Electronics',
+    subcategory: 'Cell Phones',
+    condition: 'Like New',
+    location: 'Downtown',
+    images: ['https://images.unsplash.com/photo-1678685888221-cda773a3dcdb?w=400'],
+    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 3),
+    expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 27),
+    isBumped: true,
+    bumpedUntil: new Date(Date.now() + 1000 * 60 * 60 * 24),
   },
   { 
     id: '2', 
-    title: 'Trading Course Promo', 
-    description: 'Learn advanced trading strategies from expert traders',
-    status: 'paused', 
-    views: 8900, 
-    clicks: 320, 
-    conversions: 18,
-    spent: 89, 
-    budget: 200,
-    ctr: 3.6,
-    startDate: '2025-01-10',
-    endDate: '2025-01-30',
-    category: 'Education',
-    image: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=200'
+    title: 'Professional Web Development Services', 
+    description: 'Full-stack developer offering website and app development.',
+    price: 50,
+    status: 'active', 
+    views: 156, 
+    inquiries: 8, 
+    favorites: 15,
+    category: 'Services',
+    subcategory: 'Computer',
+    condition: 'Service',
+    location: 'Remote',
+    images: ['https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=400'],
+    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 7),
+    expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 23),
+    isBumped: false,
   },
   { 
     id: '3', 
-    title: 'DeFi Platform Ad', 
-    description: 'Earn up to 12% APY on your crypto holdings',
-    status: 'active', 
-    views: 5600, 
-    clicks: 180, 
-    conversions: 12,
-    spent: 56, 
-    budget: 300,
-    ctr: 3.2,
-    startDate: '2025-01-20',
-    endDate: '2025-02-20',
-    category: 'Finance',
-    image: 'https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=200'
+    title: 'Vintage Leather Sofa', 
+    description: 'Beautiful mid-century modern leather sofa in excellent condition.',
+    price: 450,
+    status: 'paused', 
+    views: 89, 
+    inquiries: 3, 
+    favorites: 12,
+    category: 'For Sale',
+    subcategory: 'Furniture',
+    condition: 'Good',
+    location: 'Westside',
+    images: ['https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=400'],
+    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 14),
+    expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 16),
+    isBumped: false,
   },
   { 
     id: '4', 
-    title: 'Crypto Merch Store', 
-    description: 'Premium quality crypto-themed apparel and accessories',
-    status: 'ended', 
-    views: 15200, 
-    clicks: 890, 
-    conversions: 65,
-    spent: 200, 
-    budget: 200,
-    ctr: 5.9,
-    startDate: '2024-12-01',
-    endDate: '2025-01-01',
-    category: 'E-commerce',
-    image: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=200'
+    title: 'Mountain Bike - Trek', 
+    description: '2022 Trek mountain bike, excellent for trails.',
+    price: 650,
+    status: 'sold', 
+    views: 523, 
+    inquiries: 24, 
+    favorites: 45,
+    category: 'For Sale',
+    subcategory: 'Bicycles',
+    condition: 'Excellent',
+    location: 'Northside',
+    images: ['https://images.unsplash.com/photo-1576435728678-68d0fbf94e91?w=400'],
+    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 21),
+    expiresAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 5),
+    isBumped: false,
+  },
+  { 
+    id: '5', 
+    title: 'Private Guitar Lessons', 
+    description: 'Learn guitar from experienced instructor. All levels welcome.',
+    price: 40,
+    status: 'active', 
+    views: 78, 
+    inquiries: 5, 
+    favorites: 8,
+    category: 'Services',
+    subcategory: 'Creative',
+    condition: 'Service',
+    location: 'Midtown',
+    images: ['https://images.unsplash.com/photo-1510915361894-db8b60106cb1?w=400'],
+    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 5),
+    expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 25),
+    isBumped: false,
   },
 ];
 
@@ -97,42 +130,45 @@ export default function MyAdsScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const { colors } = useApp();
-  const [ads, setAds] = useState<Ad[]>(mockAds);
-  const [selectedAd, setSelectedAd] = useState<Ad | null>(null);
+  const [listings, setListings] = useState<Listing[]>(mockListings);
+  const [selectedListing, setSelectedListing] = useState<Listing | null>(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
+  const [showBumpModal, setShowBumpModal] = useState(false);
   const [filterStatus, setFilterStatus] = useState<string>('all');
+  const [searchQuery, setSearchQuery] = useState('');
 
-  const totalViews = ads.reduce((sum, ad) => sum + ad.views, 0);
-  const totalClicks = ads.reduce((sum, ad) => sum + ad.clicks, 0);
-  const totalSpent = ads.reduce((sum, ad) => sum + ad.spent, 0);
-  const totalConversions = ads.reduce((sum, ad) => sum + ad.conversions, 0);
-  const avgCtr = totalClicks > 0 ? ((totalClicks / totalViews) * 100).toFixed(1) : '0';
+  const totalViews = listings.reduce((sum, l) => sum + l.views, 0);
+  const totalInquiries = listings.reduce((sum, l) => sum + l.inquiries, 0);
+  const activeListings = listings.filter(l => l.status === 'active').length;
+  const soldListings = listings.filter(l => l.status === 'sold').length;
 
-  const filteredAds = filterStatus === 'all' 
-    ? ads 
-    : ads.filter(ad => ad.status === filterStatus);
+  const filteredListings = listings.filter(l => {
+    const matchesStatus = filterStatus === 'all' || l.status === filterStatus;
+    const matchesSearch = l.title.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesStatus && matchesSearch;
+  });
 
-  const toggleAdStatus = (adId: string) => {
-    setAds(prev => prev.map(ad => {
-      if (ad.id === adId) {
-        const newStatus = ad.status === 'active' ? 'paused' : 'active';
-        return { ...ad, status: newStatus };
+  const toggleListingStatus = (listingId: string) => {
+    setListings(prev => prev.map(l => {
+      if (l.id === listingId && l.status !== 'sold' && l.status !== 'expired') {
+        const newStatus = l.status === 'active' ? 'paused' : 'active';
+        return { ...l, status: newStatus };
       }
-      return ad;
+      return l;
     }));
   };
 
-  const deleteAd = (adId: string) => {
+  const deleteListing = (listingId: string) => {
     Alert.alert(
-      'Delete Ad',
-      'Are you sure you want to delete this ad? This action cannot be undone.',
+      'Delete Listing',
+      'Are you sure you want to delete this listing? This action cannot be undone.',
       [
         { text: 'Cancel', style: 'cancel' },
         { 
           text: 'Delete', 
           style: 'destructive',
           onPress: () => {
-            setAds(prev => prev.filter(ad => ad.id !== adId));
+            setListings(prev => prev.filter(l => l.id !== listingId));
             setShowDetailsModal(false);
           }
         }
@@ -140,18 +176,138 @@ export default function MyAdsScreen() {
     );
   };
 
+  const markAsSold = (listingId: string) => {
+    Alert.alert(
+      'Mark as Sold',
+      'Mark this listing as sold?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { 
+          text: 'Mark Sold', 
+          onPress: () => {
+            setListings(prev => prev.map(l => 
+              l.id === listingId ? { ...l, status: 'sold' as const } : l
+            ));
+            setShowDetailsModal(false);
+          }
+        }
+      ]
+    );
+  };
+
+  const bumpListing = (listingId: string, days: number) => {
+    setListings(prev => prev.map(l => {
+      if (l.id === listingId) {
+        return { 
+          ...l, 
+          isBumped: true, 
+          bumpedUntil: new Date(Date.now() + 1000 * 60 * 60 * 24 * days)
+        };
+      }
+      return l;
+    }));
+    setShowBumpModal(false);
+    Alert.alert('Success', `Your listing has been bumped for ${days} day${days > 1 ? 's' : ''}!`);
+  };
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'active': return colors.success;
       case 'paused': return colors.warning;
-      case 'ended': return colors.textTertiary;
+      case 'sold': return '#8B5CF6';
+      case 'expired': return colors.textTertiary;
       case 'pending': return colors.primary;
       default: return colors.textTertiary;
     }
   };
 
-  const renderAdDetailsModal = () => {
-    if (!selectedAd) return null;
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'active': return <CheckCircle size={12} color={getStatusColor(status)} />;
+      case 'paused': return <Pause size={12} color={getStatusColor(status)} />;
+      case 'sold': return <DollarSign size={12} color={getStatusColor(status)} />;
+      case 'expired': return <AlertCircle size={12} color={getStatusColor(status)} />;
+      case 'pending': return <Clock size={12} color={getStatusColor(status)} />;
+      default: return null;
+    }
+  };
+
+  const formatDate = (date: Date) => {
+    const diff = Date.now() - date.getTime();
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    if (days === 0) return 'Today';
+    if (days === 1) return 'Yesterday';
+    if (days < 7) return `${days} days ago`;
+    return date.toLocaleDateString();
+  };
+
+  const daysRemaining = (date: Date) => {
+    const diff = date.getTime() - Date.now();
+    return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
+  };
+
+  const renderBumpModal = () => (
+    <Modal
+      visible={showBumpModal}
+      animationType="slide"
+      presentationStyle="pageSheet"
+      onRequestClose={() => setShowBumpModal(false)}
+    >
+      <View style={[styles.modalContainer, { backgroundColor: colors.background }]}>
+        <View style={[styles.modalHeader, { borderBottomColor: colors.border }]}>
+          <Text style={[styles.modalTitle, { color: colors.text }]}>Bump Listing</Text>
+          <TouchableOpacity onPress={() => setShowBumpModal(false)}>
+            <X size={24} color={colors.text} />
+          </TouchableOpacity>
+        </View>
+
+        <ScrollView style={styles.bumpContent}>
+          <View style={[styles.bumpHero, { backgroundColor: '#FF6B00' + '15' }]}>
+            <Flame size={40} color="#FF6B00" />
+            <Text style={[styles.bumpHeroTitle, { color: colors.text }]}>Get More Visibility</Text>
+            <Text style={[styles.bumpHeroText, { color: colors.textSecondary }]}>
+              Bumped listings appear at the top of search results and get up to 5x more views!
+            </Text>
+          </View>
+
+          <Text style={[styles.bumpSectionTitle, { color: colors.text }]}>Select Duration</Text>
+
+          {[
+            { days: 1, price: 2.99, label: '24 Hours', popular: false },
+            { days: 3, price: 6.99, label: '3 Days', popular: true },
+            { days: 7, price: 12.99, label: '7 Days', popular: false },
+            { days: 14, price: 19.99, label: '14 Days', popular: false },
+          ].map((option) => (
+            <TouchableOpacity
+              key={option.days}
+              style={[
+                styles.bumpOption,
+                { backgroundColor: colors.surface },
+                option.popular && { borderColor: '#FF6B00', borderWidth: 2 }
+              ]}
+              onPress={() => selectedListing && bumpListing(selectedListing.id, option.days)}
+            >
+              {option.popular && (
+                <View style={styles.popularBadge}>
+                  <Text style={styles.popularBadgeText}>MOST POPULAR</Text>
+                </View>
+              )}
+              <View style={styles.bumpOptionLeft}>
+                <Text style={[styles.bumpOptionDays, { color: colors.text }]}>{option.label}</Text>
+                <Text style={[styles.bumpOptionDesc, { color: colors.textSecondary }]}>
+                  ~{option.days * 50} extra views
+                </Text>
+              </View>
+              <Text style={[styles.bumpOptionPrice, { color: '#FF6B00' }]}>${option.price}</Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+      </View>
+    </Modal>
+  );
+
+  const renderDetailsModal = () => {
+    if (!selectedListing) return null;
 
     return (
       <Modal
@@ -162,152 +318,176 @@ export default function MyAdsScreen() {
       >
         <View style={[styles.modalContainer, { backgroundColor: colors.background }]}>
           <View style={[styles.modalHeader, { borderBottomColor: colors.border }]}>
-            <Text style={[styles.modalTitle, { color: colors.text }]}>Ad Details</Text>
+            <Text style={[styles.modalTitle, { color: colors.text }]}>Listing Details</Text>
             <TouchableOpacity onPress={() => setShowDetailsModal(false)}>
               <X size={24} color={colors.text} />
             </TouchableOpacity>
           </View>
 
           <ScrollView showsVerticalScrollIndicator={false}>
-            <View style={[styles.adDetailCard, { backgroundColor: colors.surface }]}>
-              <View style={styles.adDetailHeader}>
-                <Text style={[styles.adDetailTitle, { color: colors.text }]}>{selectedAd.title}</Text>
-                <View style={[styles.statusBadgeLarge, { backgroundColor: getStatusColor(selectedAd.status) + '20' }]}>
-                  <Text style={[styles.statusTextLarge, { color: getStatusColor(selectedAd.status) }]}>
-                    {selectedAd.status.toUpperCase()}
-                  </Text>
-                </View>
-              </View>
-              <Text style={[styles.adDetailDesc, { color: colors.textSecondary }]}>
-                {selectedAd.description}
-              </Text>
-              <View style={styles.adDetailMeta}>
-                <View style={styles.adDetailMetaItem}>
-                  <Calendar size={14} color={colors.textTertiary} />
-                  <Text style={[styles.adDetailMetaText, { color: colors.textTertiary }]}>
-                    {selectedAd.startDate} - {selectedAd.endDate}
-                  </Text>
-                </View>
-                <View style={styles.adDetailMetaItem}>
-                  <Target size={14} color={colors.textTertiary} />
-                  <Text style={[styles.adDetailMetaText, { color: colors.textTertiary }]}>
-                    {selectedAd.category}
-                  </Text>
-                </View>
-              </View>
-            </View>
+            <Image 
+              source={{ uri: selectedListing.images[0] }} 
+              style={styles.detailImage}
+            />
 
-            <View style={styles.detailStatsGrid}>
-              <View style={[styles.detailStatCard, { backgroundColor: colors.surface }]}>
-                <Eye size={20} color={colors.primary} />
-                <Text style={[styles.detailStatValue, { color: colors.text }]}>
-                  {selectedAd.views.toLocaleString()}
-                </Text>
-                <Text style={[styles.detailStatLabel, { color: colors.textTertiary }]}>Impressions</Text>
-              </View>
-              <View style={[styles.detailStatCard, { backgroundColor: colors.surface }]}>
-                <MousePointer size={20} color={colors.success} />
-                <Text style={[styles.detailStatValue, { color: colors.text }]}>
-                  {selectedAd.clicks.toLocaleString()}
-                </Text>
-                <Text style={[styles.detailStatLabel, { color: colors.textTertiary }]}>Clicks</Text>
-              </View>
-              <View style={[styles.detailStatCard, { backgroundColor: colors.surface }]}>
-                <TrendingUp size={20} color="#8B5CF6" />
-                <Text style={[styles.detailStatValue, { color: colors.text }]}>
-                  {selectedAd.ctr}%
-                </Text>
-                <Text style={[styles.detailStatLabel, { color: colors.textTertiary }]}>CTR</Text>
-              </View>
-              <View style={[styles.detailStatCard, { backgroundColor: colors.surface }]}>
-                <Award size={20} color="#EC4899" />
-                <Text style={[styles.detailStatValue, { color: colors.text }]}>
-                  {selectedAd.conversions}
-                </Text>
-                <Text style={[styles.detailStatLabel, { color: colors.textTertiary }]}>Conversions</Text>
-              </View>
-            </View>
-
-            <View style={[styles.budgetCard, { backgroundColor: colors.surface }]}>
-              <Text style={[styles.budgetTitle, { color: colors.text }]}>Budget</Text>
-              <View style={styles.budgetRow}>
-                <View>
-                  <Text style={[styles.budgetSpent, { color: colors.text }]}>
-                    ${selectedAd.spent.toFixed(2)}
+            <View style={styles.detailContent}>
+              <View style={styles.detailHeaderRow}>
+                <View style={[
+                  styles.statusBadgeLarge,
+                  { backgroundColor: getStatusColor(selectedListing.status) + '20' }
+                ]}>
+                  {getStatusIcon(selectedListing.status)}
+                  <Text style={[styles.statusTextLarge, { color: getStatusColor(selectedListing.status) }]}>
+                    {selectedListing.status.toUpperCase()}
                   </Text>
-                  <Text style={[styles.budgetLabel, { color: colors.textTertiary }]}>Spent</Text>
                 </View>
-                <View style={styles.budgetProgress}>
-                  <View style={[styles.budgetProgressBg, { backgroundColor: colors.border }]}>
-                    <View 
-                      style={[
-                        styles.budgetProgressFill, 
-                        { 
-                          backgroundColor: colors.primary,
-                          width: `${Math.min((selectedAd.spent / selectedAd.budget) * 100, 100)}%`
-                        }
-                      ]} 
-                    />
+                {selectedListing.isBumped && (
+                  <View style={styles.bumpedBadge}>
+                    <Flame size={12} color="#FFF" />
+                    <Text style={styles.bumpedBadgeText}>BUMPED</Text>
                   </View>
-                  <Text style={[styles.budgetPercent, { color: colors.textSecondary }]}>
-                    {((selectedAd.spent / selectedAd.budget) * 100).toFixed(0)}%
+                )}
+              </View>
+
+              <Text style={[styles.detailTitle, { color: colors.text }]}>{selectedListing.title}</Text>
+              <Text style={[styles.detailPrice, { color: colors.primary }]}>
+                ${selectedListing.price}
+                {selectedListing.condition === 'Service' && <Text style={styles.perHour}>/hr</Text>}
+              </Text>
+              <Text style={[styles.detailDesc, { color: colors.textSecondary }]}>
+                {selectedListing.description}
+              </Text>
+
+              <View style={styles.detailMeta}>
+                <View style={styles.detailMetaItem}>
+                  <Tag size={14} color={colors.textTertiary} />
+                  <Text style={[styles.detailMetaText, { color: colors.textSecondary }]}>
+                    {selectedListing.category} • {selectedListing.subcategory}
                   </Text>
                 </View>
-                <View style={{ alignItems: 'flex-end' }}>
-                  <Text style={[styles.budgetTotal, { color: colors.text }]}>
-                    ${selectedAd.budget.toFixed(2)}
+                <View style={styles.detailMetaItem}>
+                  <MapPin size={14} color={colors.textTertiary} />
+                  <Text style={[styles.detailMetaText, { color: colors.textSecondary }]}>
+                    {selectedListing.location}
                   </Text>
-                  <Text style={[styles.budgetLabel, { color: colors.textTertiary }]}>Budget</Text>
+                </View>
+                <View style={styles.detailMetaItem}>
+                  <Package size={14} color={colors.textTertiary} />
+                  <Text style={[styles.detailMetaText, { color: colors.textSecondary }]}>
+                    {selectedListing.condition}
+                  </Text>
                 </View>
               </View>
-            </View>
 
-            <View style={styles.actionButtons}>
-              {selectedAd.status !== 'ended' && (
+              <View style={styles.detailStatsGrid}>
+                <View style={[styles.detailStatCard, { backgroundColor: colors.surface }]}>
+                  <Eye size={20} color={colors.primary} />
+                  <Text style={[styles.detailStatValue, { color: colors.text }]}>
+                    {selectedListing.views}
+                  </Text>
+                  <Text style={[styles.detailStatLabel, { color: colors.textTertiary }]}>Views</Text>
+                </View>
+                <View style={[styles.detailStatCard, { backgroundColor: colors.surface }]}>
+                  <MessageCircle size={20} color={colors.success} />
+                  <Text style={[styles.detailStatValue, { color: colors.text }]}>
+                    {selectedListing.inquiries}
+                  </Text>
+                  <Text style={[styles.detailStatLabel, { color: colors.textTertiary }]}>Inquiries</Text>
+                </View>
+                <View style={[styles.detailStatCard, { backgroundColor: colors.surface }]}>
+                  <Heart size={20} color="#EC4899" />
+                  <Text style={[styles.detailStatValue, { color: colors.text }]}>
+                    {selectedListing.favorites}
+                  </Text>
+                  <Text style={[styles.detailStatLabel, { color: colors.textTertiary }]}>Favorites</Text>
+                </View>
+              </View>
+
+              {selectedListing.status !== 'sold' && selectedListing.status !== 'expired' && (
+                <View style={[styles.expiryCard, { backgroundColor: colors.surface }]}>
+                  <Clock size={18} color={colors.textSecondary} />
+                  <View style={styles.expiryInfo}>
+                    <Text style={[styles.expiryLabel, { color: colors.textSecondary }]}>Expires in</Text>
+                    <Text style={[styles.expiryValue, { color: colors.text }]}>
+                      {daysRemaining(selectedListing.expiresAt)} days
+                    </Text>
+                  </View>
+                  <TouchableOpacity style={[styles.renewBtn, { backgroundColor: colors.primary + '20' }]}>
+                    <RefreshCw size={14} color={colors.primary} />
+                    <Text style={[styles.renewBtnText, { color: colors.primary }]}>Renew</Text>
+                  </TouchableOpacity>
+                </View>
+              )}
+
+              <View style={styles.actionButtons}>
+                {selectedListing.status !== 'sold' && selectedListing.status !== 'expired' && (
+                  <>
+                    <TouchableOpacity 
+                      style={[styles.actionBtn, { backgroundColor: colors.surface }]}
+                      onPress={() => toggleListingStatus(selectedListing.id)}
+                    >
+                      {selectedListing.status === 'active' ? (
+                        <>
+                          <Pause size={18} color={colors.warning} />
+                          <Text style={[styles.actionBtnText, { color: colors.text }]}>Pause</Text>
+                        </>
+                      ) : (
+                        <>
+                          <Play size={18} color={colors.success} />
+                          <Text style={[styles.actionBtnText, { color: colors.text }]}>Activate</Text>
+                        </>
+                      )}
+                    </TouchableOpacity>
+                    <TouchableOpacity 
+                      style={[styles.actionBtn, { backgroundColor: colors.surface }]}
+                      onPress={() => router.push('/menu/post-ad')}
+                    >
+                      <Edit3 size={18} color={colors.primary} />
+                      <Text style={[styles.actionBtnText, { color: colors.text }]}>Edit</Text>
+                    </TouchableOpacity>
+                  </>
+                )}
                 <TouchableOpacity 
                   style={[styles.actionBtn, { backgroundColor: colors.surface }]}
-                  onPress={() => toggleAdStatus(selectedAd.id)}
                 >
-                  {selectedAd.status === 'active' ? (
-                    <>
-                      <Pause size={20} color={colors.warning} />
-                      <Text style={[styles.actionBtnText, { color: colors.text }]}>Pause Ad</Text>
-                    </>
-                  ) : (
-                    <>
-                      <Play size={20} color={colors.success} />
-                      <Text style={[styles.actionBtnText, { color: colors.text }]}>Resume Ad</Text>
-                    </>
-                  )}
+                  <Share2 size={18} color={colors.textSecondary} />
+                  <Text style={[styles.actionBtnText, { color: colors.text }]}>Share</Text>
                 </TouchableOpacity>
+              </View>
+
+              {selectedListing.status === 'active' && (
+                <>
+                  <TouchableOpacity 
+                    style={[styles.bumpBtn, { backgroundColor: '#FF6B00' }]}
+                    onPress={() => {
+                      setShowDetailsModal(false);
+                      setTimeout(() => setShowBumpModal(true), 300);
+                    }}
+                  >
+                    <Flame size={20} color="#FFF" />
+                    <Text style={styles.bumpBtnText}>Bump to Top</Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity 
+                    style={[styles.soldBtn, { backgroundColor: '#8B5CF6' }]}
+                    onPress={() => markAsSold(selectedListing.id)}
+                  >
+                    <CheckCircle size={20} color="#FFF" />
+                    <Text style={styles.soldBtnText}>Mark as Sold</Text>
+                  </TouchableOpacity>
+                </>
               )}
+
               <TouchableOpacity 
-                style={[styles.actionBtn, { backgroundColor: colors.surface }]}
-                onPress={() => {
-                  setShowDetailsModal(false);
-                  router.push('/menu/post-ad');
-                }}
+                style={[styles.deleteBtn, { backgroundColor: colors.error + '15' }]}
+                onPress={() => deleteListing(selectedListing.id)}
               >
-                <Edit3 size={20} color={colors.primary} />
-                <Text style={[styles.actionBtnText, { color: colors.text }]}>Edit Ad</Text>
+                <Trash2 size={18} color={colors.error} />
+                <Text style={[styles.deleteBtnText, { color: colors.error }]}>Delete Listing</Text>
               </TouchableOpacity>
-              <TouchableOpacity 
-                style={[styles.actionBtn, { backgroundColor: colors.error + '15' }]}
-                onPress={() => deleteAd(selectedAd.id)}
-              >
-                <Trash2 size={20} color={colors.error} />
-                <Text style={[styles.actionBtnText, { color: colors.error }]}>Delete</Text>
-              </TouchableOpacity>
+
+              <View style={{ height: 40 }} />
             </View>
-
-            <TouchableOpacity 
-              style={[styles.boostBtn, { backgroundColor: colors.primary }]}
-            >
-              <Zap size={20} color="#FFF" />
-              <Text style={styles.boostBtnText}>Boost This Ad</Text>
-            </TouchableOpacity>
-
-            <View style={{ height: 40 }} />
           </ScrollView>
         </View>
       </Modal>
@@ -316,7 +496,8 @@ export default function MyAdsScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <Stack.Screen options={{ title: 'Ad Manager' }} />
+      <Stack.Screen options={{ title: 'My Listings' }} />
+      
       <ScrollView 
         style={styles.content}
         contentContainerStyle={{ paddingBottom: insets.bottom + 20 }}
@@ -324,161 +505,157 @@ export default function MyAdsScreen() {
       >
         <View style={styles.statsRow}>
           <View style={[styles.statCard, { backgroundColor: colors.surface }]}>
-            <Eye size={20} color={colors.primary} />
-            <Text style={[styles.statValue, { color: colors.text }]}>
-              {totalViews >= 1000 ? `${(totalViews / 1000).toFixed(1)}K` : totalViews}
-            </Text>
-            <Text style={[styles.statLabel, { color: colors.textTertiary }]}>Impressions</Text>
+            <Package size={20} color={colors.primary} />
+            <Text style={[styles.statValue, { color: colors.text }]}>{activeListings}</Text>
+            <Text style={[styles.statLabel, { color: colors.textTertiary }]}>Active</Text>
           </View>
           <View style={[styles.statCard, { backgroundColor: colors.surface }]}>
-            <MousePointer size={20} color={colors.success} />
-            <Text style={[styles.statValue, { color: colors.text }]}>
-              {totalClicks >= 1000 ? `${(totalClicks / 1000).toFixed(1)}K` : totalClicks}
-            </Text>
-            <Text style={[styles.statLabel, { color: colors.textTertiary }]}>Clicks</Text>
+            <Eye size={20} color={colors.success} />
+            <Text style={[styles.statValue, { color: colors.text }]}>{totalViews}</Text>
+            <Text style={[styles.statLabel, { color: colors.textTertiary }]}>Views</Text>
           </View>
           <View style={[styles.statCard, { backgroundColor: colors.surface }]}>
-            <DollarSign size={20} color={colors.warning} />
-            <Text style={[styles.statValue, { color: colors.text }]}>${totalSpent}</Text>
-            <Text style={[styles.statLabel, { color: colors.textTertiary }]}>Spent</Text>
+            <MessageCircle size={20} color={colors.warning} />
+            <Text style={[styles.statValue, { color: colors.text }]}>{totalInquiries}</Text>
+            <Text style={[styles.statLabel, { color: colors.textTertiary }]}>Inquiries</Text>
           </View>
-        </View>
-
-        <View style={styles.secondaryStats}>
-          <View style={[styles.secondaryStat, { backgroundColor: colors.surface }]}>
-            <TrendingUp size={16} color="#8B5CF6" />
-            <Text style={[styles.secondaryStatValue, { color: colors.text }]}>{avgCtr}%</Text>
-            <Text style={[styles.secondaryStatLabel, { color: colors.textTertiary }]}>Avg CTR</Text>
-          </View>
-          <View style={[styles.secondaryStat, { backgroundColor: colors.surface }]}>
-            <Award size={16} color="#EC4899" />
-            <Text style={[styles.secondaryStatValue, { color: colors.text }]}>{totalConversions}</Text>
-            <Text style={[styles.secondaryStatLabel, { color: colors.textTertiary }]}>Conversions</Text>
+          <View style={[styles.statCard, { backgroundColor: colors.surface }]}>
+            <DollarSign size={20} color="#8B5CF6" />
+            <Text style={[styles.statValue, { color: colors.text }]}>{soldListings}</Text>
+            <Text style={[styles.statLabel, { color: colors.textTertiary }]}>Sold</Text>
           </View>
         </View>
 
         <TouchableOpacity 
-          style={[styles.newAdButton, { backgroundColor: colors.primary }]}
+          style={[styles.newListingBtn, { backgroundColor: colors.primary }]}
           onPress={() => router.push('/menu/post-ad')}
         >
           <Plus size={20} color="#FFF" />
-          <Text style={styles.newAdText}>Create New Ad</Text>
+          <Text style={styles.newListingText}>Post New Listing</Text>
         </TouchableOpacity>
 
-        <View style={styles.filterRow}>
-          <Text style={[styles.sectionTitle, { color: colors.text }]}>My Campaigns</Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            <View style={styles.filterTabs}>
-              {['all', 'active', 'paused', 'ended'].map((status) => (
-                <TouchableOpacity
-                  key={status}
-                  style={[
-                    styles.filterTab,
-                    { backgroundColor: filterStatus === status ? colors.primary : colors.surface }
-                  ]}
-                  onPress={() => setFilterStatus(status)}
-                >
-                  <Text style={[
-                    styles.filterTabText,
-                    { color: filterStatus === status ? '#FFF' : colors.textSecondary }
-                  ]}>
-                    {status.charAt(0).toUpperCase() + status.slice(1)}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-          </ScrollView>
+        <View style={[styles.searchBar, { backgroundColor: colors.surface }]}>
+          <Search size={18} color={colors.textTertiary} />
+          <TextInput
+            style={[styles.searchInput, { color: colors.text }]}
+            placeholder="Search your listings..."
+            placeholderTextColor={colors.textTertiary}
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+          />
         </View>
 
-        <View style={styles.section}>
-          {filteredAds.length === 0 ? (
+        <ScrollView 
+          horizontal 
+          showsHorizontalScrollIndicator={false}
+          style={styles.filterScroll}
+          contentContainerStyle={styles.filterTabs}
+        >
+          {['all', 'active', 'paused', 'sold', 'expired'].map((status) => (
+            <TouchableOpacity
+              key={status}
+              style={[
+                styles.filterTab,
+                { backgroundColor: filterStatus === status ? colors.primary : colors.surface }
+              ]}
+              onPress={() => setFilterStatus(status)}
+            >
+              <Text style={[
+                styles.filterTabText,
+                { color: filterStatus === status ? '#FFF' : colors.textSecondary }
+              ]}>
+                {status.charAt(0).toUpperCase() + status.slice(1)}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+
+        <View style={styles.listingsSection}>
+          {filteredListings.length === 0 ? (
             <View style={[styles.emptyState, { backgroundColor: colors.surface }]}>
-              <BarChart3 size={48} color={colors.textTertiary} />
-              <Text style={[styles.emptyTitle, { color: colors.text }]}>No ads found</Text>
+              <Package size={48} color={colors.textTertiary} />
+              <Text style={[styles.emptyTitle, { color: colors.text }]}>No listings found</Text>
               <Text style={[styles.emptyText, { color: colors.textTertiary }]}>
                 {filterStatus === 'all' 
-                  ? 'Create your first ad to start reaching customers'
-                  : `No ${filterStatus} ads at the moment`}
+                  ? 'Create your first listing to start selling'
+                  : `No ${filterStatus} listings`}
               </Text>
             </View>
           ) : (
-            filteredAds.map((ad) => (
+            filteredListings.map((listing) => (
               <TouchableOpacity
-                key={ad.id}
-                style={[styles.adCard, { backgroundColor: colors.surface }]}
+                key={listing.id}
+                style={[styles.listingCard, { backgroundColor: colors.surface }]}
                 onPress={() => {
-                  setSelectedAd(ad);
+                  setSelectedListing(listing);
                   setShowDetailsModal(true);
                 }}
               >
-                <View style={styles.adHeader}>
-                  <View style={styles.adInfo}>
-                    <Text style={[styles.adTitle, { color: colors.text }]}>{ad.title}</Text>
-                    <View style={[
-                      styles.statusBadge,
-                      { backgroundColor: getStatusColor(ad.status) + '20' }
-                    ]}>
-                      {ad.status === 'active' ? (
-                        <Play size={10} color={getStatusColor(ad.status)} fill={getStatusColor(ad.status)} />
-                      ) : ad.status === 'paused' ? (
-                        <Pause size={10} color={getStatusColor(ad.status)} />
-                      ) : (
-                        <Clock size={10} color={getStatusColor(ad.status)} />
-                      )}
-                      <Text style={[styles.statusText, { color: getStatusColor(ad.status) }]}>
-                        {ad.status}
+                {listing.isBumped && (
+                  <View style={styles.bumpedBanner}>
+                    <Flame size={12} color="#FFF" />
+                    <Text style={styles.bumpedBannerText}>BUMPED</Text>
+                  </View>
+                )}
+                <View style={styles.listingContent}>
+                  <Image source={{ uri: listing.images[0] }} style={styles.listingImage} />
+                  <View style={styles.listingInfo}>
+                    <View style={styles.listingHeader}>
+                      <Text style={[styles.listingTitle, { color: colors.text }]} numberOfLines={1}>
+                        {listing.title}
+                      </Text>
+                      <TouchableOpacity>
+                        <MoreVertical size={18} color={colors.textTertiary} />
+                      </TouchableOpacity>
+                    </View>
+                    <Text style={[styles.listingPrice, { color: colors.primary }]}>
+                      ${listing.price}
+                      {listing.condition === 'Service' && '/hr'}
+                    </Text>
+                    <View style={styles.listingMeta}>
+                      <View style={[
+                        styles.statusBadge,
+                        { backgroundColor: getStatusColor(listing.status) + '20' }
+                      ]}>
+                        {getStatusIcon(listing.status)}
+                        <Text style={[styles.statusText, { color: getStatusColor(listing.status) }]}>
+                          {listing.status}
+                        </Text>
+                      </View>
+                      <Text style={[styles.listingDate, { color: colors.textTertiary }]}>
+                        {formatDate(listing.createdAt)}
                       </Text>
                     </View>
-                  </View>
-                  <TouchableOpacity 
-                    style={styles.moreBtn}
-                    onPress={() => {
-                      setSelectedAd(ad);
-                      setShowDetailsModal(true);
-                    }}
-                  >
-                    <MoreVertical size={18} color={colors.textTertiary} />
-                  </TouchableOpacity>
-                </View>
-                <View style={[styles.adStats, { borderTopColor: colors.border }]}>
-                  <View style={styles.adStat}>
-                    <Text style={[styles.adStatLabel, { color: colors.textTertiary }]}>Views</Text>
-                    <Text style={[styles.adStatValue, { color: colors.text }]}>{ad.views.toLocaleString()}</Text>
-                  </View>
-                  <View style={styles.adStat}>
-                    <Text style={[styles.adStatLabel, { color: colors.textTertiary }]}>Clicks</Text>
-                    <Text style={[styles.adStatValue, { color: colors.text }]}>{ad.clicks}</Text>
-                  </View>
-                  <View style={styles.adStat}>
-                    <Text style={[styles.adStatLabel, { color: colors.textTertiary }]}>CTR</Text>
-                    <Text style={[styles.adStatValue, { color: colors.text }]}>{ad.ctr}%</Text>
-                  </View>
-                  <View style={styles.adStat}>
-                    <Text style={[styles.adStatLabel, { color: colors.textTertiary }]}>Spent</Text>
-                    <Text style={[styles.adStatValue, { color: colors.text }]}>${ad.spent}</Text>
+                    <View style={styles.listingStats}>
+                      <View style={styles.listingStat}>
+                        <Eye size={12} color={colors.textTertiary} />
+                        <Text style={[styles.listingStatText, { color: colors.textTertiary }]}>
+                          {listing.views}
+                        </Text>
+                      </View>
+                      <View style={styles.listingStat}>
+                        <MessageCircle size={12} color={colors.textTertiary} />
+                        <Text style={[styles.listingStatText, { color: colors.textTertiary }]}>
+                          {listing.inquiries}
+                        </Text>
+                      </View>
+                      <View style={styles.listingStat}>
+                        <Heart size={12} color={colors.textTertiary} />
+                        <Text style={[styles.listingStatText, { color: colors.textTertiary }]}>
+                          {listing.favorites}
+                        </Text>
+                      </View>
+                    </View>
                   </View>
                 </View>
-                <View style={[styles.adBudgetBar, { backgroundColor: colors.border }]}>
-                  <View 
-                    style={[
-                      styles.adBudgetFill, 
-                      { 
-                        backgroundColor: colors.primary,
-                        width: `${Math.min((ad.spent / ad.budget) * 100, 100)}%`
-                      }
-                    ]} 
-                  />
-                </View>
-                <Text style={[styles.adBudgetText, { color: colors.textTertiary }]}>
-                  ${ad.spent} of ${ad.budget} budget used
-                </Text>
               </TouchableOpacity>
             ))
           )}
         </View>
       </ScrollView>
 
-      {renderAdDetailsModal()}
+      {renderDetailsModal()}
+      {renderBumpModal()}
     </View>
   );
 }
@@ -486,68 +663,84 @@ export default function MyAdsScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   content: { flex: 1 },
-  statsRow: { flexDirection: 'row', padding: 16, gap: 10 },
-  statCard: { flex: 1, padding: 14, borderRadius: 12, alignItems: 'center' },
-  statValue: { fontSize: 20, fontWeight: '700' as const, marginTop: 8 },
-  statLabel: { fontSize: 11, marginTop: 4 },
-  secondaryStats: { flexDirection: 'row', paddingHorizontal: 16, gap: 10, marginBottom: 16 },
-  secondaryStat: { flex: 1, flexDirection: 'row', alignItems: 'center', padding: 12, borderRadius: 12, gap: 8 },
-  secondaryStatValue: { fontSize: 16, fontWeight: '700' as const },
-  secondaryStatLabel: { fontSize: 12 },
-  newAdButton: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginHorizontal: 16, paddingVertical: 14, borderRadius: 12, gap: 8 },
-  newAdText: { color: '#FFF', fontSize: 15, fontWeight: '600' as const },
-  filterRow: { paddingHorizontal: 16, marginTop: 20, marginBottom: 12 },
-  sectionTitle: { fontSize: 18, fontWeight: '700' as const, marginBottom: 12 },
-  filterTabs: { flexDirection: 'row', gap: 8 },
-  filterTab: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20 },
+  statsRow: { flexDirection: 'row', padding: 16, gap: 8 },
+  statCard: { flex: 1, padding: 12, borderRadius: 12, alignItems: 'center' },
+  statValue: { fontSize: 18, fontWeight: '700' as const, marginTop: 6 },
+  statLabel: { fontSize: 10, marginTop: 2 },
+  newListingBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginHorizontal: 16, paddingVertical: 14, borderRadius: 12, gap: 8 },
+  newListingText: { color: '#FFF', fontSize: 15, fontWeight: '600' as const },
+  searchBar: { flexDirection: 'row', alignItems: 'center', marginHorizontal: 16, marginTop: 16, paddingHorizontal: 14, paddingVertical: 10, borderRadius: 12, gap: 10 },
+  searchInput: { flex: 1, fontSize: 15, padding: 0 },
+  filterScroll: { marginTop: 12 },
+  filterTabs: { paddingHorizontal: 16, gap: 8 },
+  filterTab: { paddingHorizontal: 16, paddingVertical: 8, borderRadius: 20 },
   filterTabText: { fontSize: 13, fontWeight: '600' as const },
-  section: { paddingHorizontal: 16 },
-  adCard: { borderRadius: 16, marginBottom: 12, overflow: 'hidden' },
-  adHeader: { flexDirection: 'row', alignItems: 'center', padding: 14 },
-  adInfo: { flex: 1 },
-  adTitle: { fontSize: 15, fontWeight: '600' as const, marginBottom: 6 },
-  statusBadge: { flexDirection: 'row', alignItems: 'center', alignSelf: 'flex-start', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6, gap: 4 },
+  listingsSection: { paddingHorizontal: 16, marginTop: 16 },
+  listingCard: { borderRadius: 14, marginBottom: 12, overflow: 'hidden' },
+  bumpedBanner: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: '#FF6B00', paddingVertical: 4, gap: 4 },
+  bumpedBannerText: { fontSize: 10, fontWeight: '800' as const, color: '#FFF', letterSpacing: 1 },
+  listingContent: { flexDirection: 'row', padding: 12, gap: 12 },
+  listingImage: { width: 80, height: 80, borderRadius: 10 },
+  listingInfo: { flex: 1 },
+  listingHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' },
+  listingTitle: { flex: 1, fontSize: 14, fontWeight: '600' as const, marginRight: 8 },
+  listingPrice: { fontSize: 16, fontWeight: '700' as const, marginTop: 2 },
+  listingMeta: { flexDirection: 'row', alignItems: 'center', marginTop: 6, gap: 8 },
+  statusBadge: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 8, paddingVertical: 3, borderRadius: 6, gap: 4 },
   statusText: { fontSize: 11, fontWeight: '500' as const, textTransform: 'capitalize' as const },
-  moreBtn: { padding: 4 },
-  adStats: { flexDirection: 'row', borderTopWidth: 1, padding: 12 },
-  adStat: { flex: 1, alignItems: 'center' },
-  adStatLabel: { fontSize: 10, marginBottom: 2 },
-  adStatValue: { fontSize: 14, fontWeight: '600' as const },
-  adBudgetBar: { height: 4, marginHorizontal: 12, borderRadius: 2, marginTop: 4 },
-  adBudgetFill: { height: '100%', borderRadius: 2 },
-  adBudgetText: { fontSize: 11, paddingHorizontal: 12, paddingVertical: 8 },
+  listingDate: { fontSize: 11 },
+  listingStats: { flexDirection: 'row', marginTop: 8, gap: 12 },
+  listingStat: { flexDirection: 'row', alignItems: 'center', gap: 4 },
+  listingStatText: { fontSize: 11 },
   emptyState: { padding: 40, borderRadius: 16, alignItems: 'center' },
   emptyTitle: { fontSize: 18, fontWeight: '600' as const, marginTop: 16 },
   emptyText: { fontSize: 14, textAlign: 'center' as const, marginTop: 8 },
   modalContainer: { flex: 1 },
   modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 16, borderBottomWidth: 1 },
   modalTitle: { fontSize: 18, fontWeight: '700' as const },
-  adDetailCard: { margin: 16, padding: 16, borderRadius: 16 },
-  adDetailHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 },
-  adDetailTitle: { fontSize: 20, fontWeight: '700' as const, flex: 1, marginRight: 12 },
-  statusBadgeLarge: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 8 },
+  detailImage: { width: '100%', height: 250 },
+  detailContent: { padding: 16 },
+  detailHeaderRow: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 12 },
+  statusBadgeLarge: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 8, gap: 6 },
   statusTextLarge: { fontSize: 12, fontWeight: '700' as const },
-  adDetailDesc: { fontSize: 14, lineHeight: 20, marginBottom: 12 },
-  adDetailMeta: { flexDirection: 'row', gap: 16 },
-  adDetailMetaItem: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  adDetailMetaText: { fontSize: 12 },
-  detailStatsGrid: { flexDirection: 'row', flexWrap: 'wrap' as const, paddingHorizontal: 12, gap: 8 },
-  detailStatCard: { width: '48%', padding: 16, borderRadius: 12, alignItems: 'center' },
-  detailStatValue: { fontSize: 24, fontWeight: '700' as const, marginTop: 8 },
-  detailStatLabel: { fontSize: 12, marginTop: 4 },
-  budgetCard: { margin: 16, padding: 16, borderRadius: 16 },
-  budgetTitle: { fontSize: 16, fontWeight: '600' as const, marginBottom: 12 },
-  budgetRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  budgetSpent: { fontSize: 18, fontWeight: '700' as const },
-  budgetLabel: { fontSize: 11, marginTop: 2 },
-  budgetProgress: { flex: 1, marginHorizontal: 16 },
-  budgetProgressBg: { height: 8, borderRadius: 4, overflow: 'hidden' },
-  budgetProgressFill: { height: '100%', borderRadius: 4 },
-  budgetPercent: { fontSize: 11, textAlign: 'center' as const, marginTop: 4 },
-  budgetTotal: { fontSize: 18, fontWeight: '700' as const },
-  actionButtons: { flexDirection: 'row', paddingHorizontal: 16, gap: 10 },
-  actionBtn: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', padding: 14, borderRadius: 12, gap: 8 },
+  bumpedBadge: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#FF6B00', paddingHorizontal: 10, paddingVertical: 6, borderRadius: 8, gap: 4 },
+  bumpedBadgeText: { fontSize: 10, fontWeight: '800' as const, color: '#FFF' },
+  detailTitle: { fontSize: 22, fontWeight: '700' as const, marginBottom: 4 },
+  detailPrice: { fontSize: 24, fontWeight: '700' as const, marginBottom: 8 },
+  perHour: { fontSize: 14, fontWeight: '500' as const },
+  detailDesc: { fontSize: 14, lineHeight: 20, marginBottom: 16 },
+  detailMeta: { gap: 8, marginBottom: 20 },
+  detailMetaItem: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  detailMetaText: { fontSize: 13 },
+  detailStatsGrid: { flexDirection: 'row', gap: 10, marginBottom: 16 },
+  detailStatCard: { flex: 1, padding: 14, borderRadius: 12, alignItems: 'center' },
+  detailStatValue: { fontSize: 20, fontWeight: '700' as const, marginTop: 6 },
+  detailStatLabel: { fontSize: 11, marginTop: 2 },
+  expiryCard: { flexDirection: 'row', alignItems: 'center', padding: 14, borderRadius: 12, marginBottom: 16, gap: 12 },
+  expiryInfo: { flex: 1 },
+  expiryLabel: { fontSize: 11 },
+  expiryValue: { fontSize: 16, fontWeight: '600' as const },
+  renewBtn: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12, paddingVertical: 8, borderRadius: 8, gap: 6 },
+  renewBtnText: { fontSize: 13, fontWeight: '600' as const },
+  actionButtons: { flexDirection: 'row', gap: 10, marginBottom: 12 },
+  actionBtn: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', padding: 12, borderRadius: 12, gap: 6 },
   actionBtnText: { fontSize: 13, fontWeight: '600' as const },
-  boostBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginHorizontal: 16, marginTop: 16, paddingVertical: 16, borderRadius: 12, gap: 8 },
-  boostBtnText: { color: '#FFF', fontSize: 16, fontWeight: '700' as const },
+  bumpBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingVertical: 16, borderRadius: 12, gap: 8, marginBottom: 10 },
+  bumpBtnText: { color: '#FFF', fontSize: 16, fontWeight: '700' as const },
+  soldBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingVertical: 16, borderRadius: 12, gap: 8, marginBottom: 10 },
+  soldBtnText: { color: '#FFF', fontSize: 16, fontWeight: '700' as const },
+  deleteBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingVertical: 14, borderRadius: 12, gap: 8 },
+  deleteBtnText: { fontSize: 14, fontWeight: '600' as const },
+  bumpContent: { flex: 1, padding: 16 },
+  bumpHero: { padding: 24, borderRadius: 16, alignItems: 'center', marginBottom: 24 },
+  bumpHeroTitle: { fontSize: 20, fontWeight: '700' as const, marginTop: 12, marginBottom: 8 },
+  bumpHeroText: { fontSize: 14, textAlign: 'center' as const, lineHeight: 20 },
+  bumpSectionTitle: { fontSize: 16, fontWeight: '700' as const, marginBottom: 12 },
+  bumpOption: { flexDirection: 'row', alignItems: 'center', padding: 16, borderRadius: 14, marginBottom: 10, position: 'relative' },
+  popularBadge: { position: 'absolute', top: -8, right: 12, backgroundColor: '#FF6B00', paddingHorizontal: 8, paddingVertical: 3, borderRadius: 6 },
+  popularBadgeText: { fontSize: 9, fontWeight: '800' as const, color: '#FFF', letterSpacing: 0.5 },
+  bumpOptionLeft: { flex: 1 },
+  bumpOptionDays: { fontSize: 16, fontWeight: '600' as const },
+  bumpOptionDesc: { fontSize: 12, marginTop: 2 },
+  bumpOptionPrice: { fontSize: 18, fontWeight: '700' as const },
 });
