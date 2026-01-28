@@ -743,7 +743,7 @@ export default function LarecoinMobileScreen() {
       {/* SMS Modal */}
       <Modal visible={showSMSModal} animationType="slide" transparent={false}>
         <View style={[styles.smsModal, { backgroundColor: colors.background, paddingTop: insets.top }]}>
-          <View style={[styles.smsHeader, { backgroundColor: colors.surface }]}>
+          <View style={[styles.smsModalHeader, { backgroundColor: colors.surface }]}>
             <TouchableOpacity onPress={() => setShowSMSModal(false)}>
               <X size={24} color={colors.text} />
             </TouchableOpacity>
@@ -778,7 +778,7 @@ export default function LarecoinMobileScreen() {
               <Text style={[styles.messageTime, { color: colors.textTertiary }]}>10:30 AM</Text>
             </View>
             <View style={[styles.messageBubble, styles.sentMessage, { backgroundColor: colors.primary }]}>
-              <Text style={[styles.messageText, { color: '#FFF' }]}>I'm good! Just finished a call.</Text>
+              <Text style={[styles.messageText, { color: '#FFF' }]}>I am good! Just finished a call.</Text>
               <Text style={[styles.messageTime, { color: 'rgba(255,255,255,0.7)' }]}>10:32 AM</Text>
             </View>
             <View style={[styles.messageBubble, styles.receivedMessage, { backgroundColor: colors.surface }]}>
@@ -1418,7 +1418,7 @@ const styles = StyleSheet.create({
   smsModal: {
     flex: 1,
   },
-  smsHeader: {
+  smsModalHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     padding: 16,
