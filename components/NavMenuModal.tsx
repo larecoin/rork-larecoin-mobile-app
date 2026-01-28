@@ -30,14 +30,6 @@ interface MenuItem {
 
 const menuSections: MenuSection[] = [
   {
-    title: 'Account',
-    items: [
-      { id: 'app-settings', label: 'App Settings', icon: Settings },
-      { id: 'customer-service', label: 'Customer Service Chat', icon: Headphones },
-      { id: 'invite-friends', label: 'Invite Friends', icon: Share2 },
-    ],
-  },
-  {
     title: 'Quick Actions',
     items: [
       { id: 'scan-qr', label: 'Scan QR', icon: QrCode },
@@ -57,22 +49,6 @@ const menuSections: MenuSection[] = [
     ],
   },
   {
-    title: 'Assets',
-    items: [
-      { id: 'tax-reports', label: 'Tax & Reports', icon: FileSpreadsheet },
-      { id: 'tokenize-assets', label: 'Tokenize Assets', icon: Gem },
-      { id: 'assets-market', label: 'Assets Market', icon: TrendingUp },
-      { id: 'my-tokenized-assets', label: 'My Tokenized Assets', icon: Boxes },
-    ],
-  },
-  {
-    title: 'Shopping',
-    items: [
-      { id: 'shopping', label: 'Shopping', icon: ShoppingCart },
-      { id: 'my-orders', label: 'My Orders', icon: ClipboardCheck },
-    ],
-  },
-  {
     title: 'Social',
     items: [
       { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -88,7 +64,23 @@ const menuSections: MenuSection[] = [
     ],
   },
   {
-    title: 'Content & Tools',
+    title: 'Shopping',
+    items: [
+      { id: 'shopping', label: 'Shopping', icon: ShoppingCart },
+      { id: 'my-orders', label: 'My Orders', icon: ClipboardCheck },
+    ],
+  },
+  {
+    title: 'Assets',
+    items: [
+      { id: 'tax-reports', label: 'Tax & Reports', icon: FileSpreadsheet },
+      { id: 'tokenize-assets', label: 'Tokenize Assets', icon: Gem },
+      { id: 'assets-market', label: 'Assets Market', icon: TrendingUp },
+      { id: 'my-tokenized-assets', label: 'My Tokenized Assets', icon: Boxes },
+    ],
+  },
+  {
+    title: 'Influencers',
     items: [
       { id: 'media', label: 'Media & Files', icon: FolderOpen },
       { id: 'creator-tools', label: 'Creator Tools', icon: Wand2 },
@@ -104,7 +96,7 @@ const menuSections: MenuSection[] = [
     ],
   },
   {
-    title: 'Tools & Services',
+    title: 'Solutions',
     items: [
       { id: 'escrow-manager', label: 'Escrow Manager', icon: Shield },
       { id: 'advanced-trading', label: 'Advanced Trading', icon: TrendingUp },
@@ -130,20 +122,28 @@ const menuSections: MenuSection[] = [
     ],
   },
   {
-    title: 'Reseller',
+    title: 'Resellers',
     items: [
       { id: 'reseller-program', label: 'Reseller Program', icon: Award },
       { id: 'join-reseller', label: 'Join Reseller Program', icon: UserPlus },
     ],
   },
   {
-    title: 'Developer',
+    title: 'Developers',
     items: [
       { id: 'developers', label: 'Developers', icon: Code },
       { id: 'domains', label: 'Domains & Websites', icon: Globe },
       { id: 'file-storage', label: 'File Storage', icon: HardDrive },
       { id: 'products-services', label: 'Products & Services', icon: Package },
       { id: 'apis-hooks', label: "API's & Hooks", icon: Webhook },
+    ],
+  },
+  {
+    title: 'Account',
+    items: [
+      { id: 'app-settings', label: 'App Settings', icon: Settings },
+      { id: 'customer-service', label: 'Customer Service Chat', icon: Headphones },
+      { id: 'invite-friends', label: 'Invite Friends', icon: Share2 },
     ],
   },
 ];
