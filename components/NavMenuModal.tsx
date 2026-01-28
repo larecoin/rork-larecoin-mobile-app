@@ -8,7 +8,7 @@ import {
   Image, Code, Globe, HardDrive, Package, Webhook, Store, ClipboardList,
   Megaphone, PlusCircle, List, Award, ChevronRight, Coins, Banknote, Clover, HandCoins,
   ShoppingCart, ClipboardCheck, Shield, HelpCircle, FileSpreadsheet, Gem, TrendingUp, Boxes,
-  UserCircle, Headphones, Share2
+  UserCircle, Headphones, Share2, Phone, MessagesSquare
 } from 'lucide-react-native';
 import { useApp } from '@/contexts/AppContext';
 
@@ -30,6 +30,8 @@ const menuItems: MenuItem[] = [
   { id: 'shopping', label: 'Shop', icon: ShoppingCart },
   { id: 'wallet-nfts', label: 'My Wallet', icon: Image },
   { id: 'buy-crypto', label: 'Buy Crypto', icon: CreditCard },
+  { id: 'larecoin-mobile', label: 'Larecoin Mobile', icon: Phone },
+  { id: 'chat', label: 'Chat', icon: MessagesSquare },
   { id: 'explore', label: 'Explore & Discover', icon: Compass },
   { id: 'resume', label: 'My Resume/CV', icon: FileText },
   { id: 'follow', label: 'Follow & Connect', icon: UserPlus },
@@ -73,6 +75,8 @@ export default function NavMenuModal({ visible, onClose }: NavMenuModalProps) {
       'dashboard': '/(tabs)/(wallet)',
       'social-spaces': '/menu/social-spaces',
       'explore': '/menu/explore',
+      'larecoin-mobile': '/menu/larecoin-mobile',
+      'chat': '/menu/chat',
       'profile': '/(tabs)/profile',
       'messages': '/menu/messages',
       'resume': '/menu/resume',

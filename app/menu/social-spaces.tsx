@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, TextInput, Modal, Switch } from 'react-native';
-import { Stack } from 'expo-router';
+import { Stack, useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Search, Plus, Users, MessageSquare, Globe, Lock, TrendingUp, Radio, Mic, MicOff, Hand, X, Volume2, Settings, Share2, UserPlus, Crown, Phone } from 'lucide-react-native';
+import { Search, Plus, Users, MessageSquare, Globe, Lock, TrendingUp, Radio, Mic, MicOff, Hand, X, Volume2, Settings, Share2, UserPlus, Crown, Phone, Video, PhoneCall, MessageCircle } from 'lucide-react-native';
 import { useApp } from '@/contexts/AppContext';
 
 interface LiveBroadcast {
@@ -61,6 +61,7 @@ const categories = ['All', 'Trading', 'DeFi', 'NFTs', 'Gaming', 'Social', 'Busin
 
 export default function SocialSpacesScreen() {
   const insets = useSafeAreaInsets();
+  const router = useRouter();
   const { colors } = useApp();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
@@ -148,6 +149,41 @@ export default function SocialSpacesScreen() {
             <Plus size={18} color="#FFF" />
             <Text style={styles.createButtonText}>Create Space</Text>
           </TouchableOpacity>
+        </View>
+
+        <View style={styles.larecoinMobileSection}>
+          <View style={styles.larecoinHeader}>
+            <View style={[styles.larecoinBadge, { backgroundColor: '#6366F1' }]}>
+              <PhoneCall size={16} color="#FFF" />
+            </View>
+            <View style={styles.larecoinInfo}>
+              <Text style={[styles.larecoinTitle, { color: colors.text }]}>Larecoin Mobile</Text>
+              <Text style={[styles.larecoinSubtitle, { color: colors.textTertiary }]}>Call & message space members</Text>
+            </View>
+          </View>
+          <View style={styles.larecoinActions}>
+            <TouchableOpacity 
+              style={[styles.larecoinAction, { backgroundColor: '#4CAF50' }]}
+              onPress={() => router.push('/menu/larecoin-mobile' as any)}
+            >
+              <Phone size={18} color="#FFF" />
+              <Text style={styles.larecoinActionText}>Voice Call</Text>
+            </TouchableOpacity>
+            <TouchableOpacity 
+              style={[styles.larecoinAction, { backgroundColor: '#2196F3' }]}
+              onPress={() => router.push('/menu/larecoin-mobile' as any)}
+            >
+              <Video size={18} color="#FFF" />
+              <Text style={styles.larecoinActionText}>Video Call</Text>
+            </TouchableOpacity>
+            <TouchableOpacity 
+              style={[styles.larecoinAction, { backgroundColor: '#9C27B0' }]}
+              onPress={() => router.push('/menu/chat' as any)}
+            >
+              <MessageCircle size={18} color="#FFF" />
+              <Text style={styles.larecoinActionText}>Group Chat</Text>
+            </TouchableOpacity>
+          </View>
         </View>
 
         {liveBroadcasts.length > 0 && (
@@ -626,6 +662,57 @@ const styles = StyleSheet.create({
   createButtonText: {
     color: '#FFF',
     fontSize: 15,
+    fontWeight: '600' as const,
+  },
+  larecoinMobileSection: {
+    marginHorizontal: 16,
+    marginTop: 16,
+    padding: 16,
+    backgroundColor: 'rgba(99, 102, 241, 0.1)',
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(99, 102, 241, 0.2)',
+  },
+  larecoinHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 14,
+  },
+  larecoinBadge: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+  },
+  larecoinInfo: {
+    flex: 1,
+  },
+  larecoinTitle: {
+    fontSize: 16,
+    fontWeight: '600' as const,
+  },
+  larecoinSubtitle: {
+    fontSize: 12,
+    marginTop: 2,
+  },
+  larecoinActions: {
+    flexDirection: 'row',
+    gap: 10,
+  },
+  larecoinAction: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 12,
+    borderRadius: 10,
+    gap: 6,
+  },
+  larecoinActionText: {
+    color: '#FFF',
+    fontSize: 12,
     fontWeight: '600' as const,
   },
   section: {
