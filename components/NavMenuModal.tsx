@@ -17,135 +17,41 @@ interface NavMenuModalProps {
   onClose: () => void;
 }
 
-interface MenuSection {
-  title: string;
-  items: MenuItem[];
-}
-
 interface MenuItem {
   id: string;
   label: string;
   icon: React.ComponentType<{ size: number; color: string }>;
 }
 
-const menuSections: MenuSection[] = [
-  {
-    title: 'Quick Actions',
-    items: [
-      { id: 'scan-qr', label: 'Scan QR', icon: QrCode },
-      { id: 'buy-crypto', label: 'Buy Crypto', icon: CreditCard },
-    ],
-  },
-  {
-    title: 'Wallet',
-    items: [
-      { id: 'wallet-nfts', label: 'My Wallet & NFTs', icon: Image },
-      { id: 'staking-rewards', label: 'Staking & Rewards', icon: Coins },
-      { id: 'lusd-debit-card', label: 'LUSD Debit Card', icon: CreditCard },
-      { id: 'payment-methods', label: 'Payment Methods', icon: CreditCard },
-      { id: 'forex', label: 'Foreign Exchange', icon: Banknote },
-      { id: 'lucky-draw', label: 'My Lucky Draws', icon: Clover },
-      { id: 'borrow-lend', label: 'Borrow & Lend', icon: HandCoins },
-    ],
-  },
-  {
-    title: 'Social',
-    items: [
-      { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-      { id: 'explore', label: 'Explore & Discover', icon: Compass },
-      { id: 'social-spaces', label: 'Social Spaces', icon: Users },
-      { id: 'profile', label: 'My Profile', icon: User },
-      { id: 'messages', label: 'Messages', icon: MessageSquare },
-      { id: 'resume', label: 'Resume / CV', icon: FileText },
-      { id: 'calendar', label: 'My Calendar', icon: Calendar },
-      { id: 'contacts', label: 'My Contacts', icon: Contact },
-      { id: 'follow', label: 'Follow & Connect', icon: UserPlus },
-      { id: 'dating', label: 'Start Dating', icon: Heart },
-    ],
-  },
-  {
-    title: 'Shopping',
-    items: [
-      { id: 'shopping', label: 'Shopping', icon: ShoppingCart },
-      { id: 'my-orders', label: 'My Orders', icon: ClipboardCheck },
-    ],
-  },
-  {
-    title: 'Assets',
-    items: [
-      { id: 'tax-reports', label: 'Tax & Reports', icon: FileSpreadsheet },
-      { id: 'tokenize-assets', label: 'Tokenize Assets', icon: Gem },
-      { id: 'assets-market', label: 'Assets Market', icon: TrendingUp },
-      { id: 'my-tokenized-assets', label: 'My Tokenized Assets', icon: Boxes },
-    ],
-  },
-  {
-    title: 'Influencers',
-    items: [
-      { id: 'media', label: 'Media & Files', icon: FolderOpen },
-      { id: 'creator-tools', label: 'Creator Tools', icon: Wand2 },
-      { id: 'apps-games', label: 'Apps & Games', icon: Gamepad2 },
-      { id: 'spaces', label: 'My Spaces', icon: Layout },
-    ],
-  },
-  {
-    title: 'Earn Rewards',
-    items: [
-      { id: 'bug-bounty', label: 'Bug Bounty', icon: Bug },
-      { id: 'referrals', label: 'Referrals', icon: Gift },
-    ],
-  },
-  {
-    title: 'Solutions',
-    items: [
-      { id: 'escrow-manager', label: 'Escrow Manager', icon: Shield },
-      { id: 'advanced-trading', label: 'Advanced Trading', icon: TrendingUp },
-      { id: 'security-center', label: 'Security Center', icon: Shield },
-      { id: 'helpdesk', label: 'Helpdesk', icon: HelpCircle },
-    ],
-  },
-  {
-    title: 'Merchant Portal',
-    items: [
-      { id: 'merchant-portal', label: 'Merchant Portal', icon: Store },
-      { id: 'register-merchant', label: 'Register Merchant', icon: ClipboardList },
-      { id: 'pos', label: 'Point of Sale', icon: CreditCard },
-      { id: 'business-listings', label: 'Business Listings', icon: List },
-    ],
-  },
-  {
-    title: 'Advertising',
-    items: [
-      { id: 'ad-manager', label: 'Ad Manager', icon: Megaphone },
-      { id: 'post-ad', label: 'Post Ad', icon: PlusCircle },
-      { id: 'my-ads', label: 'My Ads', icon: List },
-    ],
-  },
-  {
-    title: 'Resellers',
-    items: [
-      { id: 'reseller-program', label: 'Reseller Program', icon: Award },
-      { id: 'join-reseller', label: 'Join Reseller Program', icon: UserPlus },
-    ],
-  },
-  {
-    title: 'Developers',
-    items: [
-      { id: 'developers', label: 'Developers', icon: Code },
-      { id: 'domains', label: 'Domains & Websites', icon: Globe },
-      { id: 'file-storage', label: 'File Storage', icon: HardDrive },
-      { id: 'products-services', label: 'Products & Services', icon: Package },
-      { id: 'apis-hooks', label: "API's & Hooks", icon: Webhook },
-    ],
-  },
-  {
-    title: 'Account',
-    items: [
-      { id: 'app-settings', label: 'App Settings', icon: Settings },
-      { id: 'customer-service', label: 'Customer Service Chat', icon: Headphones },
-      { id: 'invite-friends', label: 'Invite Friends', icon: Share2 },
-    ],
-  },
+const menuItems: MenuItem[] = [
+  { id: 'profile', label: 'My Profile', icon: User },
+  { id: 'app-settings', label: 'Settings', icon: Settings },
+  { id: 'scan-qr', label: 'Scan QR', icon: QrCode },
+  { id: 'shopping', label: 'Shop', icon: ShoppingCart },
+  { id: 'wallet-nfts', label: 'My Wallet', icon: Image },
+  { id: 'buy-crypto', label: 'Buy Crypto', icon: CreditCard },
+  { id: 'explore', label: 'Explore & Discover', icon: Compass },
+  { id: 'resume', label: 'My Resume/CV', icon: FileText },
+  { id: 'follow', label: 'Follow & Connect', icon: UserPlus },
+  { id: 'spaces', label: 'My Spaces', icon: Layout },
+  { id: 'dating', label: 'Start Dating', icon: Heart },
+  { id: 'messages', label: 'Messages', icon: MessageSquare },
+  { id: 'calendar', label: 'My Calendar', icon: Calendar },
+  { id: 'contacts', label: 'My Contacts', icon: Contact },
+  { id: 'referrals', label: 'Referrals', icon: Gift },
+  { id: 'creator-tools', label: 'Creator Tools', icon: Wand2 },
+  { id: 'apps-games', label: 'Apps & Games', icon: Gamepad2 },
+  { id: 'business-listings', label: 'Business Listings', icon: List },
+  { id: 'merchant-portal', label: 'My Shop', icon: Store },
+  { id: 'pos', label: 'Point of Sale', icon: CreditCard },
+  { id: 'post-ad', label: 'Post Ad', icon: PlusCircle },
+  { id: 'ad-manager', label: 'Ad Manager', icon: Megaphone },
+  { id: 'domains', label: 'Domains & Websites', icon: Globe },
+  { id: 'media', label: 'Media & Files', icon: FolderOpen },
+  { id: 'products-services', label: 'Products & Services', icon: Package },
+  { id: 'apis-hooks', label: "API's & Hooks", icon: Webhook },
+  { id: 'bug-bounty', label: 'Bug Bounty', icon: Bug },
+  { id: 'reseller-program', label: 'Reseller Program', icon: Award },
 ];
 
 export default function NavMenuModal({ visible, onClose }: NavMenuModalProps) {
@@ -239,33 +145,30 @@ export default function NavMenuModal({ visible, onClose }: NavMenuModalProps) {
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingBottom: insets.bottom + 20 }}
         >
-          {menuSections.map((section) => (
-            <View key={section.title} style={styles.section}>
-              <Text style={[styles.sectionTitle, { color: colors.textTertiary }]}>{section.title}</Text>
-              <View style={[styles.sectionItems, { backgroundColor: colors.surface }]}>
-                {section.items.map((item, itemIndex) => (
-                  <TouchableOpacity
-                    key={item.id}
-                    style={[
-                      styles.menuItem,
-                      { borderBottomColor: colors.border },
-                      itemIndex === section.items.length - 1 && styles.menuItemLast,
-                    ]}
-                    onPress={() => handleMenuPress(item.id)}
-                    activeOpacity={0.7}
-                  >
-                    <View style={styles.menuItemLeft}>
-                      <View style={[styles.iconWrapper, { backgroundColor: colors.iconColor + '15' }]}>
-                        <item.icon size={20} color={colors.iconColor} />
-                      </View>
-                      <Text style={[styles.menuItemLabel, { color: colors.text }]}>{item.label}</Text>
+          <View style={styles.section}>
+            <View style={[styles.sectionItems, { backgroundColor: colors.surface }]}>
+              {menuItems.map((item, itemIndex) => (
+                <TouchableOpacity
+                  key={item.id}
+                  style={[
+                    styles.menuItem,
+                    { borderBottomColor: colors.border },
+                    itemIndex === menuItems.length - 1 && styles.menuItemLast,
+                  ]}
+                  onPress={() => handleMenuPress(item.id)}
+                  activeOpacity={0.7}
+                >
+                  <View style={styles.menuItemLeft}>
+                    <View style={[styles.iconWrapper, { backgroundColor: colors.iconColor + '15' }]}>
+                      <item.icon size={20} color={colors.iconColor} />
                     </View>
-                    <ChevronRight size={18} color={colors.textTertiary} />
-                  </TouchableOpacity>
-                ))}
-              </View>
+                    <Text style={[styles.menuItemLabel, { color: colors.text }]}>{item.label}</Text>
+                  </View>
+                  <ChevronRight size={18} color={colors.textTertiary} />
+                </TouchableOpacity>
+              ))}
             </View>
-          ))}
+          </View>
         </ScrollView>
       </View>
     </Modal>
