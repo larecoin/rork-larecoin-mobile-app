@@ -59,6 +59,24 @@ import {
 } from 'lucide-react-native';
 import { useApp } from '@/contexts/AppContext';
 
+interface Contact {
+  id: string;
+  name: string;
+  avatar: string;
+  wallet: string;
+  starred: boolean;
+  status: 'online' | 'offline' | 'typing';
+}
+
+const contactsData: Contact[] = [
+  { id: '1', name: 'Alex Johnson', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop', wallet: '0x1a2b...3c4d', starred: true, status: 'online' },
+  { id: '2', name: 'Amanda Lee', avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop', wallet: '0x5e6f...7g8h', starred: false, status: 'online' },
+  { id: '3', name: 'Brian Smith', avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop', wallet: '0x9i0j...1k2l', starred: true, status: 'offline' },
+  { id: '4', name: 'Carol Davis', avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop', wallet: '0x3m4n...5o6p', starred: false, status: 'typing' },
+  { id: '5', name: 'David Wilson', avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop', wallet: '0x7q8r...9s0t', starred: false, status: 'online' },
+  { id: '6', name: 'Emily Brown', avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&h=100&fit=crop', wallet: '0x1u2v...3w4x', starred: true, status: 'offline' },
+];
+
 interface User {
   id: string;
   name: string;
@@ -115,18 +133,15 @@ interface ChatRoom {
   inviteLink?: string;
 }
 
-const mockUsers: User[] = [
-  { id: '1', name: 'Alex Chen', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop', status: 'online', isAdmin: true },
-  { id: '2', name: 'Sarah Williams', avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop', status: 'online' },
-  { id: '3', name: 'Mike Johnson', avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop', status: 'offline' },
-  { id: '4', name: 'Emma Davis', avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop', status: 'typing' },
-  { id: '5', name: 'James Wilson', avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop', status: 'online' },
-  { id: '6', name: 'Lisa Anderson', avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop', status: 'offline' },
-  { id: '7', name: 'David Brown', avatar: 'https://images.unsplash.com/photo-1507591064344-4c6ce005b128?w=100&h=100&fit=crop', status: 'online' },
-  { id: '8', name: 'You', avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&h=100&fit=crop', status: 'online' },
-];
+const mockUsers: User[] = contactsData.map(c => ({
+  id: c.id,
+  name: c.name,
+  avatar: c.avatar,
+  status: c.status,
+  isAdmin: c.starred,
+}));
 
-const currentUser = mockUsers[7];
+const currentUser: User = { id: '0', name: 'You', avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&h=100&fit=crop', status: 'online' };
 
 const mockChatRooms: ChatRoom[] = [
   { 
@@ -134,11 +149,11 @@ const mockChatRooms: ChatRoom[] = [
     name: 'Crypto Trading Hub', 
     avatar: 'https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=100&h=100&fit=crop', 
     type: 'group',
-    members: mockUsers.slice(0, 6),
+    members: mockUsers.slice(0, 4),
     lastMessage: { content: 'Anyone watching BTC right now?', sender: 'Alex', timestamp: '2m' },
     unread: 5,
     isPinned: true,
-    isPublic: true,
+    isPublic: false,
     description: 'Discuss crypto trading strategies and market analysis',
     inviteLink: 'larecoin.app/chat/crypto-hub'
   },
@@ -147,19 +162,19 @@ const mockChatRooms: ChatRoom[] = [
     name: 'NFT Collectors', 
     avatar: 'https://images.unsplash.com/photo-1620321023374-d1a68fbc720d?w=100&h=100&fit=crop', 
     type: 'group',
-    members: mockUsers.slice(2, 7),
-    lastMessage: { content: 'New drop just announced! 🔥', sender: 'Mike', timestamp: '15m' },
+    members: mockUsers.slice(2, 6),
+    lastMessage: { content: 'New drop just announced! 🔥', sender: 'Brian', timestamp: '15m' },
     unread: 12,
-    isPublic: true,
+    isPublic: false,
     description: 'For NFT enthusiasts and collectors'
   },
   { 
     id: '3', 
-    name: 'Sarah Williams', 
+    name: 'Amanda Lee', 
     avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop', 
     type: 'direct',
     members: [mockUsers[1], currentUser],
-    lastMessage: { content: 'Thanks for the help!', sender: 'Sarah', timestamp: '1h' },
+    lastMessage: { content: 'Thanks for the help!', sender: 'Amanda', timestamp: '1h' },
     unread: 0,
   },
   { 
@@ -168,7 +183,7 @@ const mockChatRooms: ChatRoom[] = [
     avatar: 'https://images.unsplash.com/photo-1621761191319-c6fb62004040?w=100&h=100&fit=crop', 
     type: 'group',
     members: mockUsers.slice(0, 5),
-    lastMessage: { content: 'Check out this yield farm', sender: 'James', timestamp: '3h' },
+    lastMessage: { content: 'Check out this yield farm', sender: 'David', timestamp: '3h' },
     unread: 3,
     isMuted: true,
     isPublic: false,
@@ -176,11 +191,11 @@ const mockChatRooms: ChatRoom[] = [
   },
   { 
     id: '5', 
-    name: 'Mike Johnson', 
+    name: 'Brian Smith', 
     avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop', 
     type: 'direct',
     members: [mockUsers[2], currentUser],
-    lastMessage: { content: 'Let me know when you\'re free', sender: 'Mike', timestamp: 'Yesterday' },
+    lastMessage: { content: 'Let me know when you\'re free', sender: 'Brian', timestamp: 'Yesterday' },
     unread: 1,
   },
 ];
@@ -876,7 +891,7 @@ export default function ChatScreen() {
             <View>
               <Text style={[styles.headerTitle, { color: colors.text }]}>Chat</Text>
               <Text style={[styles.headerSubtitle, { color: colors.textTertiary }]}>
-                Connect with anyone, anywhere
+                Chat with your contacts
               </Text>
             </View>
           </View>
@@ -945,11 +960,18 @@ export default function ChatScreen() {
                 <View style={styles.createOptionInfo}>
                   <Text style={[styles.createOptionTitle, { color: colors.text }]}>New Group</Text>
                   <Text style={[styles.createOptionDesc, { color: colors.textTertiary }]}>
-                    Create a group chat with multiple people
+                    Create a group chat with your contacts
                   </Text>
                 </View>
                 <ChevronRight size={20} color={colors.textTertiary} />
               </TouchableOpacity>
+            </View>
+            
+            <View style={[styles.contactsOnlyNote, { backgroundColor: colors.warning + '15' }]}>
+              <Users size={16} color={colors.warning} />
+              <Text style={[styles.contactsOnlyText, { color: colors.warning }]}>
+                You can only chat with people in your contacts
+              </Text>
             </View>
             
             <Text style={[styles.inputLabel, { color: colors.textSecondary, paddingHorizontal: 16, marginTop: 16 }]}>
@@ -964,7 +986,7 @@ export default function ChatScreen() {
             />
             
             <Text style={[styles.inputLabel, { color: colors.textSecondary, paddingHorizontal: 16, marginTop: 16 }]}>
-              Add Members ({selectedMembers.length} selected)
+              Add Contacts ({selectedMembers.length} selected)
             </Text>
             
             {selectedMembers.length > 0 && (
@@ -1616,6 +1638,20 @@ const styles = StyleSheet.create({
     color: '#FFF',
     fontSize: 16,
     fontWeight: '600' as const,
+  },
+  contactsOnlyNote: {
+    flexDirection: 'row' as const,
+    alignItems: 'center' as const,
+    marginHorizontal: 16,
+    marginTop: 12,
+    padding: 12,
+    borderRadius: 12,
+    gap: 10,
+  },
+  contactsOnlyText: {
+    flex: 1,
+    fontSize: 13,
+    fontWeight: '500' as const,
   },
   infoModal: {
     borderTopLeftRadius: 24,
