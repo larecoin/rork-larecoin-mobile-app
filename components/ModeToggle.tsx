@@ -22,7 +22,7 @@ export default function ModeToggle() {
     if (newMode !== mode) {
       switchMode(newMode);
       if (newMode === 'merchant') {
-        router.push('/(tabs)/(merchant)/dashboard');
+        router.push('/(tabs)/(merchant)/myshop');
       } else {
         router.push('/(tabs)/(wallet)');
       }
