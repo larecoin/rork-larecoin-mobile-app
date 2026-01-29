@@ -13,7 +13,7 @@ import ModeToggle from '@/components/ModeToggle';
 import MerchantNavMenuModal from '@/components/MerchantNavMenuModal';
 import * as Clipboard from 'expo-clipboard';
 import Colors from '@/constants/colors';
-import { useApp } from '@/contexts/AppContext';
+import { useApp, MerchantType } from '@/contexts/AppContext';
 
 interface Charity {
   id: string;
@@ -247,7 +247,7 @@ const paymentCategories: PaymentCategory[] = [
 
 export default function MyShopScreen() {
   const insets = useSafeAreaInsets();
-  const { merchantProfile, merchantProducts } = useApp();
+  const { merchantProfile, merchantProducts, merchantProfiles, addMerchantProfile, switchMerchantProfile, activeMerchantId, wallets } = useApp();
   const [refreshing, setRefreshing] = useState(false);
   const [showCharityModal, setShowCharityModal] = useState(false);
   const [selectedCharity, setSelectedCharity] = useState<Charity | null>(charities[0]);
@@ -261,6 +261,11 @@ export default function MyShopScreen() {
   const [showNavMenu, setShowNavMenu] = useState(false);
   const [showAddProfileModal, setShowAddProfileModal] = useState(false);
   const [showSwitchProfileModal, setShowSwitchProfileModal] = useState(false);
+  const [newProfileName, setNewProfileName] = useState('');
+  const [newProfileCategory, setNewProfileCategory] = useState('');
+  const [newProfileDescription, setNewProfileDescription] = useState('');
+  const [newProfileType, setNewProfileType] = useState<MerchantType>('business');
+  const [selectedWalletId, setSelectedWalletId] = useState<string | null>(null);
   const [showCustomersModal, setShowCustomersModal] = useState(false);
   const [showRatingsModal, setShowRatingsModal] = useState(false);
   const [showLocationsModal, setShowLocationsModal] = useState(false);
@@ -333,6 +338,28 @@ export default function MyShopScreen() {
 
   const averageRating = reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length;
 
+  const handleAddProfile = async () => {
+    if (!newProfileName.trim()) return;
+    await addMerchantProfile({
+      name: newProfileName.trim(),
+      category: newProfileCategory.trim() || 'General',
+      description: newProfileDescription.trim(),
+      linkedWalletId: selectedWalletId,
+      type: newProfileType,
+    });
+    setNewProfileName('');
+    setNewProfileCategory('');
+    setNewProfileDescription('');
+    setNewProfileType('business');
+    setSelectedWalletId(null);
+    setShowAddProfileModal(false);
+  };
+
+  const handleSwitchProfile = async (profileId: string) => {
+    await switchMerchantProfile(profileId);
+    setShowSwitchProfileModal(false);
+  };
+
   const renderStars = (rating: number) => {
     return Array.from({ length: 5 }, (_, i) => (
       <Star 
@@ -370,6 +397,11 @@ export default function MyShopScreen() {
           >
             <RefreshCw size={20} color={Colors.text} />
           </TouchableOpacity>
+          {merchantProfiles.length > 1 && (
+            <View style={styles.profileCountBadge}>
+              <Text style={styles.profileCountText}>{merchantProfiles.length}</Text>
+            </View>
+          )}
           <ModeToggle />
         </View>
       </View>
@@ -589,6 +621,180 @@ export default function MyShopScreen() {
       </ScrollView>
 
       <MerchantNavMenuModal visible={showNavMenu} onClose={() => setShowNavMenu(false)} />
+
+      {/* Add Business Profile Modal */}
+      <Modal
+        visible={showAddProfileModal}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setShowAddProfileModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalContent, { paddingBottom: insets.bottom + 20 }]}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Add Business Profile</Text>
+              <TouchableOpacity onPress={() => setShowAddProfileModal(false)}>
+                <X size={24} color={Colors.text} />
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView showsVerticalScrollIndicator={false}>
+              <View style={styles.formGroup}>
+                <Text style={styles.formLabel}>Business Name *</Text>
+                <TextInput
+                  style={styles.formInput}
+                  placeholder="Enter business name"
+                  placeholderTextColor={Colors.textSecondary}
+                  value={newProfileName}
+                  onChangeText={setNewProfileName}
+                />
+              </View>
+
+              <View style={styles.formGroup}>
+                <Text style={styles.formLabel}>Category</Text>
+                <TextInput
+                  style={styles.formInput}
+                  placeholder="e.g., Food & Beverage, Retail"
+                  placeholderTextColor={Colors.textSecondary}
+                  value={newProfileCategory}
+                  onChangeText={setNewProfileCategory}
+                />
+              </View>
+
+              <View style={styles.formGroup}>
+                <Text style={styles.formLabel}>Description</Text>
+                <TextInput
+                  style={[styles.formInput, styles.formTextArea]}
+                  placeholder="Describe your business"
+                  placeholderTextColor={Colors.textSecondary}
+                  value={newProfileDescription}
+                  onChangeText={setNewProfileDescription}
+                  multiline
+                  numberOfLines={3}
+                />
+              </View>
+
+              <View style={styles.formGroup}>
+                <Text style={styles.formLabel}>Business Type</Text>
+                <View style={styles.typeSelector}>
+                  <TouchableOpacity
+                    style={[styles.typeOption, newProfileType === 'business' && styles.typeOptionActive]}
+                    onPress={() => setNewProfileType('business')}
+                  >
+                    <Store size={20} color={newProfileType === 'business' ? Colors.primary : Colors.textSecondary} />
+                    <Text style={[styles.typeOptionText, newProfileType === 'business' && styles.typeOptionTextActive]}>Business</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[styles.typeOption, newProfileType === 'charity' && styles.typeOptionActive]}
+                    onPress={() => setNewProfileType('charity')}
+                  >
+                    <Heart size={20} color={newProfileType === 'charity' ? '#E74C3C' : Colors.textSecondary} />
+                    <Text style={[styles.typeOptionText, newProfileType === 'charity' && styles.typeOptionTextActive]}>Charity</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+
+              <View style={styles.formGroup}>
+                <Text style={styles.formLabel}>Link Wallet (Optional)</Text>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.walletList}>
+                  <TouchableOpacity
+                    style={[styles.walletOption, !selectedWalletId && styles.walletOptionActive]}
+                    onPress={() => setSelectedWalletId(null)}
+                  >
+                    <Text style={[styles.walletOptionText, !selectedWalletId && styles.walletOptionTextActive]}>None</Text>
+                  </TouchableOpacity>
+                  {wallets.filter(w => !w.isSubWallet).map(wallet => (
+                    <TouchableOpacity
+                      key={wallet.id}
+                      style={[styles.walletOption, selectedWalletId === wallet.id && styles.walletOptionActive]}
+                      onPress={() => setSelectedWalletId(wallet.id)}
+                    >
+                      <Wallet size={14} color={selectedWalletId === wallet.id ? Colors.primary : Colors.textSecondary} />
+                      <Text style={[styles.walletOptionText, selectedWalletId === wallet.id && styles.walletOptionTextActive]}>{wallet.label}</Text>
+                    </TouchableOpacity>
+                  ))}
+                </ScrollView>
+              </View>
+            </ScrollView>
+
+            <TouchableOpacity 
+              style={[styles.saveBtn, !newProfileName.trim() && styles.saveBtnDisabled]}
+              onPress={handleAddProfile}
+              disabled={!newProfileName.trim()}
+            >
+              <Plus size={20} color={Colors.background} />
+              <Text style={styles.saveBtnText}>Create Business Profile</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Switch Business Profile Modal */}
+      <Modal
+        visible={showSwitchProfileModal}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setShowSwitchProfileModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalContent, { paddingBottom: insets.bottom + 20 }]}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Switch Business Profile</Text>
+              <TouchableOpacity onPress={() => setShowSwitchProfileModal(false)}>
+                <X size={24} color={Colors.text} />
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView style={styles.profileList} showsVerticalScrollIndicator={false}>
+              {merchantProfiles.map(profile => {
+                const isActive = profile.id === activeMerchantId;
+                const linkedWallet = wallets.find(w => w.id === profile.linkedWalletId);
+                return (
+                  <TouchableOpacity
+                    key={profile.id}
+                    style={[styles.profileCard, isActive && styles.profileCardActive]}
+                    onPress={() => handleSwitchProfile(profile.id)}
+                  >
+                    <View style={[styles.profileIconWrapper, { backgroundColor: profile.type === 'charity' ? '#E74C3C20' : Colors.primary + '20' }]}>
+                      {profile.type === 'charity' ? (
+                        <Heart size={24} color="#E74C3C" />
+                      ) : (
+                        <Store size={24} color={Colors.primary} />
+                      )}
+                    </View>
+                    <View style={styles.profileInfo}>
+                      <Text style={styles.profileName}>{profile.name}</Text>
+                      <Text style={styles.profileCategory}>{profile.category}</Text>
+                      {linkedWallet && (
+                        <View style={styles.linkedWalletRow}>
+                          <Wallet size={12} color={Colors.textSecondary} />
+                          <Text style={styles.linkedWalletText}>{linkedWallet.label}</Text>
+                        </View>
+                      )}
+                    </View>
+                    {isActive && (
+                      <View style={styles.activeProfileBadge}>
+                        <Check size={16} color={Colors.accent} />
+                      </View>
+                    )}
+                  </TouchableOpacity>
+                );
+              })}
+            </ScrollView>
+
+            <TouchableOpacity 
+              style={styles.addNewProfileBtn}
+              onPress={() => {
+                setShowSwitchProfileModal(false);
+                setShowAddProfileModal(true);
+              }}
+            >
+              <Plus size={20} color={Colors.primary} />
+              <Text style={styles.addNewProfileText}>Add New Business Profile</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
 
       <Modal
         visible={showCharityModal}
@@ -1156,6 +1362,22 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.surface,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  profileCountBadge: {
+    position: 'absolute',
+    right: 70,
+    top: -4,
+    backgroundColor: Colors.primary,
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  profileCountText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: '#fff',
   },
   shopCard: {
     marginHorizontal: 20,
@@ -2358,5 +2580,160 @@ const styles = StyleSheet.create({
     color: Colors.textSecondary,
     textAlign: 'center',
     lineHeight: 16,
+  },
+  formGroup: {
+    marginBottom: 18,
+  },
+  formLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: Colors.text,
+    marginBottom: 8,
+  },
+  formInput: {
+    backgroundColor: Colors.surface,
+    borderRadius: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 14,
+    fontSize: 15,
+    color: Colors.text,
+    borderWidth: 1,
+    borderColor: Colors.border,
+  },
+  formTextArea: {
+    height: 90,
+    textAlignVertical: 'top',
+  },
+  typeSelector: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  typeOption: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    backgroundColor: Colors.surface,
+    borderRadius: 12,
+    paddingVertical: 14,
+    borderWidth: 2,
+    borderColor: Colors.border,
+  },
+  typeOptionActive: {
+    borderColor: Colors.primary,
+    backgroundColor: Colors.primary + '10',
+  },
+  typeOptionText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: Colors.textSecondary,
+  },
+  typeOptionTextActive: {
+    color: Colors.primary,
+  },
+  walletList: {
+    marginTop: 4,
+  },
+  walletOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: Colors.surface,
+    borderRadius: 10,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    marginRight: 10,
+    borderWidth: 1,
+    borderColor: Colors.border,
+  },
+  walletOptionActive: {
+    borderColor: Colors.primary,
+    backgroundColor: Colors.primary + '10',
+  },
+  walletOptionText: {
+    fontSize: 13,
+    fontWeight: '500',
+    color: Colors.textSecondary,
+  },
+  walletOptionTextActive: {
+    color: Colors.primary,
+  },
+  saveBtnDisabled: {
+    opacity: 0.5,
+  },
+  profileList: {
+    maxHeight: 350,
+    marginBottom: 16,
+  },
+  profileCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: Colors.surface,
+    borderRadius: 14,
+    padding: 14,
+    marginBottom: 10,
+    borderWidth: 2,
+    borderColor: 'transparent',
+  },
+  profileCardActive: {
+    borderColor: Colors.accent,
+    backgroundColor: Colors.accent + '08',
+  },
+  profileIconWrapper: {
+    width: 50,
+    height: 50,
+    borderRadius: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 14,
+  },
+  profileInfo: {
+    flex: 1,
+  },
+  profileName: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: Colors.text,
+    marginBottom: 2,
+  },
+  profileCategory: {
+    fontSize: 13,
+    color: Colors.textSecondary,
+    marginBottom: 4,
+  },
+  linkedWalletRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  linkedWalletText: {
+    fontSize: 11,
+    color: Colors.textSecondary,
+  },
+  activeProfileBadge: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: Colors.accent + '20',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  addNewProfileBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    backgroundColor: Colors.primary + '15',
+    borderRadius: 12,
+    paddingVertical: 14,
+    borderWidth: 1,
+    borderColor: Colors.primary + '30',
+    borderStyle: 'dashed',
+  },
+  addNewProfileText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: Colors.primary,
   },
 });
