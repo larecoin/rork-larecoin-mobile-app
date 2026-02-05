@@ -6,7 +6,8 @@ import {
   Search, Bell, Plus, ThumbsUp, MessageCircle, Send, Bookmark,
   MoreHorizontal, CheckCircle, Image as ImageIcon, Video, Smile,
   TrendingUp, Users, Hash, Filter, Heart, ShoppingCart, BellRing,
-  ChevronDown, Coins, DollarSign, Image as ImageIcon2, ArrowUpRight, ArrowDownRight, Menu
+  ChevronDown, Coins, DollarSign, Image as ImageIcon2, ArrowUpRight, ArrowDownRight, Menu,
+  Droplets, Tag, UsersRound, Play, ChevronRight
 } from 'lucide-react-native';
 import Colors from '@/constants/colors';
 import { useApp } from '@/contexts/AppContext';
@@ -82,6 +83,15 @@ const feedPosts = [
 
 type MarketType = 'all' | 'crypto' | 'stablecoin' | 'nft';
 
+const poolsData = [
+  { id: '1', name: 'SOL/USDC', token0: 'SOL', token1: 'USDC', tvl: '$124.5M', apr: '18.2%', volume24h: '$45.2M', color: '#9945FF' },
+  { id: '2', name: 'LARE/USDT', token0: 'LARE', token1: 'USDT', tvl: '$8.2M', apr: '32.5%', volume24h: '$2.1M', color: '#D4AF37' },
+  { id: '3', name: 'ETH/USDC', token0: 'ETH', token1: 'USDC', tvl: '$89.3M', apr: '12.8%', volume24h: '$32.4M', color: '#627EEA' },
+  { id: '4', name: 'BTC/USDT', token0: 'BTC', token1: 'USDT', tvl: '$210.1M', apr: '8.5%', volume24h: '$78.9M', color: '#F7931A' },
+  { id: '5', name: 'LARE/SOL', token0: 'LARE', token1: 'SOL', tvl: '$3.4M', apr: '45.1%', volume24h: '$890K', color: '#00D395' },
+  { id: '6', name: 'LUSD/USDC', token0: 'LUSD', token1: 'USDC', tvl: '$15.6M', apr: '6.2%', volume24h: '$5.3M', color: '#2775CA' },
+];
+
 const marketAssets = [
   { id: '1', symbol: 'BTC', name: 'Bitcoin', price: 67432.50, change: 2.34, marketCap: '1.32T', volume: '28.5B', type: 'crypto', icon: '₿', color: '#F7931A' },
   { id: '2', symbol: 'ETH', name: 'Ethereum', price: 3245.80, change: -1.23, marketCap: '389.2B', volume: '15.2B', type: 'crypto', icon: '⟠', color: '#627EEA' },
@@ -114,7 +124,7 @@ export default function NewsfeedScreen() {
   const router = useRouter();
   const { colors } = useApp();
   const [refreshing, setRefreshing] = useState(false);
-  const [activeTab, setActiveTab] = useState<'markets' | 'foryou' | 'following' | 'trending'>('markets');
+  const [activeTab, setActiveTab] = useState<'markets' | 'foryou' | 'following' | 'trending' | 'pools'>('markets');
   const [marketFilter, setMarketFilter] = useState<MarketType>('all');
   const [favorites, setFavorites] = useState<string[]>([]);
   const [priceAlerts, setPriceAlerts] = useState<string[]>([]);
@@ -215,6 +225,13 @@ export default function NewsfeedScreen() {
           contentContainerStyle={styles.tabContainer}
         >
           <TouchableOpacity 
+            style={[styles.tab, activeTab === 'following' && [styles.tabActive, { backgroundColor: colors.primary + '15' }]]}
+            onPress={() => setActiveTab('following')}
+          >
+            <Users size={16} color={activeTab === 'following' ? colors.primary : colors.textSecondary} />
+            <Text style={[styles.tabText, { color: colors.textSecondary }, activeTab === 'following' && [styles.tabTextActive, { color: colors.primary }]]}>Following</Text>
+          </TouchableOpacity>
+          <TouchableOpacity 
             style={[styles.tab, activeTab === 'foryou' && [styles.tabActive, { backgroundColor: colors.primary + '15' }]]}
             onPress={() => setActiveTab('foryou')}
           >
@@ -222,18 +239,18 @@ export default function NewsfeedScreen() {
             <Text style={[styles.tabText, { color: colors.textSecondary }, activeTab === 'foryou' && [styles.tabTextActive, { color: colors.primary }]]}>For You</Text>
           </TouchableOpacity>
           <TouchableOpacity 
+            style={[styles.tab, activeTab === 'pools' && [styles.tabActive, { backgroundColor: colors.primary + '15' }]]}
+            onPress={() => setActiveTab('pools')}
+          >
+            <Droplets size={16} color={activeTab === 'pools' ? colors.primary : colors.textSecondary} />
+            <Text style={[styles.tabText, { color: colors.textSecondary }, activeTab === 'pools' && [styles.tabTextActive, { color: colors.primary }]]}>Pools</Text>
+          </TouchableOpacity>
+          <TouchableOpacity 
             style={[styles.tab, activeTab === 'markets' && [styles.tabActive, { backgroundColor: colors.primary + '15' }]]}
             onPress={() => setActiveTab('markets')}
           >
             <Coins size={16} color={activeTab === 'markets' ? colors.primary : colors.textSecondary} />
             <Text style={[styles.tabText, { color: colors.textSecondary }, activeTab === 'markets' && [styles.tabTextActive, { color: colors.primary }]]}>Markets</Text>
-          </TouchableOpacity>
-          <TouchableOpacity 
-            style={[styles.tab, activeTab === 'following' && [styles.tabActive, { backgroundColor: colors.primary + '15' }]]}
-            onPress={() => setActiveTab('following')}
-          >
-            <Users size={16} color={activeTab === 'following' ? colors.primary : colors.textSecondary} />
-            <Text style={[styles.tabText, { color: colors.textSecondary }, activeTab === 'following' && [styles.tabTextActive, { color: colors.primary }]]}>Following</Text>
           </TouchableOpacity>
           <TouchableOpacity 
             style={[styles.tab, activeTab === 'trending' && [styles.tabActive, { backgroundColor: colors.primary + '15' }]]}
@@ -251,6 +268,78 @@ export default function NewsfeedScreen() {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={Colors.primary} />
         }
       >
+        {activeTab === 'foryou' && (
+          <View style={styles.forYouContainer}>
+            <Text style={[styles.forYouTitle, { color: colors.text }]}>Quick Actions</Text>
+            <TouchableOpacity 
+              style={[styles.quickActionCard, { backgroundColor: colors.surface }]}
+              onPress={() => router.push('/shop')}
+            >
+              <View style={[styles.quickActionIcon, { backgroundColor: '#F59E0B20' }]}>
+                <Tag size={24} color="#F59E0B" />
+              </View>
+              <View style={styles.quickActionInfo}>
+                <Text style={[styles.quickActionTitle, { color: colors.text }]}>Classifieds / Shop</Text>
+                <Text style={[styles.quickActionDesc, { color: colors.textSecondary }]}>Browse listings, buy & sell items, and explore the marketplace</Text>
+              </View>
+              <ChevronRight size={20} color={colors.textTertiary} />
+            </TouchableOpacity>
+            <TouchableOpacity 
+              style={[styles.quickActionCard, { backgroundColor: colors.surface }]}
+              onPress={() => router.push('/menu/explore')}
+            >
+              <View style={[styles.quickActionIcon, { backgroundColor: '#3B82F620' }]}>
+                <UsersRound size={24} color="#3B82F6" />
+              </View>
+              <View style={styles.quickActionInfo}>
+                <Text style={[styles.quickActionTitle, { color: colors.text }]}>Community Access</Text>
+                <Text style={[styles.quickActionDesc, { color: colors.textSecondary }]}>Join groups, forums, and connect with the community</Text>
+              </View>
+              <ChevronRight size={20} color={colors.textTertiary} />
+            </TouchableOpacity>
+            <TouchableOpacity 
+              style={[styles.quickActionCard, { backgroundColor: colors.surface }]}
+              onPress={() => router.push('/menu/media')}
+            >
+              <View style={[styles.quickActionIcon, { backgroundColor: '#EF444420' }]}>
+                <Play size={24} color="#EF4444" />
+              </View>
+              <View style={styles.quickActionInfo}>
+                <Text style={[styles.quickActionTitle, { color: colors.text }]}>Media / Entertainment</Text>
+                <Text style={[styles.quickActionDesc, { color: colors.textSecondary }]}>Watch videos, stream content, and discover entertainment</Text>
+              </View>
+              <ChevronRight size={20} color={colors.textTertiary} />
+            </TouchableOpacity>
+          </View>
+        )}
+
+        {activeTab === 'pools' && (
+          <View style={styles.poolsContainer}>
+            <View style={[styles.poolsHeader, { backgroundColor: colors.surface }]}>
+              <Text style={[styles.poolsHeaderText, { color: colors.textSecondary, flex: 2 }]}>Pool</Text>
+              <Text style={[styles.poolsHeaderText, { color: colors.textSecondary, flex: 1, textAlign: 'right' }]}>TVL</Text>
+              <Text style={[styles.poolsHeaderText, { color: colors.textSecondary, flex: 1, textAlign: 'right' }]}>APR</Text>
+              <Text style={[styles.poolsHeaderText, { color: colors.textSecondary, flex: 1, textAlign: 'right' }]}>24h Vol</Text>
+            </View>
+            {poolsData.map((pool) => (
+              <TouchableOpacity key={pool.id} style={[styles.poolItem, { backgroundColor: colors.surface }]}>
+                <View style={styles.poolInfo}>
+                  <View style={[styles.poolIcon, { backgroundColor: pool.color + '20' }]}>
+                    <Droplets size={18} color={pool.color} />
+                  </View>
+                  <View>
+                    <Text style={[styles.poolName, { color: colors.text }]}>{pool.name}</Text>
+                    <Text style={[styles.poolTokens, { color: colors.textSecondary }]}>{pool.token0} + {pool.token1}</Text>
+                  </View>
+                </View>
+                <Text style={[styles.poolTvl, { color: colors.text }]}>{pool.tvl}</Text>
+                <Text style={[styles.poolApr, { color: '#10B981' }]}>{pool.apr}</Text>
+                <Text style={[styles.poolVolume, { color: colors.textSecondary }]}>{pool.volume24h}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
+
         {activeTab === 'markets' && (
           <View style={styles.marketsContainer}>
             <View style={styles.marketFiltersRow}>
@@ -371,7 +460,7 @@ export default function NewsfeedScreen() {
           </View>
         )}
 
-        {activeTab !== 'markets' && <View style={[styles.createPostCard, { backgroundColor: colors.surface }]}>
+        {(activeTab === 'following' || activeTab === 'trending') && <View style={[styles.createPostCard, { backgroundColor: colors.surface }]}>
           <Image 
             source={{ uri: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100' }} 
             style={styles.userAvatar} 
@@ -435,7 +524,7 @@ export default function NewsfeedScreen() {
           </View>
         )}
 
-        {activeTab !== 'markets' && feedPosts.map((post) => (
+        {(activeTab === 'following' || activeTab === 'trending') && feedPosts.map((post) => (
           <View key={post.id} style={[styles.postCard, { backgroundColor: colors.surface }]}>
             <View style={styles.postHeader}>
               <Image source={{ uri: post.avatar }} style={styles.postAvatar} />
@@ -1051,5 +1140,102 @@ const styles = StyleSheet.create({
   filterOptionText: {
     fontSize: 16,
     fontWeight: '500' as const,
+  },
+  forYouContainer: {
+    paddingHorizontal: 20,
+  },
+  forYouTitle: {
+    fontSize: 18,
+    fontWeight: '700' as const,
+    marginBottom: 14,
+  },
+  quickActionCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+    borderRadius: 14,
+    marginBottom: 12,
+    gap: 14,
+  },
+  quickActionIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  quickActionInfo: {
+    flex: 1,
+  },
+  quickActionTitle: {
+    fontSize: 16,
+    fontWeight: '600' as const,
+    marginBottom: 4,
+  },
+  quickActionDesc: {
+    fontSize: 13,
+    lineHeight: 18,
+  },
+  poolsContainer: {
+    paddingHorizontal: 20,
+  },
+  poolsHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    borderRadius: 10,
+    marginBottom: 8,
+  },
+  poolsHeaderText: {
+    fontSize: 11,
+    fontWeight: '600' as const,
+    textTransform: 'uppercase' as const,
+    letterSpacing: 0.5,
+  },
+  poolItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 12,
+    borderRadius: 12,
+    marginBottom: 8,
+  },
+  poolInfo: {
+    flex: 2,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  poolIcon: {
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  poolName: {
+    fontSize: 14,
+    fontWeight: '700' as const,
+  },
+  poolTokens: {
+    fontSize: 11,
+    marginTop: 2,
+  },
+  poolTvl: {
+    flex: 1,
+    fontSize: 13,
+    fontWeight: '600' as const,
+    textAlign: 'right' as const,
+  },
+  poolApr: {
+    flex: 1,
+    fontSize: 13,
+    fontWeight: '700' as const,
+    textAlign: 'right' as const,
+  },
+  poolVolume: {
+    flex: 1,
+    fontSize: 12,
+    textAlign: 'right' as const,
   },
 });
