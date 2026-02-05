@@ -162,7 +162,7 @@ export default function BondsScreen() {
           <Text style={styles.infoTitle}>About Bonds</Text>
         </View>
         <Text style={styles.infoText}>
-          Bonds are fixed-income securities that pay a guaranteed return upon maturity. 
+          <Text>Bonds are fixed-income securities that pay a guaranteed return upon maturity.</Text>
           Treasury bonds are backed by the protocol, while corporate and community bonds 
           fund specific projects. Returns are paid upon maturity date.
         </Text>

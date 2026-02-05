@@ -238,8 +238,8 @@ export default function TransactionLimitsScreen() {
           <View style={styles.infoContent}>
             <Text style={styles.infoTitle}>About Transaction Limits</Text>
             <Text style={styles.infoText}>
-              Transaction limits help protect your account from unauthorized spending. 
-              You can adjust these limits at any time. Higher limits may require additional verification.
+              <Text>Transaction limits help protect your account from unauthorized spending.</Text>
+              <Text>You can adjust these limits at any time. Higher limits may require additional verification.</Text>
             </Text>
           </View>
         </View>

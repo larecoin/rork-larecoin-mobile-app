@@ -178,7 +178,7 @@ export default function IdoIeoScreen() {
         <View style={styles.infoContent}>
           <Text style={[styles.infoTitle, { color: colors.text }]}>Verified Projects Only</Text>
           <Text style={[styles.infoText, { color: colors.textSecondary }]}>
-            All projects on our launchpad undergo thorough due diligence and smart contract audits.
+            <Text>All projects on our launchpad undergo thorough due diligence and smart contract audits.</Text>
           </Text>
         </View>
       </View>
@@ -186,7 +186,7 @@ export default function IdoIeoScreen() {
       <View style={[styles.warningCard, { backgroundColor: '#FEF3C720', borderColor: '#F59E0B' }]}>
         <AlertCircle size={18} color="#F59E0B" />
         <Text style={[styles.warningText, { color: colors.textSecondary }]}>
-          Token launches are high-risk investments. Always do your own research before participating.
+          <Text>Token launches are high-risk investments. Always do your own research before participating.</Text>
         </Text>
       </View>
 

@@ -151,7 +151,7 @@ export default function YieldFarmingScreen() {
         <View style={styles.warningContent}>
           <Text style={[styles.warningTitle, { color: '#F59E0B' }]}>Risk Warning</Text>
           <Text style={[styles.warningText, { color: colors.textSecondary }]}>
-            Yield farming involves risks including impermanent loss and smart contract vulnerabilities. Only invest what you can afford to lose.
+            <Text>Yield farming involves risks including impermanent loss and smart contract vulnerabilities. Only invest what you can afford to lose.</Text>
           </Text>
         </View>
       </View>

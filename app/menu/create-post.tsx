@@ -305,7 +305,7 @@ export default function CreatePostScreen() {
             </View>
             <Text style={[styles.spaceTitle, { color: colors.text }]}>Create a Social Space</Text>
             <Text style={[styles.spaceDesc, { color: colors.textSecondary }]}>
-              Host live audio conversations with your community
+              <Text>Host live audio conversations with your community</Text>
             </Text>
             <TextInput
               style={[styles.spaceNameInput, { color: colors.text, backgroundColor: colors.background }]}

@@ -11,7 +11,7 @@ import {
   FlatList,
   KeyboardAvoidingView,
   Platform,
-  Animated
+  <Text>Animated</Text>
 } from 'react-native';
 import { Stack, useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -55,7 +55,7 @@ import {
   Star,
   AtSign,
   Paperclip,
-  Gift
+  <Text>Gift</Text>
 } from 'lucide-react-native';
 import { useApp } from '@/contexts/AppContext';
 
@@ -861,7 +861,7 @@ export default function ChatScreen() {
               
               <View style={styles.shareLinkSection}>
                 <Text style={[styles.shareLinkLabel, { color: colors.textSecondary }]}>
-                  Or share invite link
+                  <Text>Or share invite link</Text>
                 </Text>
                 <TouchableOpacity style={[styles.copyLinkBtn, { backgroundColor: colors.surface }]}>
                   <Link2 size={18} color={colors.primary} />
@@ -891,7 +891,7 @@ export default function ChatScreen() {
             <View>
               <Text style={[styles.headerTitle, { color: colors.text }]}>Chat</Text>
               <Text style={[styles.headerSubtitle, { color: colors.textTertiary }]}>
-                Chat with your contacts
+                <Text>Chat with your contacts</Text>
               </Text>
             </View>
           </View>
@@ -960,7 +960,7 @@ export default function ChatScreen() {
                 <View style={styles.createOptionInfo}>
                   <Text style={[styles.createOptionTitle, { color: colors.text }]}>New Group</Text>
                   <Text style={[styles.createOptionDesc, { color: colors.textTertiary }]}>
-                    Create a group chat with your contacts
+                    <Text>Create a group chat with your contacts</Text>
                   </Text>
                 </View>
                 <ChevronRight size={20} color={colors.textTertiary} />
@@ -970,12 +970,12 @@ export default function ChatScreen() {
             <View style={[styles.contactsOnlyNote, { backgroundColor: colors.warning + '15' }]}>
               <Users size={16} color={colors.warning} />
               <Text style={[styles.contactsOnlyText, { color: colors.warning }]}>
-                You can only chat with people in your contacts
+                <Text>You can only chat with people in your contacts</Text>
               </Text>
             </View>
             
             <Text style={[styles.inputLabel, { color: colors.textSecondary, paddingHorizontal: 16, marginTop: 16 }]}>
-              Group Name
+              <Text>Group Name</Text>
             </Text>
             <TextInput
               style={[styles.groupInput, { backgroundColor: colors.surface, color: colors.text }]}

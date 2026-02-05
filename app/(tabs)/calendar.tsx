@@ -342,7 +342,7 @@ export default function CalendarScreen() {
               styles.weatherToggleText,
               { color: showWeather ? '#FFF' : colors.textSecondary }
             ]}>
-              Weather
+              <Text>Weather</Text>
             </Text>
           </TouchableOpacity>
         </View>
@@ -612,7 +612,7 @@ export default function CalendarScreen() {
               <CalendarIcon size={40} color={colors.textTertiary} />
               <Text style={[styles.emptyTitle, { color: colors.text }]}>No Events</Text>
               <Text style={[styles.emptySubtitle, { color: colors.textSecondary }]}>
-                Your schedule is clear for this day
+                <Text>Your schedule is clear for this day</Text>
               </Text>
             </View>
           ) : (

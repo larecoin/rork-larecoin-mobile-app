@@ -205,7 +205,7 @@ export default function FiatExchangeScreen() {
       <View style={[styles.infoCard, { backgroundColor: colors.surface }]}>
         <AlertCircle size={18} color={colors.primary} />
         <Text style={[styles.infoText, { color: colors.textSecondary }]}>
-          Fiat transactions may take 1-3 business days to process depending on your payment method and bank.
+          <Text>Fiat transactions may take 1-3 business days to process depending on your payment method and bank.</Text>
         </Text>
       </View>
 

@@ -173,7 +173,7 @@ export default function ArbitrageScreen() {
       <View style={[styles.warningCard, { backgroundColor: '#FEF3C720', borderColor: '#F59E0B' }]}>
         <AlertTriangle size={20} color="#F59E0B" />
         <Text style={[styles.warningText, { color: colors.textSecondary }]}>
-          Arbitrage trading involves execution risk. Prices may change before your trade completes.
+          <Text>Arbitrage trading involves execution risk. Prices may change before your trade completes.</Text>
         </Text>
       </View>
 

@@ -39,7 +39,7 @@ export default function PredictionMarketsScreen() {
         <View style={styles.headerContent}>
           <Text style={[styles.headerTitle, { color: colors.text }]}>Prediction Markets</Text>
           <Text style={[styles.headerSubtitle, { color: colors.textSecondary }]}>
-            Trade on real-world event outcomes
+            <Text>Trade on real-world event outcomes</Text>
           </Text>
         </View>
       </View>

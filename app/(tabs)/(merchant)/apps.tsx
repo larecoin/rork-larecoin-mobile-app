@@ -108,7 +108,7 @@ export default function MyAppsScreen() {
           onPress={() => setActiveTab('discover')}
         >
           <Text style={[styles.tabText, activeTab === 'discover' && styles.tabTextActive]}>
-            Discover
+            <Text>Discover</Text>
           </Text>
         </TouchableOpacity>
       </View>

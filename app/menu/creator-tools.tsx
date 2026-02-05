@@ -98,7 +98,7 @@ export default function CreatorToolsScreen() {
           <View style={styles.analyticsInfo}>
             <Text style={[styles.analyticsTitle, { color: colors.text }]}>Creator Analytics</Text>
             <Text style={[styles.analyticsDescription, { color: colors.textTertiary }]}>
-              Track your content performance and audience growth
+              <Text>Track your content performance and audience growth</Text>
             </Text>
           </View>
         </TouchableOpacity>

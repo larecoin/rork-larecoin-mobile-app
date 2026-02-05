@@ -635,7 +635,7 @@ export default function WalletDashboard() {
           <View style={[styles.cardManagerInfo, { backgroundColor: colors.surface }]}>
             <AlertCircle size={18} color={colors.primary} />
             <Text style={[styles.cardManagerInfoText, { color: colors.textSecondary }]}>
-              Link a debit card to spend your LUSD balance anywhere Visa/Mastercard is accepted.
+              <Text>Link a debit card to spend your LUSD balance anywhere Visa/Mastercard is accepted.</Text>
             </Text>
           </View>
 
@@ -1146,7 +1146,7 @@ export default function WalletDashboard() {
             <View style={[styles.subWalletInfoBox, { backgroundColor: colors.background }]}>
               <AlertCircle size={16} color={colors.primary} />
               <Text style={[styles.subWalletInfoText, { color: colors.textSecondary }]}>
-                Sub-wallets share the same recovery phrase as the parent wallet but have separate addresses for organization.
+                <Text>Sub-wallets share the same recovery phrase as the parent wallet but have separate addresses for organization.</Text>
               </Text>
             </View>
             <View style={styles.modalActions}>
@@ -1177,7 +1177,7 @@ export default function WalletDashboard() {
           <View style={[styles.customTokenModalContent, { backgroundColor: colors.surface }]}>
             <Text style={[styles.customTokenModalTitle, { color: colors.text }]}>Add Custom Token</Text>
             <Text style={[styles.customTokenModalSubtitle, { color: colors.textSecondary }]}>
-              Import a token by selecting the network and pasting the contract address
+              <Text>Import a token by selecting the network and pasting the contract address</Text>
             </Text>
 
             <View style={styles.customTokenInputGroup}>
@@ -1230,7 +1230,7 @@ export default function WalletDashboard() {
             <View style={[styles.customTokenNote, { backgroundColor: colors.background }]}>
               <AlertCircle size={14} color={colors.primary} />
               <Text style={[styles.customTokenNoteText, { color: colors.textSecondary }]}>
-                Only import tokens you trust. Scam tokens can be disguised as popular tokens.
+                <Text>Only import tokens you trust. Scam tokens can be disguised as popular tokens.</Text>
               </Text>
             </View>
 
@@ -1609,7 +1609,7 @@ export default function WalletDashboard() {
                     <Text style={[styles.twoFASectionTitle, { color: colors.text }]}>Verify to View Card Details</Text>
                   </View>
                   <Text style={[styles.twoFADescription, { color: colors.textSecondary }]}>
-                    Enter your 2FA code to reveal your card details securely
+                    <Text>Enter your 2FA code to reveal your card details securely</Text>
                   </Text>
                   <View style={styles.twoFAInputContainer}>
                     <TextInput
@@ -1685,7 +1685,7 @@ export default function WalletDashboard() {
                   <View style={styles.cardManagementContent}>
                     <Text style={[styles.cardManagementItemTitle, { color: colors.text }]}>Report Lost or Stolen</Text>
                     <Text style={[styles.cardManagementItemSubtitle, { color: colors.textSecondary }]}>
-                      Block card immediately and report issue
+                      <Text>Block card immediately and report issue</Text>
                     </Text>
                   </View>
                   <ChevronRight size={18} color={colors.textTertiary} />
@@ -1719,7 +1719,7 @@ export default function WalletDashboard() {
                   <View style={styles.cardManagementContent}>
                     <Text style={[styles.cardManagementItemTitle, { color: colors.text }]}>Change PIN</Text>
                     <Text style={[styles.cardManagementItemSubtitle, { color: colors.textSecondary }]}>
-                      Update your card PIN securely
+                      <Text>Update your card PIN securely</Text>
                     </Text>
                   </View>
                   <ChevronRight size={18} color={colors.textTertiary} />
@@ -1736,7 +1736,7 @@ export default function WalletDashboard() {
                   <View style={styles.cardManagementContent}>
                     <Text style={[styles.cardManagementItemTitle, { color: colors.text }]}>Spending Limits</Text>
                     <Text style={[styles.cardManagementItemSubtitle, { color: colors.textSecondary }]}>
-                      Set daily and monthly limits
+                      <Text>Set daily and monthly limits</Text>
                     </Text>
                   </View>
                   <ChevronRight size={18} color={colors.textTertiary} />
@@ -1773,7 +1773,7 @@ export default function WalletDashboard() {
                 <View style={[styles.reportModalContent, { backgroundColor: colors.surface }]}>
                   <Text style={[styles.reportModalTitle, { color: colors.text }]}>Report Card Issue</Text>
                   <Text style={[styles.reportModalSubtitle, { color: colors.textSecondary }]}>
-                    Select the reason for reporting your card
+                    <Text>Select the reason for reporting your card</Text>
                   </Text>
 
                   <TouchableOpacity
@@ -1807,7 +1807,7 @@ export default function WalletDashboard() {
                   <View style={[styles.reportWarning, { backgroundColor: '#FEF3C7' }]}>
                     <AlertCircle size={16} color="#D97706" />
                     <Text style={styles.reportWarningText}>
-                      Reporting will immediately block your card. A replacement can be ordered.
+                      <Text>Reporting will immediately block your card. A replacement can be ordered.</Text>
                     </Text>
                   </View>
 
@@ -1848,7 +1848,7 @@ export default function WalletDashboard() {
           <View style={[styles.addCardModalContent, { backgroundColor: colors.surface }]}>
             <Text style={[styles.addCardModalTitle, { color: colors.text }]}>Link Debit Card</Text>
             <Text style={[styles.addCardModalSubtitle, { color: colors.textSecondary }]}>
-              Enter your debit card details to link with LUSD
+              <Text>Enter your debit card details to link with LUSD</Text>
             </Text>
 
             <View style={styles.addCardInputGroup}>
@@ -1906,7 +1906,7 @@ export default function WalletDashboard() {
             <View style={[styles.addCardSecurityNote, { backgroundColor: colors.background }]}>
               <Shield size={14} color={colors.primary} />
               <Text style={[styles.addCardSecurityText, { color: colors.textSecondary }]}>
-                Your card details are encrypted and securely stored
+                <Text>Your card details are encrypted and securely stored</Text>
               </Text>
             </View>
 

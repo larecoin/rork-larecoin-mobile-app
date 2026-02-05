@@ -80,7 +80,7 @@ export default function PaymentScreen() {
           </View>
 
           <Text style={styles.instruction}>
-            Customer scans QR with any compatible wallet
+            <Text>Customer scans QR with any compatible wallet</Text>
           </Text>
 
           <TouchableOpacity style={styles.newPaymentButton} onPress={handleNewPayment}>

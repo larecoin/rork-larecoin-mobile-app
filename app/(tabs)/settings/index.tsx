@@ -16,7 +16,7 @@ import {
   Globe,
   Wallet,
   Store,
-  Menu
+  <Text>Menu</Text>
 } from 'lucide-react-native';
 import NavMenuModal from '@/components/NavMenuModal';
 import { useApp } from '@/contexts/AppContext';

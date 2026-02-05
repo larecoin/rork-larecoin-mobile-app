@@ -36,7 +36,7 @@ export default function DCABotsScreen() {
         <View style={styles.headerContent}>
           <Text style={[styles.headerTitle, { color: colors.text }]}>DCA Bots</Text>
           <Text style={[styles.headerSubtitle, { color: colors.textSecondary }]}>
-            Dollar-cost averaging made automatic
+            <Text>Dollar-cost averaging made automatic</Text>
           </Text>
         </View>
       </View>

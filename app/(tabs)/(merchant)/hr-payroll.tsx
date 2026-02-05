@@ -17,7 +17,7 @@ import {
   TrendingUp,
   CheckCircle,
   AlertCircle,
-  CreditCard
+  <Text>CreditCard</Text>
 } from 'lucide-react-native';
 import Colors from '@/constants/colors';
 
@@ -125,7 +125,7 @@ export default function HRPayroll() {
           >
             <Users size={16} color={activeTab === 'employees' ? Colors.primary : Colors.textSecondary} />
             <Text style={[styles.tabText, activeTab === 'employees' && styles.tabTextActive]}>
-              Employees
+              <Text>Employees</Text>
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
@@ -134,7 +134,7 @@ export default function HRPayroll() {
           >
             <DollarSign size={16} color={activeTab === 'payroll' ? Colors.primary : Colors.textSecondary} />
             <Text style={[styles.tabText, activeTab === 'payroll' && styles.tabTextActive]}>
-              Payroll
+              <Text>Payroll</Text>
             </Text>
           </TouchableOpacity>
         </View>

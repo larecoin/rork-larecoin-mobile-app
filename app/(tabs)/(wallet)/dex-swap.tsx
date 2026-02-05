@@ -183,7 +183,7 @@ export default function DexSwapScreen() {
       <View style={[styles.securityNote, { backgroundColor: colors.surface }]}>
         <Shield size={18} color={colors.primary} />
         <Text style={[styles.securityText, { color: colors.textSecondary }]}>
-          This swap is protected by MEV protection and will be executed through audited contracts.
+          <Text>This swap is protected by MEV protection and will be executed through audited contracts.</Text>
         </Text>
       </View>
 

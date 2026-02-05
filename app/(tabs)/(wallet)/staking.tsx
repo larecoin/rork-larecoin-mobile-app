@@ -141,8 +141,8 @@ export default function StakingScreen() {
           <Text style={styles.infoTitle}>Staking Information</Text>
         </View>
         <Text style={styles.infoText}>
-          Stake your tokens to earn passive rewards. Longer lock periods offer higher APY rates. 
-          Rewards are calculated and distributed daily. Unstaking during lock period may incur penalties.
+          <Text>Stake your tokens to earn passive rewards. Longer lock periods offer higher APY rates.</Text>
+          <Text>Rewards are calculated and distributed daily. Unstaking during lock period may incur penalties.</Text>
         </Text>
       </View>
 

@@ -70,7 +70,7 @@ export default function PaymentMethodsScreen() {
           <View style={styles.securityInfo}>
             <Text style={[styles.securityTitle, { color: colors.text }]}>Secure Payments</Text>
             <Text style={[styles.securityDescription, { color: colors.textTertiary }]}>
-              Your payment information is encrypted and securely stored. We never share your details with third parties.
+              <Text>Your payment information is encrypted and securely stored. We never share your details with third parties.</Text>
             </Text>
           </View>
         </View>

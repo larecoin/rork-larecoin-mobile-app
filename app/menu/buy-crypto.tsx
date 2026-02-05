@@ -243,7 +243,7 @@ export default function BuyCryptoScreen() {
               <View style={styles.recurringInfo}>
                 <Text style={[styles.recurringTitle, { color: colors.text }]}>Set as Recurring Buy</Text>
                 <Text style={[styles.recurringDesc, { color: colors.textTertiary }]}>
-                  Automatically buy on a schedule
+                  <Text>Automatically buy on a schedule</Text>
                 </Text>
               </View>
               <View style={[
@@ -423,7 +423,7 @@ export default function BuyCryptoScreen() {
         <View style={[styles.infoBox, { backgroundColor: colors.primary + '10' }]}>
           <Info size={16} color={colors.primary} />
           <Text style={[styles.infoText, { color: colors.primary }]}>
-            Crypto will be credited to your wallet within 5-10 minutes after payment confirmation.
+            <Text>Crypto will be credited to your wallet within 5-10 minutes after payment confirmation.</Text>
           </Text>
         </View>
 
@@ -457,7 +457,7 @@ export default function BuyCryptoScreen() {
                 <RefreshCw size={48} color={colors.textTertiary} />
                 <Text style={[styles.emptyTitle, { color: colors.text }]}>No Recurring Orders</Text>
                 <Text style={[styles.emptyDesc, { color: colors.textTertiary }]}>
-                  Set up automatic buys to dollar-cost average into your favorite assets.
+                  <Text>Set up automatic buys to dollar-cost average into your favorite assets.</Text>
                 </Text>
               </View>
             ) : (

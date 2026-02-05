@@ -59,7 +59,7 @@ export default function RateUsScreen() {
           </View>
           <Text style={styles.thankYouTitle}>Thank You!</Text>
           <Text style={styles.thankYouSubtitle}>
-            Your feedback helps us improve Larecoin for everyone
+            <Text>Your feedback helps us improve Larecoin for everyone</Text>
           </Text>
 
           {rating >= 4 && (
@@ -103,7 +103,7 @@ export default function RateUsScreen() {
           </View>
           <Text style={styles.heroTitle}>Enjoying Larecoin?</Text>
           <Text style={styles.heroSubtitle}>
-            Your feedback means the world to us and helps us make the app even better
+            <Text>Your feedback means the world to us and helps us make the app even better</Text>
           </Text>
         </View>
 

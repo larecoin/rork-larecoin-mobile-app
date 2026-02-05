@@ -240,7 +240,7 @@ export default function BridgeScreen() {
       <View style={styles.warningSection}>
         <AlertTriangle size={18} color="#F39C12" />
         <Text style={styles.warningText}>
-          Bridge transactions may take longer during network congestion. Always verify the receiving address.
+          <Text>Bridge transactions may take longer during network congestion. Always verify the receiving address.</Text>
         </Text>
       </View>
 

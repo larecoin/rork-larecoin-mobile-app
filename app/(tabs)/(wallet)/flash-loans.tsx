@@ -30,7 +30,7 @@ export default function FlashLoansScreen() {
         <View style={styles.headerContent}>
           <Text style={[styles.headerTitle, { color: colors.text }]}>Flash Loans</Text>
           <Text style={[styles.headerSubtitle, { color: colors.textSecondary }]}>
-            Uncollateralized loans repaid within one transaction
+            <Text>Uncollateralized loans repaid within one transaction</Text>
           </Text>
         </View>
       </View>
@@ -40,7 +40,7 @@ export default function FlashLoansScreen() {
         <View style={styles.warningContent}>
           <Text style={[styles.warningTitle, { color: '#F59E0B' }]}>Advanced Feature</Text>
           <Text style={[styles.warningText, { color: colors.textSecondary }]}>
-            Flash loans require smart contract development knowledge. Entire transaction reverts if loan isn't repaid.
+            <Text>Flash loans require smart contract development knowledge. Entire transaction reverts if loan isn't repaid.</Text>
           </Text>
         </View>
       </View>

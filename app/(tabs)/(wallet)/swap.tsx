@@ -311,7 +311,7 @@ export default function SwapTokens() {
         <View style={styles.infoContent}>
           <Text style={[styles.infoTitle, { color: colors.text }]}>Best Rate Guaranteed</Text>
           <Text style={[styles.infoDescription, { color: colors.textSecondary }]}>
-            We automatically find the best exchange rate across multiple liquidity sources.
+            <Text>We automatically find the best exchange rate across multiple liquidity sources.</Text>
           </Text>
         </View>
       </View>

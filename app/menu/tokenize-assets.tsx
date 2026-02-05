@@ -36,7 +36,7 @@ export default function TokenizeAssetsScreen() {
           <Gem size={48} color="#FFF" />
           <Text style={styles.heroTitle}>Tokenize Real-World Assets</Text>
           <Text style={styles.heroSubtitle}>
-            Convert physical assets into blockchain tokens for fractional ownership and easy trading
+            <Text>Convert physical assets into blockchain tokens for fractional ownership and easy trading</Text>
           </Text>
         </View>
 

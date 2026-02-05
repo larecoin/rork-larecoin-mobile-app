@@ -110,7 +110,7 @@ export default function WalletSecurityScreen() {
           <KeyRound size={48} color={colors.textTertiary} />
           <Text style={[styles.emptyTitle, { color: colors.text }]}>No Wallet Set Up</Text>
           <Text style={[styles.emptySubtitle, { color: colors.textSecondary }]}>
-            Set up your wallet first to manage security settings.
+            <Text>Set up your wallet first to manage security settings.</Text>
           </Text>
         </View>
       </View>

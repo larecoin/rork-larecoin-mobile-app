@@ -180,7 +180,7 @@ export default function NotificationsScreen() {
 
         <View style={styles.infoCard}>
           <Text style={styles.infoText}>
-            Push notifications require the Larecoin app to be installed on your device. Email notifications will be sent to your registered email address.
+            <Text>Push notifications require the Larecoin app to be installed on your device. Email notifications will be sent to your registered email address.</Text>
           </Text>
         </View>
 

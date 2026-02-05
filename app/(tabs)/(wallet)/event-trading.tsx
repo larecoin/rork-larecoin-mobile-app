@@ -43,7 +43,7 @@ export default function EventTradingScreen() {
         <View style={styles.headerContent}>
           <Text style={[styles.headerTitle, { color: colors.text }]}>Event Trading</Text>
           <Text style={[styles.headerSubtitle, { color: colors.textSecondary }]}>
-            Trade on specific event outcomes
+            <Text>Trade on specific event outcomes</Text>
           </Text>
         </View>
       </View>

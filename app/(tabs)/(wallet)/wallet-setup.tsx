@@ -239,7 +239,7 @@ export default function WalletSetupScreen() {
             </View>
             <Text style={[styles.heroTitle, { color: colors.text }]}>Secure Your Wallet</Text>
             <Text style={[styles.heroSubtitle, { color: colors.textSecondary }]}>
-              Create a new non-custodial wallet or import an existing one using your seed phrase.
+              <Text>Create a new non-custodial wallet or import an existing one using your seed phrase.</Text>
             </Text>
             <View style={styles.optionCards}>
               <TouchableOpacity
@@ -253,7 +253,7 @@ export default function WalletSetupScreen() {
                 <View style={styles.optionTextWrap}>
                   <Text style={[styles.optionTitle, { color: colors.text }]}>Create New Wallet</Text>
                   <Text style={[styles.optionDesc, { color: colors.textSecondary }]}>
-                    Generate a new seed phrase and keypair
+                    <Text>Generate a new seed phrase and keypair</Text>
                   </Text>
                 </View>
                 <ChevronRight size={20} color={colors.textTertiary} />
@@ -268,7 +268,7 @@ export default function WalletSetupScreen() {
                 <View style={styles.optionTextWrap}>
                   <Text style={[styles.optionTitle, { color: colors.text }]}>Import Existing Wallet</Text>
                   <Text style={[styles.optionDesc, { color: colors.textSecondary }]}>
-                    Restore using your 12 or 24-word seed phrase
+                    <Text>Restore using your 12 or 24-word seed phrase</Text>
                   </Text>
                 </View>
                 <ChevronRight size={20} color={colors.textTertiary} />
@@ -284,7 +284,7 @@ export default function WalletSetupScreen() {
               <View style={[styles.warningBanner, { backgroundColor: '#F59E0B' + '15', borderColor: '#F59E0B' + '40' }]}>
                 <AlertTriangle size={20} color="#F59E0B" />
                 <Text style={[styles.warningText, { color: '#F59E0B' }]}>
-                  Write down these words in order. Never share your seed phrase with anyone.
+                  <Text>Write down these words in order. Never share your seed phrase with anyone.</Text>
                 </Text>
               </View>
               <TouchableOpacity
@@ -331,7 +331,7 @@ export default function WalletSetupScreen() {
             <View style={styles.stepContainer}>
               <Text style={[styles.stepTitle, { color: colors.text }]}>Verify Your Seed Phrase</Text>
               <Text style={[styles.stepSubtitle, { color: colors.textSecondary }]}>
-                Enter the following words to confirm you saved your seed phrase.
+                <Text>Enter the following words to confirm you saved your seed phrase.</Text>
               </Text>
               {confirmIndices.map(idx => (
                 <View key={idx} style={styles.confirmField}>
@@ -432,7 +432,7 @@ export default function WalletSetupScreen() {
             </View>
             <Text style={[styles.heroTitle, { color: colors.text }]}>Wallet Ready!</Text>
             <Text style={[styles.heroSubtitle, { color: colors.textSecondary }]}>
-              Your non-custodial wallet has been set up. Your keys are stored securely on this device.
+              <Text>Your non-custodial wallet has been set up. Your keys are stored securely on this device.</Text>
             </Text>
             <TouchableOpacity
               style={[styles.primaryBtn, { backgroundColor: colors.primary, marginTop: 32 }]}

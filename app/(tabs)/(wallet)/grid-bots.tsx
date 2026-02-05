@@ -45,7 +45,7 @@ export default function GridBotsScreen() {
         <View style={styles.headerContent}>
           <Text style={[styles.headerTitle, { color: colors.text }]}>Grid Trading Bots</Text>
           <Text style={[styles.headerSubtitle, { color: colors.textSecondary }]}>
-            Profit from market volatility with automated grid orders
+            <Text>Profit from market volatility with automated grid orders</Text>
           </Text>
         </View>
       </View>
@@ -131,7 +131,7 @@ export default function GridBotsScreen() {
         <View style={styles.infoContent}>
           <Text style={[styles.infoTitle, { color: colors.text }]}>How Grid Bots Work</Text>
           <Text style={[styles.infoText, { color: colors.textSecondary }]}>
-            Grid bots place buy and sell orders at preset intervals within a price range. They profit from price oscillations by buying low and selling high repeatedly.
+            <Text>Grid bots place buy and sell orders at preset intervals within a price range. They profit from price oscillations by buying low and selling high repeatedly.</Text>
           </Text>
         </View>
       </View>

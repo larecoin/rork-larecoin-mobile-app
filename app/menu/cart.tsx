@@ -186,7 +186,7 @@ export default function CartScreen() {
           <View style={styles.scanInfo}>
             <Text style={[styles.scanTitle, dynamicStyles.text]}>Scan Product Barcode</Text>
             <Text style={[styles.scanSubtitle, dynamicStyles.textSecondary]}>
-              Add items not on the menu by scanning SKU
+              <Text>Add items not on the menu by scanning SKU</Text>
             </Text>
           </View>
           <QrCode size={20} color={colors.textTertiary} />
@@ -221,7 +221,7 @@ export default function CartScreen() {
             <ShoppingBag size={48} color={colors.textTertiary} />
             <Text style={[styles.emptyTitle, dynamicStyles.text]}>Your cart is empty</Text>
             <Text style={[styles.emptySubtitle, dynamicStyles.textSecondary]}>
-              Scan products or browse the shop to add items
+              <Text>Scan products or browse the shop to add items</Text>
             </Text>
           </View>
         ) : (
@@ -325,7 +325,7 @@ export default function CartScreen() {
               </View>
             ) : (
               <Text style={[styles.selectPaymentText, dynamicStyles.textSecondary]}>
-                Select payment method
+                <Text>Select payment method</Text>
               </Text>
             )}
             <ChevronRight size={20} color={colors.textTertiary} />
@@ -506,7 +506,7 @@ export default function CartScreen() {
             <View style={[styles.scannerPlaceholder, { backgroundColor: colors.backgroundTertiary }]}>
               <ScanBarcode size={64} color={colors.textTertiary} />
               <Text style={[styles.scannerText, dynamicStyles.textSecondary]}>
-                Position barcode within frame
+                <Text>Position barcode within frame</Text>
               </Text>
             </View>
 

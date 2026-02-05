@@ -132,7 +132,7 @@ export default function PostAdScreen() {
         <View style={[styles.section, { backgroundColor: colors.surface }]}>
           <Text style={[styles.sectionTitle, { color: colors.text }]}>Photos</Text>
           <Text style={[styles.sectionHint, { color: colors.textSecondary }]}>
-            Add up to 8 photos. First photo will be the cover.
+            <Text>Add up to 8 photos. First photo will be the cover.</Text>
           </Text>
           
           <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.imagesScroll}>
@@ -331,7 +331,7 @@ export default function PostAdScreen() {
               />
             </View>
             <Text style={[styles.inputHint, { color: colors.textTertiary }]}>
-              Your exact address won't be shown publicly
+              <Text>Your exact address won't be shown publicly</Text>
             </Text>
           </View>
         </View>
@@ -356,7 +356,7 @@ export default function PostAdScreen() {
             >
               <MessageSquare size={20} color={contactChat ? colors.primary : colors.textTertiary} />
               <Text style={[styles.contactOptionText, { color: contactChat ? colors.primary : colors.text }]}>
-                In-App Chat
+                <Text>In-App Chat</Text>
               </Text>
               {contactChat && <Check size={16} color={colors.primary} />}
             </TouchableOpacity>
@@ -373,7 +373,7 @@ export default function PostAdScreen() {
             >
               <Phone size={20} color={contactPhone ? colors.primary : colors.textTertiary} />
               <Text style={[styles.contactOptionText, { color: contactPhone ? colors.primary : colors.text }]}>
-                Phone Call
+                <Text>Phone Call</Text>
               </Text>
               {contactPhone && <Check size={16} color={colors.primary} />}
             </TouchableOpacity>
@@ -390,7 +390,7 @@ export default function PostAdScreen() {
             >
               <Mail size={20} color={contactEmail ? colors.primary : colors.textTertiary} />
               <Text style={[styles.contactOptionText, { color: contactEmail ? colors.primary : colors.text }]}>
-                Email
+                <Text>Email</Text>
               </Text>
               {contactEmail && <Check size={16} color={colors.primary} />}
             </TouchableOpacity>
@@ -405,7 +405,7 @@ export default function PostAdScreen() {
           <View style={styles.boostContent}>
             <Text style={[styles.boostTitle, { color: colors.text }]}>Boost Your Listing</Text>
             <Text style={[styles.boostText, { color: colors.textSecondary }]}>
-              Get up to 5x more views with a featured placement
+              <Text>Get up to 5x more views with a featured placement</Text>
             </Text>
           </View>
           <ChevronRight size={20} color="#FF6B00" />
@@ -431,7 +431,7 @@ export default function PostAdScreen() {
         <View style={styles.infoBox}>
           <Shield size={16} color={colors.textTertiary} />
           <Text style={[styles.infoText, { color: colors.textTertiary }]}>
-            All listings are reviewed to ensure they meet our community guidelines. Your listing will be live within minutes.
+            <Text>All listings are reviewed to ensure they meet our community guidelines. Your listing will be live within minutes.</Text>
           </Text>
         </View>
       </ScrollView>
@@ -590,7 +590,7 @@ export default function PostAdScreen() {
                   <View style={styles.previewMetaItem}>
                     <Clock size={14} color={colors.textTertiary} />
                     <Text style={[styles.previewMetaText, { color: colors.textSecondary }]}>
-                      Just now
+                      <Text>Just now</Text>
                     </Text>
                   </View>
                 </View>

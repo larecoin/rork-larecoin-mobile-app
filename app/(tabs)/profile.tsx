@@ -663,7 +663,7 @@ export default function ProfileScreen() {
                 </View>
 
                 <Text style={styles.modalSubtitle}>
-                  Share breaking news or go live to report a story
+                  <Text>Share breaking news or go live to report a story</Text>
                 </Text>
 
                 <View style={styles.reportOptionsContainer}>
@@ -788,7 +788,7 @@ export default function ProfileScreen() {
                   <View style={styles.submitDisclaimer}>
                     <AlertCircle size={14} color={Colors.textSecondary} />
                     <Text style={styles.disclaimerText}>
-                      Your report will be reviewed before publishing. False reports may result in account suspension.
+                      <Text>Your report will be reviewed before publishing. False reports may result in account suspension.</Text>
                     </Text>
                   </View>
                 </ScrollView>
@@ -931,7 +931,7 @@ export default function ProfileScreen() {
                         <Text style={styles.transcriptionTitle}>Live Transcription</Text>
                       </View>
                       <Text style={styles.transcriptionText}>
-                        Your speech is being transcribed in real-time. The AI is generating an article based on your report...
+                        <Text>Your speech is being transcribed in real-time. The AI is generating an article based on your report...</Text>
                       </Text>
                     </View>
                   </View>
@@ -990,7 +990,7 @@ export default function ProfileScreen() {
             </View>
 
             <Text style={styles.modalSubtitle}>
-              Your unique handle for your public profile
+              <Text>Your unique handle for your public profile</Text>
             </Text>
 
             <View style={styles.handleInputContainer}>

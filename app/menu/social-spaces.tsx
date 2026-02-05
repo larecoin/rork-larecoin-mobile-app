@@ -396,7 +396,7 @@ export default function SocialSpacesScreen() {
               />
 
               <Text style={[styles.inputLabel, { color: colors.textSecondary, marginTop: 16 }]}>
-                Select Space
+                <Text>Select Space</Text>
               </Text>
               <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.spaceSelector}>
                 {spaces.map((space) => (
@@ -422,7 +422,7 @@ export default function SocialSpacesScreen() {
                   <View style={styles.settingInfo}>
                     <Text style={[styles.settingTitle, { color: colors.text }]}>Allow Recording</Text>
                     <Text style={[styles.settingDesc, { color: colors.textTertiary }]}>
-                      Save broadcast for replay
+                      <Text>Save broadcast for replay</Text>
                     </Text>
                   </View>
                   <Switch
@@ -436,7 +436,7 @@ export default function SocialSpacesScreen() {
                   <View style={styles.settingInfo}>
                     <Text style={[styles.settingTitle, { color: colors.text }]}>Speaker Requests</Text>
                     <Text style={[styles.settingDesc, { color: colors.textTertiary }]}>
-                      Allow listeners to request to speak
+                      <Text>Allow listeners to request to speak</Text>
                     </Text>
                   </View>
                   <Switch

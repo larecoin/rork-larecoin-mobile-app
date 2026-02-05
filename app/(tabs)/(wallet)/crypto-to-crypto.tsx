@@ -183,7 +183,7 @@ export default function CryptoToCryptoScreen() {
         <View style={styles.infoContent}>
           <Text style={[styles.infoTitle, { color: colors.text }]}>Secure Swaps</Text>
           <Text style={[styles.infoText, { color: colors.textSecondary }]}>
-            All swaps are executed through audited smart contracts with MEV protection.
+            <Text>All swaps are executed through audited smart contracts with MEV protection.</Text>
           </Text>
         </View>
       </View>

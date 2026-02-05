@@ -99,7 +99,7 @@ export default function AdvancedTradingScreen() {
               styles.buySellText,
               { color: orderSide === 'sell' ? '#FFF' : colors.text }
             ]}>
-              Sell
+              <Text>Sell</Text>
             </Text>
           </TouchableOpacity>
         </View>
@@ -157,7 +157,7 @@ export default function AdvancedTradingScreen() {
         <View style={[styles.warningCard, { backgroundColor: colors.warning + '15' }]}>
           <AlertCircle size={20} color={colors.warning} />
           <Text style={[styles.warningText, { color: colors.warning }]}>
-            Trading involves risk. Only trade with funds you can afford to lose.
+            <Text>Trading involves risk. Only trade with funds you can afford to lose.</Text>
           </Text>
         </View>
       </ScrollView>

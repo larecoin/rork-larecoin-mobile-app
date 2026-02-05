@@ -24,10 +24,10 @@ export default function ScanQRScreen() {
           </View>
           <Camera size={64} color={colors.textTertiary} />
           <Text style={[styles.placeholderText, { color: colors.textTertiary }]}>
-            Camera preview will appear here
+            <Text>Camera preview will appear here</Text>
           </Text>
           <Text style={[styles.placeholderSubtext, { color: colors.textTertiary }]}>
-            Position QR code within the frame
+            <Text>Position QR code within the frame</Text>
           </Text>
         </View>
       </View>

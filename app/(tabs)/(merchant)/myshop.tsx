@@ -494,7 +494,7 @@ export default function MyShopScreen() {
               {enabledPaymentMethods.length} payment methods enabled
             </Text>
             <Text style={styles.paymentRequestNote}>
-              Net amounts moved on-chain to Larecoin liquidity pools
+              <Text>Net amounts moved on-chain to Larecoin liquidity pools</Text>
             </Text>
           </View>
           <ChevronRight size={20} color={Colors.textSecondary} />
@@ -875,7 +875,7 @@ export default function MyShopScreen() {
             <View style={styles.paymentNotice}>
               <DollarSign size={16} color={Colors.accent} />
               <Text style={styles.paymentNoticeText}>
-                All payments incur processing fees. Net amounts are moved on-chain into Larecoin's liquidity pools.
+                <Text>All payments incur processing fees. Net amounts are moved on-chain into Larecoin's liquidity pools.</Text>
               </Text>
             </View>
 
@@ -1197,7 +1197,7 @@ export default function MyShopScreen() {
             <View style={styles.metaverseNotice}>
               <Cable size={18} color="#8E44AD" />
               <Text style={styles.metaverseNoticeText}>
-                Own virtual commercial land to host your shop in immersive environments
+                <Text>Own virtual commercial land to host your shop in immersive environments</Text>
               </Text>
             </View>
 
@@ -1304,7 +1304,7 @@ export default function MyShopScreen() {
                   </TouchableOpacity>
 
                   <Text style={styles.purchaseDisclaimer}>
-                    Virtual land ownership is recorded on-chain. You can resell or lease your plot anytime.
+                    <Text>Virtual land ownership is recorded on-chain. You can resell or lease your plot anytime.</Text>
                   </Text>
                 </View>
               </>

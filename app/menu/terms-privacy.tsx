@@ -102,7 +102,7 @@ export default function TermsPrivacyScreen() {
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>4. Financial Services</Text>
               <Text style={styles.sectionText}>
-                Cryptocurrency trading involves substantial risk. The value of digital assets can fluctuate significantly. Past performance is not indicative of future results. You should only invest what you can afford to lose.
+                <Text>Cryptocurrency trading involves substantial risk. The value of digital assets can fluctuate significantly. Past performance is not indicative of future results. You should only invest what you can afford to lose.</Text>
               </Text>
             </View>
           </View>

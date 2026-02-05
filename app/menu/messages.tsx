@@ -9,7 +9,7 @@ import {
   TextInput,
   Modal,
   Animated,
-  Dimensions
+  <Text>Dimensions</Text>
 } from 'react-native';
 import { Stack } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -32,7 +32,7 @@ import {
   ChevronDown,
   Check,
   Filter,
-  MoreVertical
+  <Text>MoreVertical</Text>
 } from 'lucide-react-native';
 import { useApp } from '@/contexts/AppContext';
 

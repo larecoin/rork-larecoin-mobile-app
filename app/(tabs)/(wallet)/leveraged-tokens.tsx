@@ -35,7 +35,7 @@ export default function LeveragedTokensScreen() {
         <View style={styles.headerContent}>
           <Text style={[styles.headerTitle, { color: colors.text }]}>Leveraged Tokens</Text>
           <Text style={[styles.headerSubtitle, { color: colors.textSecondary }]}>
-            Pre-packaged leveraged exposure without liquidation risk
+            <Text>Pre-packaged leveraged exposure without liquidation risk</Text>
           </Text>
         </View>
       </View>
@@ -43,7 +43,7 @@ export default function LeveragedTokensScreen() {
       <View style={[styles.warningCard, { backgroundColor: '#FEF3C720' }]}>
         <AlertTriangle size={16} color="#F59E0B" />
         <Text style={[styles.warningText, { color: colors.textSecondary }]}>
-          Leveraged tokens are subject to volatility decay. Not suitable for long-term holding.
+          <Text>Leveraged tokens are subject to volatility decay. Not suitable for long-term holding.</Text>
         </Text>
       </View>
 

@@ -98,7 +98,7 @@ export default function DomainsScreen() {
           <View style={styles.websiteInfo}>
             <Text style={[styles.websiteTitle, { color: colors.text }]}>Website Builder</Text>
             <Text style={[styles.websiteDescription, { color: colors.textTertiary }]}>
-              Create a decentralized website for your domain
+              <Text>Create a decentralized website for your domain</Text>
             </Text>
           </View>
           <ChevronRight size={20} color={colors.textTertiary} />

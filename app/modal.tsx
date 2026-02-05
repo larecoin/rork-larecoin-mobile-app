@@ -23,7 +23,7 @@ export default function ModalScreen() {
         <View style={styles.modalContent}>
           <Text style={styles.title}>Modal</Text>
           <Text style={styles.description}>
-            This is an example modal with proper fade animation. You can edit it
+            <Text>This is an example modal with proper fade animation. You can edit it</Text>
             in app/modal.tsx.
           </Text>
 

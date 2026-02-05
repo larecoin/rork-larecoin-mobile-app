@@ -309,7 +309,7 @@ export default function BuyCrypto() {
           >
             <Clock size={16} color={scheduleType === 'instant' ? '#FFFFFF' : colors.textSecondary} />
             <Text style={[styles.scheduleTypeBtnText, { color: scheduleType === 'instant' ? '#FFFFFF' : colors.textSecondary }]}>
-              Instant
+              <Text>Instant</Text>
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
@@ -321,7 +321,7 @@ export default function BuyCrypto() {
           >
             <Target size={16} color={scheduleType === 'price_target' ? '#FFFFFF' : colors.textSecondary} />
             <Text style={[styles.scheduleTypeBtnText, { color: scheduleType === 'price_target' ? '#FFFFFF' : colors.textSecondary }]}>
-              Price Target
+              <Text>Price Target</Text>
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
@@ -399,7 +399,7 @@ export default function BuyCrypto() {
               </View>
             </View>
             <Text style={[styles.helperText, { color: colors.textTertiary }]}>
-              Order will execute automatically at the specified date and time
+              <Text>Order will execute automatically at the specified date and time</Text>
             </Text>
           </View>
         )}
@@ -413,7 +413,7 @@ export default function BuyCrypto() {
               <View style={styles.recurringToggleLeft}>
                 <Repeat size={18} color={isRecurring ? '#27AE60' : colors.textSecondary} />
                 <Text style={[styles.recurringToggleText, { color: colors.text }]}>
-                  Make this a recurring buy
+                  <Text>Make this a recurring buy</Text>
                 </Text>
               </View>
               <View style={[
@@ -463,7 +463,7 @@ export default function BuyCrypto() {
                 <View style={[styles.recurringNotice, { backgroundColor: colors.primary + '15' }]}>
                   <AlertCircle size={16} color={colors.primary} />
                   <Text style={[styles.recurringNoticeText, { color: colors.primary }]}>
-                    Recurring buys will execute automatically using your selected payment method
+                    <Text>Recurring buys will execute automatically using your selected payment method</Text>
                   </Text>
                 </View>
               </View>
@@ -611,7 +611,7 @@ export default function BuyCrypto() {
                 <View style={styles.emptyState}>
                   <Calendar size={48} color={colors.textTertiary} />
                   <Text style={[styles.emptyStateText, { color: colors.textSecondary }]}>
-                    No scheduled buy orders
+                    <Text>No scheduled buy orders</Text>
                   </Text>
                 </View>
               ) : (

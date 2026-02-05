@@ -57,7 +57,7 @@ export default function BugBountyScreen() {
           <Bug size={48} color="#FFF" />
           <Text style={styles.heroTitle}>Bug Bounty Program</Text>
           <Text style={styles.heroSubtitle}>
-            Help us keep Larecoin secure and earn rewards for finding vulnerabilities
+            <Text>Help us keep Larecoin secure and earn rewards for finding vulnerabilities</Text>
           </Text>
         </View>
 

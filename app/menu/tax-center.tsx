@@ -19,7 +19,7 @@ import {
   Building2,
   Wallet,
   Receipt,
-  Shield
+  <Text>Shield</Text>
 } from 'lucide-react-native';
 import { useApp } from '@/contexts/AppContext';
 
@@ -315,7 +315,7 @@ export default function TaxCenterScreen() {
         <View style={styles.apiInfo}>
           <Text style={[styles.apiTitle, { color: colors.text }]}>API Access</Text>
           <Text style={[styles.apiDesc, { color: colors.textTertiary }]}>
-            Connect your own tax software via API
+            <Text>Connect your own tax software via API</Text>
           </Text>
         </View>
         <ChevronRight size={20} color={colors.textTertiary} />
@@ -381,7 +381,7 @@ export default function TaxCenterScreen() {
           <View style={styles.helpInfo}>
             <Text style={[styles.helpTitle, { color: colors.text }]}>Tax Help & Support</Text>
             <Text style={[styles.helpDesc, { color: colors.textTertiary }]}>
-              Chat with our tax specialists or schedule a consultation
+              <Text>Chat with our tax specialists or schedule a consultation</Text>
             </Text>
           </View>
           <ChevronRight size={20} color={colors.primary} />
@@ -392,7 +392,7 @@ export default function TaxCenterScreen() {
           <View style={styles.helpInfo}>
             <Text style={[styles.helpTitle, { color: colors.text }]}>Tax Guide</Text>
             <Text style={[styles.helpDesc, { color: colors.textTertiary }]}>
-              Learn about crypto tax rules and best practices
+              <Text>Learn about crypto tax rules and best practices</Text>
             </Text>
           </View>
           <ChevronRight size={20} color={colors.success} />
@@ -403,7 +403,7 @@ export default function TaxCenterScreen() {
           <View style={styles.helpInfo}>
             <Text style={[styles.helpTitle, { color: colors.text }]}>Find a CPA</Text>
             <Text style={[styles.helpDesc, { color: colors.textTertiary }]}>
-              Connect with crypto-savvy tax professionals
+              <Text>Connect with crypto-savvy tax professionals</Text>
             </Text>
           </View>
           <ChevronRight size={20} color={colors.warning} />

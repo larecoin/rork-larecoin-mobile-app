@@ -177,7 +177,7 @@ export default function EarnScreen() {
                     disabled={reward.amount === 0}
                   >
                     <Text style={[styles.claimSingleText, reward.amount === 0 && styles.claimSingleTextDisabled]}>
-                      Claim
+                      <Text>Claim</Text>
                     </Text>
                   </TouchableOpacity>
                 </View>

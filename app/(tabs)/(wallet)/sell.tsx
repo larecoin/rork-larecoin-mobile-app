@@ -323,7 +323,7 @@ export default function SellCrypto() {
           >
             <Clock size={16} color={scheduleType === 'instant' ? '#FFFFFF' : colors.textSecondary} />
             <Text style={[styles.scheduleTypeBtnText, { color: scheduleType === 'instant' ? '#FFFFFF' : colors.textSecondary }]}>
-              Instant
+              <Text>Instant</Text>
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
@@ -335,7 +335,7 @@ export default function SellCrypto() {
           >
             <Target size={16} color={scheduleType === 'price_target' ? '#FFFFFF' : colors.textSecondary} />
             <Text style={[styles.scheduleTypeBtnText, { color: scheduleType === 'price_target' ? '#FFFFFF' : colors.textSecondary }]}>
-              Price Target
+              <Text>Price Target</Text>
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
@@ -413,7 +413,7 @@ export default function SellCrypto() {
               </View>
             </View>
             <Text style={[styles.helperText, { color: colors.textTertiary }]}>
-              Order will execute automatically at the specified date and time
+              <Text>Order will execute automatically at the specified date and time</Text>
             </Text>
           </View>
         )}
@@ -427,7 +427,7 @@ export default function SellCrypto() {
               <View style={styles.recurringToggleLeft}>
                 <Repeat size={18} color={isRecurring ? '#27AE60' : colors.textSecondary} />
                 <Text style={[styles.recurringToggleText, { color: colors.text }]}>
-                  Make this a recurring sell
+                  <Text>Make this a recurring sell</Text>
                 </Text>
               </View>
               <View style={[
@@ -477,7 +477,7 @@ export default function SellCrypto() {
                 <View style={[styles.recurringNotice, { backgroundColor: colors.accent + '15' }]}>
                   <AlertCircle size={16} color={colors.accent} />
                   <Text style={[styles.recurringNoticeText, { color: colors.accent }]}>
-                    Recurring sells will only execute if you have sufficient balance
+                    <Text>Recurring sells will only execute if you have sufficient balance</Text>
                   </Text>
                 </View>
               </View>
@@ -686,7 +686,7 @@ export default function SellCrypto() {
                 <View style={styles.emptyState}>
                   <Calendar size={48} color={colors.textTertiary} />
                   <Text style={[styles.emptyStateText, { color: colors.textSecondary }]}>
-                    No scheduled sell orders
+                    <Text>No scheduled sell orders</Text>
                   </Text>
                 </View>
               ) : (

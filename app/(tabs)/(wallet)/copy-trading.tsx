@@ -44,7 +44,7 @@ export default function CopyTradingScreen() {
         <View style={styles.headerContent}>
           <Text style={[styles.headerTitle, { color: colors.text }]}>Copy Trading</Text>
           <Text style={[styles.headerSubtitle, { color: colors.textSecondary }]}>
-            Automatically replicate trades from top performers
+            <Text>Automatically replicate trades from top performers</Text>
           </Text>
         </View>
       </View>

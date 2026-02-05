@@ -195,7 +195,7 @@ export default function AdManagerScreen() {
               </View>
               <Text style={styles.noListingTitle}>No Business Listing Yet</Text>
               <Text style={styles.noListingText}>
-                Add your business to the global crypto merchant directory and reach thousands of crypto users worldwide.
+                <Text>Add your business to the global crypto merchant directory and reach thousands of crypto users worldwide.</Text>
               </Text>
               <TouchableOpacity 
                 style={styles.addListingBtn}

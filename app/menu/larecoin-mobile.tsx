@@ -11,7 +11,7 @@ import {
   Animated,
   Dimensions,
   FlatList,
-  Switch
+  <Text>Switch</Text>
 } from 'react-native';
 import { Stack, useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -47,7 +47,7 @@ import {
   Zap,
   Globe,
   Send,
-  Smile
+  <Text>Smile</Text>
 } from 'lucide-react-native';
 import { useApp } from '@/contexts/AppContext';
 
@@ -436,7 +436,7 @@ export default function LarecoinMobileScreen() {
           )}
 
           <Text style={[styles.sectionTitle, { color: colors.textTertiary, paddingHorizontal: 16 }]}>
-            Recent Calls
+            <Text>Recent Calls</Text>
           </Text>
           <FlatList
             data={mockCallLogs}

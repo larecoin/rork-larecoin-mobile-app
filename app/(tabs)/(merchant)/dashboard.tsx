@@ -41,7 +41,7 @@ import {
   Building2,
   HandHeart,
   Copy,
-  Sliders
+  <Text>Sliders</Text>
 } from 'lucide-react-native';
 import * as Clipboard from 'expo-clipboard';
 import Colors from '@/constants/colors';
@@ -892,7 +892,7 @@ export default function MerchantDashboard() {
                 <AlertCircle size={16} color={Colors.primary} />
               </View>
               <Text style={styles.distributionInfoText}>
-                Incoming payments will be automatically split between LARE and LUSD based on this ratio.
+                <Text>Incoming payments will be automatically split between LARE and LUSD based on this ratio.</Text>
               </Text>
             </View>
 

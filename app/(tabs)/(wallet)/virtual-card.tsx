@@ -157,7 +157,7 @@ export default function VirtualCardScreen() {
           <View style={styles.infoContent}>
             <Text style={[styles.infoTitle, { color: colors.text }]}>Secure Online Shopping</Text>
             <Text style={[styles.infoText, { color: colors.textSecondary }]}>
-              Create virtual cards for online purchases. Set spending limits and protect your main card details.
+              <Text>Create virtual cards for online purchases. Set spending limits and protect your main card details.</Text>
             </Text>
           </View>
         </View>
@@ -173,7 +173,7 @@ export default function VirtualCardScreen() {
               <CreditCard size={48} color={colors.textTertiary} />
               <Text style={[styles.emptyTitle, { color: colors.text }]}>No Virtual Cards</Text>
               <Text style={[styles.emptySubtitle, { color: colors.textSecondary }]}>
-                Create your first virtual card for secure online purchases
+                <Text>Create your first virtual card for secure online purchases</Text>
               </Text>
               <TouchableOpacity 
                 style={[styles.createFirstButton, { backgroundColor: colors.primary }]}
@@ -334,7 +334,7 @@ export default function VirtualCardScreen() {
           <View style={[styles.modalContent, { backgroundColor: colors.surface }]}>
             <Text style={[styles.modalTitle, { color: colors.text }]}>Create Virtual Card</Text>
             <Text style={[styles.modalSubtitle, { color: colors.textSecondary }]}>
-              Set up a new virtual card for online purchases
+              <Text>Set up a new virtual card for online purchases</Text>
             </Text>
 
             <View style={styles.inputGroup}>

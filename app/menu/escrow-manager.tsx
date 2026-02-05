@@ -44,7 +44,7 @@ export default function EscrowManagerScreen() {
           <Shield size={40} color="#FFF" />
           <Text style={styles.heroTitle}>Secure Escrow</Text>
           <Text style={styles.heroSubtitle}>
-            Protected transactions with smart contract escrow
+            <Text>Protected transactions with smart contract escrow</Text>
           </Text>
         </View>
 
@@ -104,7 +104,7 @@ export default function EscrowManagerScreen() {
           <View style={styles.infoContent}>
             <Text style={[styles.infoTitle, { color: colors.text }]}>How Escrow Works</Text>
             <Text style={[styles.infoDescription, { color: colors.textTertiary }]}>
-              Funds are held securely until both parties confirm the transaction is complete. Smart contracts ensure trustless execution.
+              <Text>Funds are held securely until both parties confirm the transaction is complete. Smart contracts ensure trustless execution.</Text>
             </Text>
           </View>
         </View>

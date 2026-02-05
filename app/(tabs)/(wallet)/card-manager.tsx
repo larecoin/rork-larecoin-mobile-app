@@ -137,7 +137,7 @@ export default function CardManagerScreen() {
         <View style={[styles.infoCard, { backgroundColor: colors.surface }]}>
           <AlertCircle size={20} color={colors.primary} />
           <Text style={[styles.infoText, { color: colors.textSecondary }]}>
-            Link a debit card to spend your LUSD balance anywhere Visa/Mastercard is accepted. 
+            <Text>Link a debit card to spend your LUSD balance anywhere Visa/Mastercard is accepted.</Text>
             {isMerchant && ' Business cards include expense tracking and higher limits.'}
           </Text>
         </View>
@@ -159,7 +159,7 @@ export default function CardManagerScreen() {
               <CreditCard size={48} color={colors.textTertiary} />
               <Text style={[styles.emptyTitle, { color: colors.text }]}>No Cards Linked</Text>
               <Text style={[styles.emptySubtitle, { color: colors.textSecondary }]}>
-                Add a debit card to start spending your LUSD
+                <Text>Add a debit card to start spending your LUSD</Text>
               </Text>
             </View>
           ) : (
@@ -320,7 +320,7 @@ export default function CardManagerScreen() {
           <View style={[styles.modalContent, { backgroundColor: colors.surface }]}>
             <Text style={[styles.modalTitle, { color: colors.text }]}>Link Debit Card</Text>
             <Text style={[styles.modalSubtitle, { color: colors.textSecondary }]}>
-              Enter your debit card details to link it with your LUSD balance
+              <Text>Enter your debit card details to link it with your LUSD balance</Text>
             </Text>
 
             <View style={styles.inputGroup}>
@@ -378,7 +378,7 @@ export default function CardManagerScreen() {
             <View style={[styles.securityNote, { backgroundColor: colors.background }]}>
               <Shield size={16} color={colors.primary} />
               <Text style={[styles.securityNoteText, { color: colors.textSecondary }]}>
-                Your card details are encrypted and securely stored
+                <Text>Your card details are encrypted and securely stored</Text>
               </Text>
             </View>
 

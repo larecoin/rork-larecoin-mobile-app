@@ -370,7 +370,7 @@ export default function PreciousMetalsScreen() {
       <View style={[styles.infoCard, { backgroundColor: colors.surface }]}>
         <Clock size={18} color={colors.primary} />
         <Text style={[styles.infoText, { color: colors.textSecondary }]}>
-          Transactions are processed instantly. Physical redemption requires minimum 1 oz and takes 5-10 business days.
+          <Text>Transactions are processed instantly. Physical redemption requires minimum 1 oz and takes 5-10 business days.</Text>
         </Text>
       </View>
 

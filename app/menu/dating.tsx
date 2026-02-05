@@ -361,7 +361,7 @@ export default function DatingScreen() {
     >
       <Text style={[styles.sectionTitle, { color: colors.text }]}>Your Matches</Text>
       <Text style={[styles.sectionSubtitle, { color: colors.textSecondary }]}>
-        Ask someone on a date to start the dating process
+        <Text>Ask someone on a date to start the dating process</Text>
       </Text>
 
       {matches.filter(m => m.dateStage === 'none').map(match => (
@@ -605,7 +605,7 @@ export default function DatingScreen() {
                   <View style={styles.infoCardContent}>
                     <Text style={[styles.infoCardTitle, { color: colors.text }]}>Safe Dating Process</Text>
                     <Text style={[styles.infoCardText, { color: colors.textSecondary }]}>
-                      Our dating process ensures safety for both parties. Contact information cannot be exchanged until you've completed all three dates.
+                      <Text>Our dating process ensures safety for both parties. Contact information cannot be exchanged until you've completed all three dates.</Text>
                     </Text>
                   </View>
                 </View>
@@ -632,7 +632,7 @@ export default function DatingScreen() {
                     <View style={styles.stepContent}>
                       <Text style={[styles.stepTitle, { color: colors.text }]}>2nd Date - Video Call</Text>
                       <Text style={[styles.stepDesc, { color: colors.textSecondary }]}>
-                        Face-to-face video call with the same guidelines.
+                        <Text>Face-to-face video call with the same guidelines.</Text>
                       </Text>
                     </View>
                   </View>
@@ -644,7 +644,7 @@ export default function DatingScreen() {
                     <View style={styles.stepContent}>
                       <Text style={[styles.stepTitle, { color: colors.text }]}>3rd Date - In Person</Text>
                       <Text style={[styles.stepDesc, { color: colors.textSecondary }]}>
-                        Meet at a restaurant or public place of your choice.
+                        <Text>Meet at a restaurant or public place of your choice.</Text>
                       </Text>
                     </View>
                   </View>
@@ -776,7 +776,7 @@ export default function DatingScreen() {
                 <View style={[styles.callWarning, { backgroundColor: 'rgba(255,255,255,0.1)' }]}>
                   <Lock size={16} color="#FF6B6B" />
                   <Text style={styles.callWarningText}>
-                    This call is monitored. Do not exchange personal contact information.
+                    <Text>This call is monitored. Do not exchange personal contact information.</Text>
                   </Text>
                 </View>
               </>
@@ -878,7 +878,7 @@ export default function DatingScreen() {
                   <View style={styles.statusInfo}>
                     <Text style={[styles.statusTitle, { color: colors.text }]}>Exclusive</Text>
                     <Text style={[styles.statusDesc, { color: colors.textSecondary }]}>
-                      You're exclusively dating each other
+                      <Text>You're exclusively dating each other</Text>
                     </Text>
                   </View>
                   <ChevronRight size={20} color={colors.textSecondary} />
@@ -894,7 +894,7 @@ export default function DatingScreen() {
                   <View style={styles.statusInfo}>
                     <Text style={[styles.statusTitle, { color: colors.text }]}>Platonic</Text>
                     <Text style={[styles.statusDesc, { color: colors.textSecondary }]}>
-                      You've decided to stay friends
+                      <Text>You've decided to stay friends</Text>
                     </Text>
                   </View>
                   <ChevronRight size={20} color={colors.textSecondary} />
@@ -910,7 +910,7 @@ export default function DatingScreen() {
                   <View style={styles.statusInfo}>
                     <Text style={[styles.statusTitle, { color: colors.text }]}>Open Relationship</Text>
                     <Text style={[styles.statusDesc, { color: colors.textSecondary }]}>
-                      You're dating but open to others
+                      <Text>You're dating but open to others</Text>
                     </Text>
                   </View>
                   <ChevronRight size={20} color={colors.textSecondary} />

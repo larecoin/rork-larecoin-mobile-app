@@ -16,7 +16,7 @@ import {
   DollarSign,
   Calendar,
   ChevronRight,
-  Sparkles
+  <Text>Sparkles</Text>
 } from 'lucide-react-native';
 import Colors from '@/constants/colors';
 

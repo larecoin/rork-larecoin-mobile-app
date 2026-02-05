@@ -127,7 +127,7 @@ export default function HelpdeskScreen() {
           <View style={styles.contactInfo}>
             <Text style={[styles.contactTitle, { color: colors.text }]}>Need more help?</Text>
             <Text style={[styles.contactDescription, { color: colors.textTertiary }]}>
-              Contact our support team 24/7
+              <Text>Contact our support team 24/7</Text>
             </Text>
           </View>
           <ChevronRight size={20} color={colors.textTertiary} />
