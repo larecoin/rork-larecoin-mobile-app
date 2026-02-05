@@ -20,7 +20,7 @@ import {
   CreditCard,
   ChevronRight,
   Filter,
-  <Text>Send</Text>
+  Send
 } from 'lucide-react-native';
 import Colors from '@/constants/colors';
 

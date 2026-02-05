@@ -11,7 +11,7 @@ import {
   FlatList,
   KeyboardAvoidingView,
   Platform,
-  <Text>Animated</Text>
+  Animated
 } from 'react-native';
 import { Stack, useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -55,7 +55,7 @@ import {
   Star,
   AtSign,
   Paperclip,
-  <Text>Gift</Text>
+  Gift
 } from 'lucide-react-native';
 import { useApp } from '@/contexts/AppContext';
 

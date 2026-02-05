@@ -19,7 +19,7 @@ import {
   Building2,
   Wallet,
   Receipt,
-  <Text>Shield</Text>
+  Shield
 } from 'lucide-react-native';
 import { useApp } from '@/contexts/AppContext';
 

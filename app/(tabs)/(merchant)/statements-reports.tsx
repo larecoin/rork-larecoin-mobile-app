@@ -18,7 +18,7 @@ import {
   ChevronRight,
   Share2,
   Printer,
-  <Text>Mail</Text>
+  Mail
 } from 'lucide-react-native';
 import Colors from '@/constants/colors';
 

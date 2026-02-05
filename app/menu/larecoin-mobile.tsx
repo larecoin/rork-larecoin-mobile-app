@@ -11,7 +11,7 @@ import {
   Animated,
   Dimensions,
   FlatList,
-  <Text>Switch</Text>
+  Switch
 } from 'react-native';
 import { Stack, useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -47,7 +47,7 @@ import {
   Zap,
   Globe,
   Send,
-  <Text>Smile</Text>
+  Smile
 } from 'lucide-react-native';
 import { useApp } from '@/contexts/AppContext';
 

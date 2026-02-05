@@ -17,7 +17,7 @@ import {
   TrendingUp,
   CheckCircle,
   AlertCircle,
-  <Text>CreditCard</Text>
+  CreditCard
 } from 'lucide-react-native';
 import Colors from '@/constants/colors';
 

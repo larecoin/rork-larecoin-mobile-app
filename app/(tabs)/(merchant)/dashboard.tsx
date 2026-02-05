@@ -41,7 +41,7 @@ import {
   Building2,
   HandHeart,
   Copy,
-  <Text>Sliders</Text>
+  Sliders
 } from 'lucide-react-native';
 import * as Clipboard from 'expo-clipboard';
 import Colors from '@/constants/colors';

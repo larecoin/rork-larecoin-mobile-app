@@ -27,7 +27,7 @@ import {
   Minus,
   FolderOpen,
   MoreVertical,
-  <Text>Check</Text>
+  Check
 } from 'lucide-react-native';
 import Colors from '@/constants/colors';
 
