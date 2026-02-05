@@ -17,6 +17,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { ArrowUpRight, ArrowDownLeft, RefreshCw, Eye, EyeOff, ChevronRight, Plus, ChevronDown, Image, Coins, Droplets, Wallet, Check, Trash2, Edit3, Menu, Search, ArrowLeftRight, Clover, Receipt, GitBranch, Users, ShoppingCart, DollarSign, ShieldCheck, HandCoins, Send, FileText, CreditCard, Lock, Smartphone, Bell, AlertCircle, Shield, Settings, Link, Globe, TrendingUp, Repeat, Landmark, PiggyBank, Percent, Zap, Bot, Copy, Grid3X3, Target, Gem, Rocket, BarChart3, Scale, CircleDollarSign, Layers, Vote, Sparkles } from 'lucide-react-native';
 import { useApp } from '@/contexts/AppContext';
+import { useWalletSecurity } from '@/contexts/WalletSecurityContext';
 import ModeToggle from '@/components/ModeToggle';
 import TokenCard from '@/components/TokenCard';
 import TransactionItem from '@/components/TransactionItem';
@@ -81,6 +82,7 @@ export default function WalletDashboard() {
   const [selectedChain, setSelectedChain] = React.useState<string>('');
   const [contractAddress, setContractAddress] = React.useState('');
   const [showChainPicker, setShowChainPicker] = React.useState(false);
+  const { setupStatus, securityLevel } = useWalletSecurity();
   const [tradeTab, setTradeTab] = React.useState<'basic' | 'advanced'>('basic');
   const [showWalletSettingsModal, setShowWalletSettingsModal] = React.useState(false);
   const [showSeedPhrase, setShowSeedPhrase] = React.useState(false);
@@ -481,6 +483,34 @@ export default function WalletDashboard() {
             </View>
           </View>
         </View>
+
+        {setupStatus !== 'ready' && (
+          <TouchableOpacity
+            style={[styles.setupBanner, { backgroundColor: '#F59E0B' + '15', borderColor: '#F59E0B' + '40' }]}
+            onPress={() => router.push('/(tabs)/(wallet)/wallet-setup')}
+          >
+            <Shield size={20} color="#F59E0B" />
+            <View style={{ flex: 1 }}>
+              <Text style={[styles.setupBannerTitle, { color: colors.text }]}>Set Up Secure Wallet</Text>
+              <Text style={[styles.setupBannerDesc, { color: colors.textSecondary }]}>Create or import a non-custodial wallet with seed phrase backup</Text>
+            </View>
+            <ChevronRight size={18} color="#F59E0B" />
+          </TouchableOpacity>
+        )}
+
+        {setupStatus === 'ready' && securityLevel === 'none' && (
+          <TouchableOpacity
+            style={[styles.setupBanner, { backgroundColor: '#EF4444' + '10', borderColor: '#EF4444' + '30' }]}
+            onPress={() => router.push('/(tabs)/(wallet)/wallet-security')}
+          >
+            <Lock size={20} color="#EF4444" />
+            <View style={{ flex: 1 }}>
+              <Text style={[styles.setupBannerTitle, { color: colors.text }]}>Protect Your Wallet</Text>
+              <Text style={[styles.setupBannerDesc, { color: colors.textSecondary }]}>Set up PIN or biometric lock for security</Text>
+            </View>
+            <ChevronRight size={18} color="#EF4444" />
+          </TouchableOpacity>
+        )}
 
         <View style={styles.actions}>
           <ActionButton 
@@ -3469,5 +3499,23 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 14,
     fontWeight: '600' as const,
+  },
+  setupBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    marginHorizontal: 16,
+    marginBottom: 16,
+    padding: 14,
+    borderRadius: 14,
+    borderWidth: 1,
+  },
+  setupBannerTitle: {
+    fontSize: 14,
+    fontWeight: '600' as const,
+    marginBottom: 2,
+  },
+  setupBannerDesc: {
+    fontSize: 12,
   },
 });

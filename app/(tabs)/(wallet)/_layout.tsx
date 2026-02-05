@@ -283,6 +283,21 @@ export default function WalletLayout() {
           headerStyle: { backgroundColor: Colors.backgroundSecondary },
         }} 
       />
+      <Stack.Screen 
+        name="wallet-setup" 
+        options={{ 
+          title: 'Wallet Setup',
+          presentation: 'modal',
+          headerStyle: { backgroundColor: Colors.backgroundSecondary },
+        }} 
+      />
+      <Stack.Screen 
+        name="wallet-security" 
+        options={{ 
+          title: 'Wallet Security',
+          headerStyle: { backgroundColor: Colors.backgroundSecondary },
+        }} 
+      />
     </Stack>
   );
 }

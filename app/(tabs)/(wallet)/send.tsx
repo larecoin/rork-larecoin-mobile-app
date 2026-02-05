@@ -4,10 +4,13 @@ import { useRouter } from 'expo-router';
 import { Scan, ChevronDown, AlertCircle } from 'lucide-react-native';
 import Colors from '@/constants/colors';
 import { useApp } from '@/contexts/AppContext';
+import { useWalletSecurity } from '@/contexts/WalletSecurityContext';
+import { formatAddress } from '@/services/walletCrypto';
 
 export default function SendScreen() {
   const router = useRouter();
-  const { userTokens, addTransaction } = useApp();
+  const { userTokens, addTransaction, colors } = useApp();
+  const { walletKeys, setupStatus } = useWalletSecurity();
   const [address, setAddress] = useState('');
   const [amount, setAmount] = useState('');
   const [selectedToken, setSelectedToken] = useState(userTokens[0]);
@@ -21,17 +24,19 @@ export default function SendScreen() {
 
   const handleSend = () => {
     if (!canSend) return;
-    
+    console.log('[Send] Sending', amount, selectedToken.symbol, 'to', formatAddress(address));
+    if (walletKeys) {
+      console.log('[Send] From wallet:', formatAddress(walletKeys.publicKey));
+    }
     addTransaction({
       type: 'send',
       status: 'pending',
       amount: parseFloat(amount),
       token: selectedToken.symbol,
       usdValue,
-      address: address.slice(0, 6) + '...' + address.slice(-4),
+      address: formatAddress(address),
       description: 'Transfer to external wallet',
     });
-    
     router.back();
   };
 
@@ -41,10 +46,16 @@ export default function SendScreen() {
 
   return (
     <KeyboardAvoidingView 
-      style={styles.container}
+      style={[styles.container, { backgroundColor: colors.backgroundSecondary }]}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <ScrollView showsVerticalScrollIndicator={false}>
+        {setupStatus === 'ready' && walletKeys && (
+          <View style={[styles.fromWallet, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+            <Text style={[styles.fromLabel, { color: colors.textSecondary }]}>From</Text>
+            <Text style={[styles.fromAddress, { color: colors.text }]}>{formatAddress(walletKeys.publicKey, 10)}</Text>
+          </View>
+        )}
         <View style={styles.section}>
           <Text style={styles.label}>Recipient Address</Text>
           <View style={styles.addressContainer}>
@@ -160,8 +171,22 @@ export default function SendScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.backgroundSecondary,
     padding: 20,
+  },
+  fromWallet: {
+    padding: 14,
+    borderRadius: 14,
+    borderWidth: 1,
+    marginBottom: 20,
+  },
+  fromLabel: {
+    fontSize: 12,
+    fontWeight: '600' as const,
+    marginBottom: 4,
+  },
+  fromAddress: {
+    fontSize: 14,
+    fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
   },
   section: {
     marginBottom: 24,

@@ -5,14 +5,16 @@ import * as Haptics from 'expo-haptics';
 import * as Clipboard from 'expo-clipboard';
 import Colors from '@/constants/colors';
 import { useApp } from '@/contexts/AppContext';
+import { useWalletSecurity } from '@/contexts/WalletSecurityContext';
 
 export default function ReceiveScreen() {
   const { userTokens } = useApp();
+  const { walletKeys } = useWalletSecurity();
   const [selectedToken, setSelectedToken] = useState(userTokens[0]);
   const [showTokenPicker, setShowTokenPicker] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  const walletAddress = '0xLARE1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t';
+  const walletAddress = walletKeys?.publicKey || '0xLARE1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t';
 
   const qrPattern = useMemo(() => {
     const pattern: boolean[][] = [];
