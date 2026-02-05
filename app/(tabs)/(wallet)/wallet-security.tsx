@@ -1,15 +1,16 @@
 import React, { useState, useCallback } from 'react';
 import {
-  View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert, Platform,
+  View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert, Platform, TextInput,
 } from 'react-native';
 import { Stack } from 'expo-router';
 import {
   Lock, Fingerprint, Shield, Eye, EyeOff, Copy, Check, Trash2,
-  AlertTriangle, ChevronRight, KeyRound,
+  AlertTriangle, ChevronRight, KeyRound, MessageSquare, ScanFace,
 } from 'lucide-react-native';
 import * as Clipboard from 'expo-clipboard';
 import * as Haptics from 'expo-haptics';
 import { useWalletSecurity } from '@/contexts/WalletSecurityContext';
+import { useTransactionVerification } from '@/contexts/TransactionVerificationContext';
 import { useApp } from '@/contexts/AppContext';
 import { formatAddress } from '@/services/walletCrypto';
 
@@ -17,7 +18,7 @@ export default function WalletSecurityScreen() {
   const { colors } = useApp();
   const {
     securityLevel, hasBackedUp, walletKeys, setupStatus,
-    setupPin, removePin, enableBiometric, markBackedUp,
+    removePin, enableBiometric, markBackedUp,
     getMnemonic, resetWallet, lockWallet,
   } = useWalletSecurity();
 
@@ -25,6 +26,12 @@ export default function WalletSecurityScreen() {
   const [seedPhrase, setSeedPhrase] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [showPrivateKey, setShowPrivateKey] = useState(false);
+  const [phoneInput, setPhoneInput] = useState('');
+  const [showPhoneSetup, setShowPhoneSetup] = useState(false);
+  const {
+    is2FAEnabled, phoneNumber, isBiometricAvailable,
+    enable2FA, disable2FA,
+  } = useTransactionVerification();
 
   const handleRevealSeed = useCallback(async () => {
     if (showSeed) {
@@ -184,6 +191,90 @@ export default function WalletSecurityScreen() {
           </>
         )}
 
+        <Text style={[styles.sectionLabel, { color: colors.textSecondary }]}>TRANSACTION VERIFICATION</Text>
+        <View style={[styles.settingsCard, { backgroundColor: colors.surface }]}>
+          <TouchableOpacity style={styles.settingRow} onPress={() => {
+            Alert.alert('Biometric Verification', 'Face/fingerprint scan is required for every financial transaction.\n\nThis is always enabled for your security.');
+          }}>
+            <View style={[styles.settingIcon, { backgroundColor: '#2E86AB' + '15' }]}>
+              <ScanFace size={18} color="#2E86AB" />
+            </View>
+            <View style={styles.settingContent}>
+              <Text style={[styles.settingTitle, { color: colors.text }]}>Biometric Scan</Text>
+              <Text style={[styles.settingDesc, { color: colors.textSecondary }]}>
+                {isBiometricAvailable ? 'Required for all transactions' : 'Auto-approved on web'}
+              </Text>
+            </View>
+            <View style={[styles.secBadge, { backgroundColor: '#10B981' + '20' }]}>
+              <Text style={[styles.secBadgeText, { color: '#10B981' }]}>Active</Text>
+            </View>
+          </TouchableOpacity>
+          <View style={[styles.divider, { backgroundColor: colors.border }]} />
+          <TouchableOpacity style={styles.settingRow} onPress={() => {
+            if (is2FAEnabled) {
+              Alert.alert('Disable SMS 2FA?', 'Transactions will only require biometric verification.', [
+                { text: 'Cancel', style: 'cancel' },
+                { text: 'Disable', style: 'destructive', onPress: () => { disable2FA(); Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning); } },
+              ]);
+            } else {
+              setPhoneInput(phoneNumber || '');
+              setShowPhoneSetup(true);
+            }
+          }}>
+            <View style={[styles.settingIcon, { backgroundColor: '#00B88A' + '15' }]}>
+              <MessageSquare size={18} color="#00B88A" />
+            </View>
+            <View style={styles.settingContent}>
+              <Text style={[styles.settingTitle, { color: colors.text }]}>SMS 2FA</Text>
+              <Text style={[styles.settingDesc, { color: colors.textSecondary }]}>
+                {is2FAEnabled ? `Enabled • ${phoneNumber.slice(0, 4)}****${phoneNumber.slice(-2)}` : 'Add extra security layer'}
+              </Text>
+            </View>
+            <View style={[styles.secBadge, { backgroundColor: is2FAEnabled ? '#10B981' + '20' : '#F59E0B' + '20' }]}>
+              <Text style={[styles.secBadgeText, { color: is2FAEnabled ? '#10B981' : '#F59E0B' }]}>
+                {is2FAEnabled ? 'Active' : 'Off'}
+              </Text>
+            </View>
+          </TouchableOpacity>
+        </View>
+
+        {showPhoneSetup && (
+          <View style={[styles.settingsCard, { backgroundColor: colors.surface, padding: 16 }]}>
+            <Text style={[styles.settingTitle, { color: colors.text, marginBottom: 8 }]}>Enter Phone Number</Text>
+            <TextInput
+              style={[styles.phoneInput, { backgroundColor: colors.background, color: colors.text, borderColor: colors.border }]}
+              value={phoneInput}
+              onChangeText={setPhoneInput}
+              placeholder="+1 234 567 8900"
+              placeholderTextColor={colors.textTertiary}
+              keyboardType="phone-pad"
+              testID="phone-input"
+            />
+            <View style={styles.phoneActions}>
+              <TouchableOpacity
+                style={[styles.phoneBtn, { backgroundColor: colors.background }]}
+                onPress={() => setShowPhoneSetup(false)}
+              >
+                <Text style={[styles.phoneBtnText, { color: colors.textSecondary }]}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.phoneBtn, { backgroundColor: colors.primary }]}
+                onPress={() => {
+                  if (phoneInput.length >= 8) {
+                    enable2FA(phoneInput);
+                    setShowPhoneSetup(false);
+                    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+                  } else {
+                    Alert.alert('Invalid', 'Please enter a valid phone number.');
+                  }
+                }}
+              >
+                <Text style={[styles.phoneBtnText, { color: '#fff' }]}>Enable 2FA</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        )}
+
         <Text style={[styles.sectionLabel, { color: colors.textSecondary }]}>BACKUP</Text>
         <View style={[styles.settingsCard, { backgroundColor: colors.surface }]}>
           <TouchableOpacity style={styles.settingRow} onPress={handleRevealSeed}>
@@ -284,4 +375,8 @@ const styles = StyleSheet.create({
   copyRowText: { fontSize: 13, fontWeight: '600' as const },
   dangerBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, padding: 14, borderRadius: 12, borderWidth: 1 },
   dangerBtnText: { fontSize: 15, fontWeight: '600' as const },
+  phoneInput: { borderWidth: 1, borderRadius: 10, padding: 12, fontSize: 16, marginBottom: 12 },
+  phoneActions: { flexDirection: 'row', gap: 10 },
+  phoneBtn: { flex: 1, alignItems: 'center', paddingVertical: 10, borderRadius: 10 },
+  phoneBtnText: { fontSize: 14, fontWeight: '600' as const },
 });
